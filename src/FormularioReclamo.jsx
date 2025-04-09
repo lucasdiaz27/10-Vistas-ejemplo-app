@@ -70,7 +70,7 @@ const FormularioReclamo = () => {
 */
 import React, { useState } from 'react';
 
-const FormularioReclamo = () => {
+export const FormularioReclamo = () => {
   // Estados de los campos
   const [formData, setFormData] = useState({
     nombre: '',

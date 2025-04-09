@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-function inicio() {
+export const Inicio = () => {
   const navigate = useNavigate();
 
   const irAlFormulario = () => {
@@ -21,6 +21,4 @@ function inicio() {
       </div>
     </div>
   );
-}
-
-export default inicio;
+};
