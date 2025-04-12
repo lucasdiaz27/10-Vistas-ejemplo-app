@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { FormPersona } from "../components/FormPersona";
 import { FormObjeto } from "../components/FormObjeto";
+import { useForm } from "react-hook-form";
+import { data } from "react-router-dom";
 
 export const Formulario = () => {
   const [formularioEnviado, setFormularioEnviado] = useState(false);
+  const { register, handleSubmit } = useForm();
 
   return (
     <div className="bg-light min-vh-100 py-5">
@@ -17,33 +20,38 @@ export const Formulario = () => {
         <p className="text-center">
           Completar Formulario con los siguientes datos:
         </p>
-        <div className="row">
-          <div className="col-6">
-            <FormPersona tipoPersona={"Denunciante"} />
+        <form
+          onSubmit={handleSubmit((data) => {
+            console.log("Esta es la data:", data);
+          })}
+        >
+          <div className="row">
+            <div className="col-6">
+              <FormPersona register={register} tipoPersona={"Denunciante"} />
+            </div>
+            <div className={"col-6"}>
+              <FormPersona register={register} tipoPersona={"Denunciado"} />
+            </div>
           </div>
-          <div className={"col-6"}>
-            <FormPersona tipoPersona={"Denunciado"} />
-          </div>
-        </div>
 
-        <div className="row">
-          <div className={"col-6"}>
-            <FormPersona tipoPersona={"Técnico"} />
+          <div className="row">
+            <div className={"col-6"}>
+              <FormPersona register={register} tipoPersona={"Técnico"} />
+            </div>
+            <div className={"col-6"}>
+              <FormObjeto />
+            </div>
           </div>
-          <div className={"col-6"}>
-            <FormObjeto />
-          </div>
-        </div>
 
-        <div className="text-center ">
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={() => setFormularioEnviado(true)}
-          >
-            Enviar formulario
-          </button>
-        </div>
+          <div className="text-center ">
+            <button
+              type="submit"
+              className="btn btn-success"
+            >
+              Enviar formulario
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
