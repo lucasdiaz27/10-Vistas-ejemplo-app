@@ -39,7 +39,7 @@ export const Formulario = () => {
               <FormPersona register={register} tipoPersona={"Técnico"} />
             </div>
             <div className={"col-6"}>
-              <FormObjeto />
+              <FormObjeto register={register} />
             </div>
           </div>
 
