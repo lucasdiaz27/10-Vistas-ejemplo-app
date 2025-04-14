@@ -16,7 +16,7 @@ export const FormPersona = ({tipoPersona, register}) => {
               className="form-control"
               id="nombre"
               placeholder="Ingrese el nombre o razón social"
-              {...register("nombre")}
+              {...register(`${tipoPersona}.nombre`)}
             />
           </div>
           <div className="mb-3">
@@ -28,7 +28,7 @@ export const FormPersona = ({tipoPersona, register}) => {
               className="form-control"
               id="dni"
               placeholder="Ingrese DNI o CUIT"
-              {...register("dni")}
+              {...register(`${tipoPersona}.dni`)}
             />
           </div>
           <div className="mb-3">
@@ -40,7 +40,7 @@ export const FormPersona = ({tipoPersona, register}) => {
               className="form-control"
               id="domicilio"
               placeholder="Ingrese el domicilio"
-              {...register("domicilio")}
+              {...register(`${tipoPersona}.domicilio`)}
             />
           </div>
           <div className="mb-3">
@@ -52,7 +52,7 @@ export const FormPersona = ({tipoPersona, register}) => {
               className="form-control"
               id="localidad"
               placeholder="Ingrese la localidad"
-              {...register("localidad")}
+              {...register(`${tipoPersona}.localidad`)}
             />
           </div>
           <div className="mb-3">
@@ -64,7 +64,7 @@ export const FormPersona = ({tipoPersona, register}) => {
               className="form-control"
               id="cp"
               placeholder="Ingrese el código postal"
-              {...register("cp")}
+              {...register(`${tipoPersona}.cp`)}
             />
           </div>
           <div className="mb-3">
@@ -76,7 +76,7 @@ export const FormPersona = ({tipoPersona, register}) => {
               className="form-control"
               id="telefono"
               placeholder="Ingrese el teléfono"
-              {...register("telefono")}
+              {...register(`${tipoPersona}.telefono`)}
             />
           </div>
           <div className="mb-3">
@@ -88,7 +88,7 @@ export const FormPersona = ({tipoPersona, register}) => {
               className="form-control"
               id="email"
               placeholder="Ingrese el email"
-              {...register("email")}
+              {...register(`${tipoPersona}.email`)}
             />
           </div>
           <div className="mb-3">
@@ -100,7 +100,7 @@ export const FormPersona = ({tipoPersona, register}) => {
               className="form-control"
               id="fax"
               placeholder="Ingrese el fax"
-              {...register("fax")}
+              {...register(`${tipoPersona}.fax`)}
             />
           </div>
         </div>
