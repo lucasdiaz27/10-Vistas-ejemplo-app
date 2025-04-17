@@ -135,4 +135,4 @@ export const Inicio = () => {
   );
 }
 
-export default inicio;
+export default Inicio;
