@@ -3,9 +3,6 @@ import { useNavigate } from "react-router-dom";
 export const Inicio = () => {
   const navigate = useNavigate();
 
-  const irAlFormulario = () => {
-    navigate("/formulario"); // Redirige al componente Formulario
-  };
 
   return (
     <div className="container text-center mt-5">
@@ -15,10 +12,12 @@ export const Inicio = () => {
         <p className="mb-4">Sistema Interno de Traspasos y Expedientes</p>
 
         {/* Boton para ir al formulario */}
-        <button onClick={irAlFormulario} className="btn btn-primary">
+        <button onClick={() => navigate("/formulario")} className="btn btn-primary">
           Ir al Formulario
         </button>
       </div>
     </div>
   );
-};
+}
+
+export default inicio;
