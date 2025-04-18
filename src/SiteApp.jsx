@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from './components/NavBar';
-import { Formulario } from './pages/Formulario'
-import { Inicio } from "./pages/inicio";
 import { FormPersona } from "./components/FormPersona";
 import Consulta from "./pages/consulta";
+import { Formulario } from "./pages/formulario";
+import Inicio from "./pages/inicio";
 
 function SiteApp() {
   return (

@@ -16,10 +16,7 @@ export const NavBar = () =>{
     <div className="collapse navbar-collapse" id="navbarNav">
       <ul className="navbar-nav mx-auto">
         <li className="nav-item me-5">
-          <a className="nav-link" aria-current="page" href="#">Mis trámites</a>
-        </li>
-        <li className="nav-item me-5">
-          <a className="nav-link" href="#">Requisitos</a>
+          <a className="nav-link" aria-current="page" href="#">Inicio</a>
         </li>
         <li className="nav-item me-5">
         <Link className="nav-link" to="/consulta">Consultas</Link>

@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Inicio = () => {
   const navigate = useNavigate();
-
+  // A la parte de SITE dividila en un componente y a Consulta tu expediente
   return (
     <div className="container-fluid px-0">
       
@@ -52,7 +52,7 @@ export const Inicio = () => {
             </p>
           </div>
 
-          {/* Columna derecha: acordeón */}
+          {/* Columna derecha: acordeón // Esto puede ser un componente a futuro*/ } 
           <div className="col-md-5">
             <div
               className="accordion p-3 border rounded"
