@@ -27,7 +27,7 @@ export const NavBar = () =>{
       </ul>
       <ul className="navbar-nav ms-auto">
         <li className="nav-item">
-          <a className="nav-link" href="#">Cerrar Sesión</a>
+          <Link className="nav-link" to="login">Iniciar Sesión</Link>
         </li>
       </ul>
     </div>

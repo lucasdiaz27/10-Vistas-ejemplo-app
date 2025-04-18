@@ -4,6 +4,7 @@ import { FormPersona } from "./components/FormPersona";
 import Consulta from "./pages/consulta";
 import { Formulario } from "./pages/formulario";
 import Inicio from "./pages/inicio";
+import Login from "./pages/Login";
 
 function SiteApp() {
   return (
@@ -15,6 +16,8 @@ function SiteApp() {
         <Route path="/formulario" element={<Formulario />} />
         <Route path="/formularioPersona" element={<FormPersona />} />
         <Route path="/consulta" element={<Consulta />} />
+        <Route path="/login" element={<Login />} />
+
       </Routes>
 
     </Router>
