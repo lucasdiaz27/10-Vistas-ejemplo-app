@@ -19,7 +19,7 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               {...register(`${tipoPersona}.nombre`)}
             />
             {
-                errors?.[tipoPersona]?.nombre?.message && <p>{errors[tipoPersona].nombre.message}</p> // Aquí pregunta si hay un error sobre cada tipo de persona y en cada atributo. Esto lo debes poner en todos
+                errors?.[tipoPersona]?.nombre?.message && <p className="text-danger">{errors[tipoPersona].nombre.message}</p> // Aquí pregunta si hay un error sobre cada tipo de persona y en cada atributo. Esto lo debes poner en todos
             }
           </div>
           <div className="mb-3">
@@ -34,7 +34,7 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               {...register(`${tipoPersona}.dni`)}
             />
             {
-                errors?.[tipoPersona]?.dni?.message && <p>{errors[tipoPersona].dni.message}</p> // Ves, aquí va lo mismo pero con dni
+                errors?.[tipoPersona]?.dni?.message && <p className="text-danger">{errors[tipoPersona].dni.message}</p> // Ves, aquí va lo mismo pero con dni
             }
           </div>
           <div className="mb-3">
@@ -48,6 +48,9 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               placeholder="Ingrese el domicilio"
               {...register(`${tipoPersona}.domicilio`)}
             />
+            {
+                errors?.[tipoPersona]?.domicilio?.message && <p className="text-danger">{errors[tipoPersona].domicilio.message}</p> 
+            }
           </div>
           <div className="mb-3">
             <label htmlFor="localidad" className="form-label">
@@ -60,6 +63,9 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               placeholder="Ingrese la localidad"
               {...register(`${tipoPersona}.localidad`)}
             />
+            {
+                errors?.[tipoPersona]?.localidad?.message && <p className="text-danger">{errors[tipoPersona].localidad.message}</p> 
+            }
           </div>
           <div className="mb-3">
             <label htmlFor="cp" className="form-label">
@@ -72,6 +78,9 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               placeholder="Ingrese el código postal"
               {...register(`${tipoPersona}.cp`)}
             />
+            {
+                errors?.[tipoPersona]?.cp?.message && <p className="text-danger">{errors[tipoPersona].cp.message}</p> 
+            }
           </div>
           <div className="mb-3">
             <label htmlFor="telefono" className="form-label">
@@ -84,6 +93,9 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               placeholder="Ingrese el teléfono"
               {...register(`${tipoPersona}.telefono`)}
             />
+            {
+                errors?.[tipoPersona]?.telefono?.message && <p className="text-danger">{errors[tipoPersona].telefono.message}</p> 
+            }
           </div>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
@@ -96,6 +108,9 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               placeholder="Ingrese el email"
               {...register(`${tipoPersona}.email`)}
             />
+            {
+                errors?.[tipoPersona]?.email?.message && <p className="text-danger">{errors[tipoPersona].email.message}</p> 
+            }
           </div>
           <div className="mb-3">
             <label htmlFor="fax" className="form-label">
@@ -108,6 +123,9 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               placeholder="Ingrese el fax"
               {...register(`${tipoPersona}.fax`)}
             />
+            {
+                errors?.[tipoPersona]?.fax?.message && <p className="text-danger">{errors[tipoPersona].fax.message}</p> 
+            }
           </div>
         </div>
       </div>
