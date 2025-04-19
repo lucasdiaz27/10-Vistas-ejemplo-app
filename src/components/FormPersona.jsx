@@ -1,6 +1,6 @@
 import React from "react";
 
-export const FormPersona = ({tipoPersona, register}) => {
+export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos la propiedad errors
   return (
     <>
       <div className="mb-4">
@@ -18,6 +18,9 @@ export const FormPersona = ({tipoPersona, register}) => {
               placeholder="Ingrese el nombre o razón social"
               {...register(`${tipoPersona}.nombre`)}
             />
+            {
+                errors?.[tipoPersona]?.nombre?.message && <p>{errors[tipoPersona].nombre.message}</p> // Aquí pregunta si hay un error sobre cada tipo de persona y en cada atributo. Esto lo debes poner en todos
+            }
           </div>
           <div className="mb-3">
             <label htmlFor="dni" className="form-label">
@@ -30,6 +33,9 @@ export const FormPersona = ({tipoPersona, register}) => {
               placeholder="Ingrese DNI o CUIT"
               {...register(`${tipoPersona}.dni`)}
             />
+            {
+                errors?.[tipoPersona]?.dni?.message && <p>{errors[tipoPersona].dni.message}</p> // Ves, aquí va lo mismo pero con dni
+            }
           </div>
           <div className="mb-3">
             <label htmlFor="domicilio" className="form-label">
