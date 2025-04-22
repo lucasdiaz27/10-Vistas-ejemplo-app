@@ -30,8 +30,14 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               type="number"
               className="form-control"
               id="dni"
+              min={0}
               placeholder="Ingrese DNI o CUIT"
               {...register(`${tipoPersona}.dni`)}
+              onKeyDown={(e) => {
+                if(e.key === '-' || e.key === 'e') {
+                  e.preventDefault();
+                }
+              }}
             />
             {
                 errors?.[tipoPersona]?.dni?.message && <p className="text-danger">{errors[tipoPersona].dni.message}</p> // Ves, aquí va lo mismo pero con dni
@@ -72,9 +78,10 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               Código postal
             </label>
             <input
-              type="number"
+              type="text"
               className="form-control"
               id="cp"
+              min={0}
               placeholder="Ingrese el código postal"
               {...register(`${tipoPersona}.cp`)}
             />
@@ -90,6 +97,7 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               type="number"
               className="form-control"
               id="telefono"
+              min={0}
               placeholder="Ingrese el teléfono"
               {...register(`${tipoPersona}.telefono`)}
             />
@@ -121,6 +129,7 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="fax"
               placeholder="Ingrese el fax"
+              min={0}
               {...register(`${tipoPersona}.fax`)}
             />
             {
