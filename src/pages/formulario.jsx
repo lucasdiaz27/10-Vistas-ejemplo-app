@@ -49,7 +49,7 @@ export const Formulario = () => {
               <FormPersona register={register} errors={errors} tipoPersona={"Técnico"} />
             </div>
             <div className={"col-6"}>
-              <FormObjeto register={register} />
+              <FormObjeto errors={errors} register={register} />
             </div>
           </div>
 

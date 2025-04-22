@@ -37,4 +37,6 @@ export const denunciaSchema = z.object({ // Este es el que se exporta
     Denunciante: personaSchema,
     Denunciado: personaSchema,
     Técnico: personaSchema,
+    motivo: z.array(z.string()).min(1, { message: "El objeto es requerido" }), // Aquí le pasas el array de motivos y le pones que sea requerido
+    objeto: z.array(z.string()).min(1, { message: "El objeto es requerido" }), // Aquí le pasas el array de objetos y le pones que sea requerido
 });

@@ -1,6 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
+import { useForm } from "react-hook-form";
+import { denunciaSchema } from "../validations/denunciaSchma";
 
-export const FormCheckBox = ({ register }) => {
+export const FormCheckBox = ({ register, errors }) => {
   const objeto = [
     "Cambio de producto",
     "Bonificación",
@@ -32,7 +35,7 @@ export const FormCheckBox = ({ register }) => {
               className="form-check-input"
               type="checkbox"
               id={element}
-              {...register("objeto")}
+              {...register("objeto", {required: true})}
               value={element}
             />
             <label className="form-check-label" htmlFor={element}>
@@ -40,6 +43,11 @@ export const FormCheckBox = ({ register }) => {
             </label>
           </div>
         ))}
+        {
+          errors.objeto?.message && (
+            <p className="text-danger">{errors.objeto?.message}</p>
+          ) // Aquí pregunta si hay un error sobre cada tipo de persona y en cada atributo. Esto lo debes poner en todos
+        }
       </div>
 
       <div className="bg-white rounded shadow p-2">
@@ -50,7 +58,7 @@ export const FormCheckBox = ({ register }) => {
               className="form-check-input"
               type="checkbox"
               id={element}
-              {...register("motivo")}
+              {...register("motivo", {required: true})}
               value={element}
             />
             <label className="form-check-label" htmlFor={element}>
@@ -58,8 +66,13 @@ export const FormCheckBox = ({ register }) => {
             </label>
           </div>
         ))}
-      </div>
 
+        {
+          errors.objeto?.message && (
+            <p className="text-danger">{errors.motivo?.message}</p>
+          ) // Aquí pregunta si hay un error sobre cada tipo de persona y en cada atributo. Esto lo debes poner en todos
+        }
+      </div>
     </>
   );
 };
