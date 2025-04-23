@@ -3,7 +3,7 @@ import NavBar from "./components/NavBar";
 import Footer from "./components/Footer/Footer";
 import { Formulario } from "./pages/Formulario";
 import { Inicio } from "./pages/inicio";
-import { FormPersona } from "./components/FormPersona";
+import { FormPersona } from "./components/formulario-denuncia/FormPersona";
 import Consulta from "./pages/consulta";
 import Login from "./pages/Login";
 

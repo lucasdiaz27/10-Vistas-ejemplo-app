@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { FormPersona } from "../components/FormPersona";
-import { FormObjeto } from "../components/FormObjeto";
+import { FormPersona } from "../components/formulario-denuncia/FormPersona";
+import { FormObjeto } from "../components/formulario-denuncia/FormObjeto";
 import { useForm } from "react-hook-form";
 import { data } from "react-router-dom";
 

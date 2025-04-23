@@ -20,7 +20,7 @@ export const BienvenidoSite = () => {
           position: "absolute",
           height: "300px",
           width: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.3)", // capa negra con opacidad
+          backgroundColor: "rgba(0, 0, 0, 0.5)", // capa negra con opacidad
           zIndex: 1,
         }}
       />
