@@ -40,6 +40,20 @@ export const Formulario = () => {
             </div>
             <div className={"col-6"}>
               <FormObjeto register={register} />
+              
+              <label className="form-label" htmlFor="">Descripción</label>
+              <textarea
+                className="form-control"
+                {...register("descripcion")}
+                rows={5}
+                placeholder="Descripción de la denuncia"
+                />
+                <label for="formFileMultiple" className="form-label">Multiple files input example</label>
+                <input className="form-control" type="file" id="formFileMultiple" multiple/>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-6">
             </div>
           </div>
 

@@ -4,7 +4,7 @@ export const NavBar = () => {
   return (
     <>
       <nav
-        className="navbar navbar-expand-lg bg-primary"
+        className="navbar sticky-top navbar-expand-lg bg-primary"
         data-bs-theme="dark"
         style={{ height: "60px" }}
       >
