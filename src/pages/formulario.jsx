@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FormPersona } from "../components/formulario-denuncia/FormPersona";
 import { FormObjeto } from "../components/formulario-denuncia/FormObjeto";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod"
+import { zodResolver } from "@hookform/resolvers/zod";
 import { data } from "react-router-dom";
 import { denunciaSchema } from "../validations/denunciaSchma";
 
@@ -10,17 +10,28 @@ export const Formulario = () => {
   const [formularioEnviado, setFormularioEnviado] = useState(false);
 
   /* formState errors trae los errores (si es que hay), de cada fieldValue o input por así decirlo,  */
-  const { register, handleSubmit, formState: {errors}, watch } = useForm({ 
-    resolver: zodResolver(denunciaSchema) // Aquí le pasas el schema del cual se va a basar para resolver los errores (o eso entendí yo). Si pones el clic sobre resolver y denunciaSchema vas a ver
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm({
+    resolver: zodResolver(denunciaSchema), // Aquí le pasas el schema del cual se va a basar para resolver los errores (o eso entendí yo). Si pones el clic sobre resolver y denunciaSchema vas a ver
   });
-  console.log(errors) // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
+  console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
 
   return (
     <div className="bg-light min-vh-100 py-5">
       <div className="container ">
-            <div>
-              {JSON.stringify(watch(), null, 2) /* A esto borralo cuando quieras, es para que se vean todos los campos nomas. */ }
-            </div>
+        <div>
+          {
+            JSON.stringify(
+              watch(),
+              null,
+              2
+            ) /* A esto borralo cuando quieras, es para que se vean todos los campos nomas. */
+          }
+        </div>
         <h2 className="text-center mb-4">Formulario de Expedientes</h2>
         {formularioEnviado && (
           <div className="alert alert-success text-center" role="alert">
@@ -37,19 +48,42 @@ export const Formulario = () => {
         >
           <div className="row">
             <div className="col-6">
-              <FormPersona register={register} errors={errors} tipoPersona={"Denunciante"} /> {/* Pasa el valor errors para el FormPersona así pilla de ahí los errores */}
+              <FormPersona
+                register={register}
+                errors={errors}
+                tipoPersona={"Denunciante"}
+              />{" "}
+              {/* Pasa el valor errors para el FormPersona así pilla de ahí los errores */}
             </div>
             <div className={"col-6"}>
-              <FormPersona register={register} errors={errors} tipoPersona={"Denunciado"} />
+              <FormPersona
+                register={register}
+                errors={errors}
+                tipoPersona={"Denunciado"}
+              />
             </div>
           </div>
 
           <div className="row">
             <div className={"col-6"}>
-              <FormPersona register={register} errors={errors} tipoPersona={"Técnico"} />
+              <FormPersona
+                register={register}
+                errors={errors}
+                tipoPersona={"Técnico"}
+              />
             </div>
             <div className={"col-6"}>
               <FormObjeto errors={errors} register={register} />
+
+              <label className="form-label" htmlFor="">
+                Descripción
+              </label>
+              <textarea
+                className="form-control col-6"
+                {...register("descripcion")}
+                rows={5}
+                placeholder="Descripción de la denuncia"
+              />
             </div>
           </div>
           <div className="row">

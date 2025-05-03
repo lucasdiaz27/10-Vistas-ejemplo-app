@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { denunciaSchema } from "../validations/denunciaSchma";
+import { denunciaSchema } from "../../validations/denunciaSchma";
 
 export const FormCheckBox = ({ register, errors }) => {
   const objeto = [
