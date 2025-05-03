@@ -1,11 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer/Footer";
-import { Formulario } from "./pages/Formulario";
+import { Formulario } from "./pages/formulario";
 import { Inicio } from "./pages/inicio";
 import { FormPersona } from "./components/formulario-denuncia/FormPersona";
 import Consulta from "./pages/consulta";
 import Login from "./pages/Login";
+import MenuInterno from "./pages/MenuInterno";
+
 
 function SiteApp() {
   return (
@@ -19,6 +21,9 @@ function SiteApp() {
             <Route path="/formularioPersona" element={<FormPersona />} />
             <Route path="/consulta" element={<Consulta />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/menu-interno" element={<MenuInterno />} />
+
+
           </Routes>
         </main>
         <Footer />

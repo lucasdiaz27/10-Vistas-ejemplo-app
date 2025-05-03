@@ -25,11 +25,7 @@ export const Formulario = () => {
       <div className="container ">
         <div>
           {
-            JSON.stringify(
-              watch(),
-              null,
-              2
-            ) /* A esto borralo cuando quieras, es para que se vean todos los campos nomas. */
+             /* A esto borralo cuando quieras, es para que se vean todos los campos nomas. */
           }
         </div>
         <h2 className="text-center mb-4">Formulario de Expedientes</h2>
@@ -105,5 +101,7 @@ export const Formulario = () => {
         </form>
       </div>
     </div>
+
+    
   );
 };
