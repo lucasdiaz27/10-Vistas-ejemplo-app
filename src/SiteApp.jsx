@@ -7,27 +7,76 @@ import { FormPersona } from "./components/formulario-denuncia/FormPersona";
 import Consulta from "./pages/consulta";
 import Login from "./pages/Login";
 import MenuInterno from "./pages/MenuInterno";
-
+import NavBarInterno from "./components/NavBarInterno";
 
 function SiteApp() {
   return (
     <Router>
-      <div className="d-flex flex-column min-vh-100">
-        <NavBar />
-        <main className="flex-grow-1">
-          <Routes>
-            <Route path="/" element={<Inicio />} />
-            <Route path="/formulario" element={<Formulario />} />
-            <Route path="/formularioPersona" element={<FormPersona />} />
-            <Route path="/consulta" element={<Consulta />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/menu-interno" element={<MenuInterno />} />
+      <Routes>
+        {/* Páginas normales con NavBar y Footer */}
+        <Route
+          path="/"
+          element={
+            <>
+              <NavBar />
+              <Inicio />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/formulario"
+          element={
+            <>
+              <NavBar />
+              <Formulario />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/formularioPersona"
+          element={
+            <>
+              <NavBar />
+              <FormPersona />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/consulta"
+          element={
+            <>
+              <NavBar />
+              <Consulta />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <>
+              <NavBar />
+              <Login />
+              <Footer />
+            </>
+          }
+        />
 
-
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+        {/* Paginas Internos con NavBarInterno */}
+        <Route
+          path="/menu-interno"
+          element={
+            <>
+              <NavBarInterno />
+              <MenuInterno />
+              {/* Aqui podria ir otro footer */}
+            </>
+          }
+        />
+      </Routes>
     </Router>
   );
 }

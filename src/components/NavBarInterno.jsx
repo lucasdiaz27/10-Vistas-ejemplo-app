@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export const NavBar = () => {
+export const NavBarInterno = () => {
   return (
     <>
       <nav
@@ -10,7 +10,7 @@ export const NavBar = () => {
       >
         <div className="container-fluid">
           <Link
-            to="/"
+            to="/menu-interno"
             className="navbar-brand d-flex align-items-center"
             style={{ height: "60px" }}
           >
@@ -34,25 +34,40 @@ export const NavBar = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mx-auto">
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/">
-                  Inicio
+                <Link className="nav-link" to="/menu-interno">
+                  Mesa de Entrada
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/consulta">
-                  Consultas
+                <Link className="nav-link" to="">
+                  Pases
+                </Link>
+              </li>
+              <li className="nav-item me-5">
+                <Link className="nav-link" to="">
+                  Expedientes
+                </Link>
+              </li>
+              <li className="nav-item me-5">
+                <Link className="nav-link" to="">
+                  Completar Formulario
+                </Link>
+              </li>
+              <li className="nav-item me-5">
+                <Link className="nav-link" to="">
+                  Usuarios
                 </Link>
               </li>
               <li className="nav-item ">
-                <Link className="nav-link" to="/formulario">
-                  Formulario
+                <Link className="nav-link" to="">
+                  Ajustes
                 </Link>
               </li>
             </ul>
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
                 <Link className="nav-link" to="/login">
-                  Iniciar Sesión
+                  Cerrar Sesión
                 </Link>
               </li>
             </ul>
@@ -63,4 +78,4 @@ export const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default NavBarInterno;
