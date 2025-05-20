@@ -6,18 +6,12 @@ import Expedientetabla from "../components/Expedientetabla";
 const MenuInterno = () => {
   const location = useLocation();
   const [vista, setVista] = useState(null);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const vistaParam = params.get("vista");
-    setVista(vistaParam);
-  }, [location]);
-
-  const expedientes = [
+  const [busqueda, setBusqueda] = useState("");
+  const [expedientes, setExpedientes] = useState([
     {
       id: 1,
       nroOrden: "001",
-      nombre: "Juan Pérez",
+      nombre: "Luma Perez",
       tipoDocumento: "Reclamo",
       dni: "12345678",
       fechaIngreso: "2025-05-19",
@@ -26,7 +20,7 @@ const MenuInterno = () => {
     {
       id: 2,
       nroOrden: "002",
-      nombre: "Ana Gómez",
+      nombre: "Ale React",
       tipoDocumento: "Denuncia",
       dni: "23456789",
       fechaIngreso: "2025-05-18",
@@ -35,43 +29,75 @@ const MenuInterno = () => {
     {
       id: 3,
       nroOrden: "003",
-      nombre: "Lucas Díaz",
+      nombre: "Lucas Diaz",
       tipoDocumento: "Reclamo",
       dni: "34567890",
       fechaIngreso: "2025-05-17",
       estado: "Aprobado",
     },
-  ];
+  ]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const vistaParam = params.get("vista");
+    setVista(vistaParam);
+  }, [location]);
+
+  //  Cambia estado de un expediente
+  const cambiarEstado = (id) => {
+    const nuevos = expedientes.map((exp) => {
+      if (exp.id === id) {
+        let nuevoEstado = "Pendiente";
+        if (exp.estado === "Pendiente") nuevoEstado = "En proceso";
+        else if (exp.estado === "En proceso") nuevoEstado = "Aprobado";
+        else if (exp.estado === "Aprobado") nuevoEstado = "Pendiente";
+
+        return { ...exp, estado: nuevoEstado };
+      }
+      return exp;
+    });
+
+    setExpedientes(nuevos);
+  };
+
+  //  Filtro general (por nombre, estado, nroOrden o dni)
+  const texto = busqueda.toLowerCase();
+  const expedientesFiltrados = expedientes.filter((exp) => {
+    return (
+      exp.nroOrden.toLowerCase().includes(texto) ||
+      exp.dni.toLowerCase().includes(texto) ||
+      exp.nombre.toLowerCase().includes(texto) ||
+      exp.estado.toLowerCase().includes(texto)
+    );
+  });
 
   return (
     <div className="container mt-4">
       <h2>Panel Interno</h2>
 
-      {/* Vista dinámica según parámetro en URL */}
       {vista === "mesa-entrada" && (
         <>
           {/* Buscador */}
           <div className="mb-4">
-            <h4>Buscar solicitud</h4>
-            <p>Ingresá número de solicitud para buscar formulario</p>
+            <h4>Buscar solicitudes</h4>
+            <p>Filtrá por nombre, estado, número o DNI</p>
             <input
               type="text"
-              placeholder="Número de formulario"
-              className="form-control d-inline-block me-2"
-              style={{ width: "200px" }}
-            />
-            <input
-              type="text"
-              placeholder="DNI"
-              className="form-control d-inline-block"
-              style={{ width: "200px" }}
+              placeholder="Buscar..."
+              className="form-control"
+              style={{ width: "300px" }}
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
             />
           </div>
 
-          {/* Tabla de expedientes */}
-          <Expedientetabla expedientes={expedientes} />
+          {/* Tabla filtrada */}
+          <Expedientetabla
+            expedientes={expedientesFiltrados}
+            cambiarEstado={cambiarEstado}
+          />
 
-          {/* Tabla fija de prueba */}
+          {/* Tabla fija de pruebas */}
           <div className="mt-5">
             <h4>Tabla fija de pruebas</h4>
             <table className="table table-bordered table-hover">
