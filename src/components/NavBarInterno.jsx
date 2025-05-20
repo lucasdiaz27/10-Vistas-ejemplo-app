@@ -34,32 +34,33 @@ export const NavBarInterno = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mx-auto">
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/menu-interno">
-                  Mesa de Entrada
-                </Link>
+                <Link className="nav-link" to="/menu-interno?vista=mesa-entrada">
+  Mesa de Entrada
+</Link>
+
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="">
+                <Link className="nav-link" to="/menu-interno?vista=pases">
                   Pases
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="">
+                <Link className="nav-link" to="/menu-interno?vista=expedientes">
                   Expedientes
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="">
+                <Link className="nav-link" to="/menu-interno?vista=completar-formulario">
                   Completar Formulario
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="">
+                <Link className="nav-link" to="/menu-interno?vista=usuarios">
                   Usuarios
                 </Link>
               </li>
               <li className="nav-item ">
-                <Link className="nav-link" to="">
+                <Link className="nav-link" to="/menu-interno?vista=ajustes">
                   Ajustes
                 </Link>
               </li>
