@@ -34,28 +34,22 @@ export const NavBar = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mx-auto">
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/">
+                <Link className="nav-link text-white fw-semibold" to="/">
                   Inicio
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/consulta">
+                <Link className="nav-link text-white fw-semibold" to="/consulta">
                   Consultas
                 </Link>
               </li>
               <li className="nav-item ">
-                <Link className="nav-link" to="/formulario">
+                <Link className="nav-link text-white fw-semibold" to="/formulario">
                   Formulario
                 </Link>
               </li>
             </ul>
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
-                  Iniciar Sesión
-                </Link>
-              </li>
-            </ul>
+           
           </div>
         </div>
       </nav>
@@ -64,3 +58,4 @@ export const NavBar = () => {
 };
 
 export default NavBar;
+
