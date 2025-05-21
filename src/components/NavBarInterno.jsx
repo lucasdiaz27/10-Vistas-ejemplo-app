@@ -11,7 +11,7 @@ export const NavBarInterno = () => {
         <div className="container-fluid">
           <Link
             to="/menu-interno"
-            className="navbar-brand d-flex align-items-center"
+            className="navbar-brand d-flex align-items-center "
             style={{ height: "60px" }}
           >
             <img
@@ -34,40 +34,40 @@ export const NavBarInterno = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav mx-auto">
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/menu-interno?vista=mesa-entrada">
+                <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=mesa-entrada">
   Mesa de Entrada
 </Link>
 
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/menu-interno?vista=pases">
+                <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=pases">
                   Pases
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/menu-interno?vista=expedientes">
+                <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=expedientes">
                   Expedientes
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/menu-interno?vista=completar-formulario">
+                <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=completar-formulario">
                   Completar Formulario
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link" to="/menu-interno?vista=usuarios">
+                <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=usuarios">
                   Usuarios
                 </Link>
               </li>
               <li className="nav-item ">
-                <Link className="nav-link" to="/menu-interno?vista=ajustes">
+                <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=ajustes">
                   Ajustes
                 </Link>
               </li>
             </ul>
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <Link className="nav-link" to="/login">
+                <Link className="nav-link text-white fw-semibold" to="/login">
                   Cerrar Sesión
                 </Link>
               </li>

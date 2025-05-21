@@ -20,6 +20,11 @@ export const Footer = () => {
                             <li className="font-weight-bold mb-1">25 de Mayo 35 CP (4200)</li>
                             <li className="font-weight-bold mb-1">(0385) 4211062 / 4218461 / 0800 888 3030</li>
                             <li className="font-weight-bold mb-1">Email: areacomerciosde@hotmail.com</li>
+                            <li className="nav-item">
+                <Link className="nav-link" to="/login">
+                <button type="submit" className="btn btn-outline-light">Personal</button>
+                </Link>
+              </li>
                         </ul>
                         </div>
                     </div>
