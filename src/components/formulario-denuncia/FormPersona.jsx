@@ -1,6 +1,7 @@
 import React from "react";
 
-export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos la propiedad errors
+export const FormPersona = ({ tipoPersona, register, errors, index }) => {
+  // Agregamos la propiedad errors
   return (
     <>
       <div className="mb-4">
@@ -16,10 +17,14 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="nombre"
               placeholder="Ingrese el nombre o razón social"
-              {...register(`${tipoPersona}.nombre`)}
+              {...register(`personas.${index}.persona.nombre`)}
             />
             {
-                errors?.[tipoPersona]?.nombre?.message && <p className="text-danger">{errors[tipoPersona].nombre.message}</p> // Aquí pregunta si hay un error sobre cada tipo de persona y en cada atributo. Esto lo debes poner en todos
+              errors?.personas?.[index]?.persona?.nombre?.message && (
+                <p className="text-danger">
+                  {errors.personas[index].persona.nombre.message}
+                </p>
+              ) // Aquí pregunta si hay un error sobre cada tipo de persona y en cada atributo. Esto lo debes poner en todos
             }
           </div>
           <div className="mb-3">
@@ -31,11 +36,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="apellido"
               placeholder="Ingrese el apellido"
-              {...register(`${tipoPersona}.apellido`)}
+              {...register(`personas.${index}.persona.apellido`)}
             />
-            {
-                errors?.[tipoPersona]?.apellido?.message && <p className="text-danger">{errors[tipoPersona].apellido.message}</p>
-            }
+            {errors?.personas?.[index]?.persona?.apellido?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.apellido.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <label htmlFor="dni" className="form-label">
@@ -47,15 +54,19 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               id="dni"
               min={0}
               placeholder="Ingrese DNI o CUIT"
-              {...register(`${tipoPersona}.dni`)}
+              {...register(`personas.${index}.persona.documento`)}
               onKeyDown={(e) => {
-                if(e.key === '-' || e.key === 'e') {
+                if (e.key === "-" || e.key === "e") {
                   e.preventDefault();
                 }
               }}
             />
             {
-                errors?.[tipoPersona]?.dni?.message && <p className="text-danger">{errors[tipoPersona].dni.message}</p> // Ves, aquí va lo mismo pero con dni
+              errors?.personas?.[index]?.persona?.documento?.message && (
+                <p className="text-danger">
+                  {errors.personas[index].persona.documento.message}
+                </p>
+              ) // Ves, aquí va lo mismo pero con dni
             }
           </div>
           <div className="mb-3">
@@ -67,11 +78,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="domicilio"
               placeholder="Ingrese el domicilio"
-              {...register(`${tipoPersona}.domicilio`)}
+              {...register(`personas.${index}.persona.domicilio`)}
             />
-            {
-                errors?.[tipoPersona]?.domicilio?.message && <p className="text-danger">{errors[tipoPersona].domicilio.message}</p> 
-            }
+            {errors?.personas?.[index]?.persona?.domicilio?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.domicilio.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <label htmlFor="localidad" className="form-label">
@@ -82,11 +95,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="localidad"
               placeholder="Ingrese la localidad"
-              {...register(`${tipoPersona}.localidad`)}
+              {...register(`personas.${index}.persona.localidad`)}
             />
-            {
-                errors?.[tipoPersona]?.localidad?.message && <p className="text-danger">{errors[tipoPersona].localidad.message}</p> 
-            }
+            {errors?.personas?.[index]?.persona?.localidad?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.localidad.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <label htmlFor="cp" className="form-label">
@@ -98,11 +113,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               id="cp"
               min={0}
               placeholder="Ingrese el código postal"
-              {...register(`${tipoPersona}.cp`)}
+              {...register(`personas.${index}.persona.cp`)}
             />
-            {
-                errors?.[tipoPersona]?.cp?.message && <p className="text-danger">{errors[tipoPersona].cp.message}</p> 
-            }
+            {errors?.personas?.[index]?.persona?.cp?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.cp.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <label htmlFor="telefono" className="form-label">
@@ -114,11 +131,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               id="telefono"
               min={0}
               placeholder="Ingrese el teléfono"
-              {...register(`${tipoPersona}.telefono`)}
+              {...register(`personas.${index}.persona.telefono`)}
             />
-            {
-                errors?.[tipoPersona]?.telefono?.message && <p className="text-danger">{errors[tipoPersona].telefono.message}</p> 
-            }
+            {errors?.personas?.[index]?.persona?.telefono?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.telefono.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
@@ -129,11 +148,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="email"
               placeholder="Ingrese el email"
-              {...register(`${tipoPersona}.email`)}
+              {...register(`personas.${index}.persona.email`)}
             />
-            {
-                errors?.[tipoPersona]?.email?.message && <p className="text-danger">{errors[tipoPersona].email.message}</p> 
-            }
+            {errors?.personas?.[index]?.persona?.email?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.email.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <label htmlFor="fax" className="form-label">
@@ -145,11 +166,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               id="fax"
               placeholder="Ingrese el fax"
               min={0}
-              {...register(`${tipoPersona}.fax`)}
+              {...register(`personas.${index}.persona.fax`)}
             />
-            {
-                errors?.[tipoPersona]?.fax?.message && <p className="text-danger">{errors[tipoPersona].fax.message}</p> 
-            }
+            {errors?.personas?.[index]?.persona?.fax?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.fax.message}
+              </p>
+            )}
           </div>
           {/* Delegado */}
           <div className="mb-3">
@@ -161,11 +184,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="nombre_delegado"
               placeholder="Ingrese el nombre del delegado"
-              {...register(`${tipoPersona}.nombre_delegado`)}
+              {...register(`personas.${index}.nombre_delegado`)}
             />
-            {
-                errors?.[tipoPersona]?.nombre_delegado?.message && <p className="text-danger">{errors[tipoPersona].nombre_delegado.message}</p>
-            }
+            {errors?.personas?.[index]?.nombre_delegado?.message && (
+              <p className="text-danger">
+                {errors.personas[index].nombre_delegado.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <label htmlFor="apellido_delegado" className="form-label">
@@ -176,11 +201,13 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="apellido_delegado"
               placeholder="Ingrese el apellido del delegado"
-              {...register(`${tipoPersona}.apellido_delegado`)}
+              {...register(`personas.${index}.apellido_delegado`)}
             />
-            {
-                errors?.[tipoPersona]?.apellido_delegado?.message && <p className="text-danger">{errors[tipoPersona].apellido_delegado.message}</p>
-            }
+            {errors?.personas?.[index]?.apellido_delegado?.message && (
+              <p className="text-danger">
+                {errors.personas[index].nombre_delegado.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
             <label htmlFor="dni_delegado" className="form-label">
@@ -191,12 +218,23 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
               className="form-control"
               id="dni_delegado"
               placeholder="Ingrese el DNI del delegado"
-              {...register(`${tipoPersona}.dni_delegado`)}
+              {...register(`personas.${index}.dni_delegado`)}
             />
-            {
-                errors?.[tipoPersona]?.dni_delegado?.message && <p className="text-danger">{errors[tipoPersona].dni_delegado.message}</p>
-            }
+            {errors?.personas?.[index]?.dni_delegado?.message && (
+              <p className="text-danger">
+                {errors.personas[index].nombre_delegado.message}
+              </p>
+            )}
           </div>
+          <input
+            type="hidden"
+            disabled
+            value={tipoPersona
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")}
+            {...register(`personas.${index}.rol`)}
+          />
         </div>
       </div>
     </>

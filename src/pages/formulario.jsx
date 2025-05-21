@@ -15,18 +15,16 @@ export const Formulario = () => {
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm({
+  } = useForm(/*{
     resolver: zodResolver(denunciaSchema), // Aquí le pasas el schema del cual se va a basar para resolver los errores (o eso entendí yo). Si pones el clic sobre resolver y denunciaSchema vas a ver
-  });
+  }*/);
   console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
 
   return (
     <div className="bg-light min-vh-100 py-5">
       <div className="container ">
         <div>
-          {
-             /* A esto borralo cuando quieras, es para que se vean todos los campos nomas. */
-          }
+          {/* A esto borralo cuando quieras, es para que se vean todos los campos nomas. */}
         </div>
         <h2 className="text-center mb-4">Formulario de Expedientes</h2>
         {formularioEnviado && (
@@ -39,39 +37,7 @@ export const Formulario = () => {
         </p>
         <form
           onSubmit={handleSubmit((data) => {
-            const roles = ["denunciante", "denunciado", "técnico"];
-            const personas = roles.map((rol) => {
-              const p = data[rol.charAt(0).toUpperCase() + rol.slice(1)];
-              return {
-                persona: {
-                  nombre: p?.nombre || "",
-                  apellido: p?.apellido || "",
-                  email: p?.email || "",
-                  telefono: p?.telefono || "",
-                  cp: p?.cp || "",
-                  localidad: p?.localidad || "",
-                  documento: p?.dni || "",
-                  tipoDocumento: "DNI",
-                  domicilio: p?.domicilio || "",
-                  wpp: null,
-                  fax: p?.fax || "",
-                },
-                rol,
-                nombre_delegado: p?.nombre_delegado || "",
-                apellido_delegado: p?.apellido_delegado || "",
-                dni_delegado: p?.dni_delegado || "",
-              };
-            });
-
-            const jsonFinal = {
-              descripcion: data.descripcion,
-              objeto: data.objeto || [],
-              motivo: data.motivo || [],
-              personas,
-            };
-
-            console.log("JSON a enviar:", jsonFinal);
-            // Aquí puedes hacer el fetch/axios para enviar el jsonFinal
+            console.log("Esta es la data:", data);
           })}
         >
           <div className="row">
@@ -80,7 +46,8 @@ export const Formulario = () => {
                 register={register}
                 errors={errors}
                 tipoPersona={"Denunciante"}
-              />{" "}
+                index={0}
+              />
               {/* Pasa el valor errors para el FormPersona así pilla de ahí los errores */}
             </div>
             <div className={"col-6"}>
@@ -88,6 +55,7 @@ export const Formulario = () => {
                 register={register}
                 errors={errors}
                 tipoPersona={"Denunciado"}
+                index={1}
               />
             </div>
           </div>
@@ -98,6 +66,7 @@ export const Formulario = () => {
                 register={register}
                 errors={errors}
                 tipoPersona={"Técnico"}
+                index={2}
               />
             </div>
             <div className={"col-6"}>
@@ -133,7 +102,5 @@ export const Formulario = () => {
         </form>
       </div>
     </div>
-
-    
   );
 };

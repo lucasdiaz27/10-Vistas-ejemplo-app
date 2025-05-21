@@ -35,7 +35,7 @@ export const FormCheckBox = ({ register, errors }) => {
               className="form-check-input"
               type="checkbox"
               id={element}
-              {...register("objeto", {required: true})}
+              {...register("objeto")}
               value={element}
             />
             <label className="form-check-label" htmlFor={element}>
@@ -58,7 +58,7 @@ export const FormCheckBox = ({ register, errors }) => {
               className="form-check-input"
               type="checkbox"
               id={element}
-              {...register("motivo", {required: true})}
+              {...register("motivo")}
               value={element}
             />
             <label className="form-check-label" htmlFor={element}>
