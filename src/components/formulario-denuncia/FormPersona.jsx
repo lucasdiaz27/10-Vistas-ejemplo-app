@@ -23,6 +23,21 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
             }
           </div>
           <div className="mb-3">
+            <label htmlFor="apellido" className="form-label">
+              Apellido
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="apellido"
+              placeholder="Ingrese el apellido"
+              {...register(`${tipoPersona}.apellido`)}
+            />
+            {
+                errors?.[tipoPersona]?.apellido?.message && <p className="text-danger">{errors[tipoPersona].apellido.message}</p>
+            }
+          </div>
+          <div className="mb-3">
             <label htmlFor="dni" className="form-label">
               DNI/CUIT
             </label>
@@ -134,6 +149,52 @@ export const FormPersona = ({tipoPersona, register, errors}) => { // Agregamos l
             />
             {
                 errors?.[tipoPersona]?.fax?.message && <p className="text-danger">{errors[tipoPersona].fax.message}</p> 
+            }
+          </div>
+          {/* Delegado */}
+          <div className="mb-3">
+            <label htmlFor="nombre_delegado" className="form-label">
+              Nombre del delegado (opcional)
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="nombre_delegado"
+              placeholder="Ingrese el nombre del delegado"
+              {...register(`${tipoPersona}.nombre_delegado`)}
+            />
+            {
+                errors?.[tipoPersona]?.nombre_delegado?.message && <p className="text-danger">{errors[tipoPersona].nombre_delegado.message}</p>
+            }
+          </div>
+          <div className="mb-3">
+            <label htmlFor="apellido_delegado" className="form-label">
+              Apellido del delegado (opcional)
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="apellido_delegado"
+              placeholder="Ingrese el apellido del delegado"
+              {...register(`${tipoPersona}.apellido_delegado`)}
+            />
+            {
+                errors?.[tipoPersona]?.apellido_delegado?.message && <p className="text-danger">{errors[tipoPersona].apellido_delegado.message}</p>
+            }
+          </div>
+          <div className="mb-3">
+            <label htmlFor="dni_delegado" className="form-label">
+              DNI del delegado (opcional)
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              id="dni_delegado"
+              placeholder="Ingrese el DNI del delegado"
+              {...register(`${tipoPersona}.dni_delegado`)}
+            />
+            {
+                errors?.[tipoPersona]?.dni_delegado?.message && <p className="text-danger">{errors[tipoPersona].dni_delegado.message}</p>
             }
           </div>
         </div>

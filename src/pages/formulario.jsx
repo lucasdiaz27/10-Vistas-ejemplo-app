@@ -39,7 +39,39 @@ export const Formulario = () => {
         </p>
         <form
           onSubmit={handleSubmit((data) => {
-            console.log("Esta es la data:", data);
+            const roles = ["denunciante", "denunciado", "técnico"];
+            const personas = roles.map((rol) => {
+              const p = data[rol.charAt(0).toUpperCase() + rol.slice(1)];
+              return {
+                persona: {
+                  nombre: p?.nombre || "",
+                  apellido: p?.apellido || "",
+                  email: p?.email || "",
+                  telefono: p?.telefono || "",
+                  cp: p?.cp || "",
+                  localidad: p?.localidad || "",
+                  documento: p?.dni || "",
+                  tipoDocumento: "DNI",
+                  domicilio: p?.domicilio || "",
+                  wpp: null,
+                  fax: p?.fax || "",
+                },
+                rol,
+                nombre_delegado: p?.nombre_delegado || "",
+                apellido_delegado: p?.apellido_delegado || "",
+                dni_delegado: p?.dni_delegado || "",
+              };
+            });
+
+            const jsonFinal = {
+              descripcion: data.descripcion,
+              objeto: data.objeto || [],
+              motivo: data.motivo || [],
+              personas,
+            };
+
+            console.log("JSON a enviar:", jsonFinal);
+            // Aquí puedes hacer el fetch/axios para enviar el jsonFinal
           })}
         >
           <div className="row">

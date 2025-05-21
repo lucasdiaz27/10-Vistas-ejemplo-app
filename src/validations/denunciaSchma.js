@@ -3,6 +3,8 @@ import { z } from "zod";
 const personaSchema = z.object({ // Creamos un esquema sobre persona, que es un objeto que tiene los atributos del formulario, te faltaría completar eso:
     nombre: z.string()
             .min(1, { message: "El nombre es requerido" }),
+        apellido: z.string()
+            .min(1, { message: "El apellido es requerido" }),
 
     dni: z.string()
             .min(7, { message: "El DNI/CUIT debe tener al menos 7 dígitos" })
@@ -10,6 +12,8 @@ const personaSchema = z.object({ // Creamos un esquema sobre persona, que es un 
             .refine(value => /^\d+$/.test(value), {
                 message: "El DNI/CUIT solo puede contener números positivos sin símbolos",
             }),
+        tipoDocumento: z.string()
+            .default("DNI"),
 
     domicilio: z.string()
             .min(1, { message: "El domicilio es requerido" }),
@@ -32,12 +36,24 @@ const personaSchema = z.object({ // Creamos un esquema sobre persona, que es un 
     
 });
 
+// Esquema de persona con delegado y rol
+const personaConDelegadoSchema = z.object({
+    persona: personaSchema,
+    rol: z.enum(["denunciante", "denunciado", "técnico"]),
+    nombre_delegado: z.string().optional(),
+    apellido_delegado: z.string().optional(),
+    dni_delegado: z.string().optional(),
+});
+
 // Este sería el esquema principal digamos, donde están las tres Personas, faltaría que le agregues dos más, uno para el motivo y otro para el objeto. Decime si te animas a hacerlo o sino lo hago yo
 export const denunciaSchema = z.object({ // Este es el que se exporta
     Denunciante: personaSchema,
     Denunciado: personaSchema,
     Técnico: personaSchema,
-    motivo: z.array(z.string()).min(1, { message: "El objeto es requerido" }), // Aquí le pasas el array de motivos y le pones que sea requerido
+    motivo: z.array(z.string()).min(1, { message: "El motivo es requerido" }), // Aquí le pasas el array de motivos y le pones que sea requerido
     objeto: z.array(z.string()).min(1, { message: "El objeto es requerido" }), // Aquí le pasas el array de objetos y le pones que sea requerido
+descripcion: z.string().min(1, { message: "La descripción es requerida" }),
+ personas: z.array(personaConDelegadoSchema).min(1, { message: "Debe haber al menos una persona" }),
+
 });
 
