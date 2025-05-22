@@ -1,4 +1,4 @@
-const expediente = [
+export const expediente = [
     {
         id: 1,
         nombre: "Expediente 1",
@@ -20,5 +20,3 @@ const expediente = [
 
     //irian mas pero me da paja escribirlos
 ];
-
-export default expediente;

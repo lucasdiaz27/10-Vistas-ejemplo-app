@@ -8,6 +8,7 @@ import Consulta from "./pages/consulta";
 import Login from "./pages/Login";
 import MenuInterno from "./pages/MenuInterno";
 import NavBarInterno from "./components/NavBarInterno";
+import { Prueba } from "./pages/prueba";
 
 function SiteApp() {
   return (
@@ -72,6 +73,17 @@ function SiteApp() {
             <>
               <NavBarInterno />
               <MenuInterno />
+              {/* Aqui podria ir otro footer */}
+            </>
+          }
+        />
+
+        
+        <Route
+          path="/prueba"
+          element={
+            <>
+            <Prueba />
               {/* Aqui podria ir otro footer */}
             </>
           }

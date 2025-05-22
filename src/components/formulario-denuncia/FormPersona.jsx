@@ -1,4 +1,5 @@
 import React from "react";
+import { InputsDelegado } from "./InputsDelegado";
 
 export const FormPersona = ({ tipoPersona, register, errors, index }) => {
   // Agregamos la propiedad errors
@@ -175,57 +176,7 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           {/* Delegado */}
-          <div className="mb-3">
-            <label htmlFor="nombre_delegado" className="form-label">
-              Nombre del delegado (opcional)
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="nombre_delegado"
-              placeholder="Ingrese el nombre del delegado"
-              {...register(`personas.${index}.nombre_delegado`)}
-            />
-            {errors?.personas?.[index]?.nombre_delegado?.message && (
-              <p className="text-danger">
-                {errors.personas[index].nombre_delegado.message}
-              </p>
-            )}
-          </div>
-          <div className="mb-3">
-            <label htmlFor="apellido_delegado" className="form-label">
-              Apellido del delegado (opcional)
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="apellido_delegado"
-              placeholder="Ingrese el apellido del delegado"
-              {...register(`personas.${index}.apellido_delegado`)}
-            />
-            {errors?.personas?.[index]?.apellido_delegado?.message && (
-              <p className="text-danger">
-                {errors.personas[index].nombre_delegado.message}
-              </p>
-            )}
-          </div>
-          <div className="mb-3">
-            <label htmlFor="dni_delegado" className="form-label">
-              DNI del delegado (opcional)
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="dni_delegado"
-              placeholder="Ingrese el DNI del delegado"
-              {...register(`personas.${index}.dni_delegado`)}
-            />
-            {errors?.personas?.[index]?.dni_delegado?.message && (
-              <p className="text-danger">
-                {errors.personas[index].nombre_delegado.message}
-              </p>
-            )}
-          </div>
+          {tipoPersona == "Denunciante" ? <InputsDelegado register={register} index={index} errors={errors} /> : null}
           <input
             type="hidden"
             disabled

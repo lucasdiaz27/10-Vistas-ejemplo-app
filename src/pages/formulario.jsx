@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FormPersona } from "../components/formulario-denuncia/FormPersona";
 import { FormObjeto } from "../components/formulario-denuncia/FormObjeto";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { data } from "react-router-dom";
 import { denunciaSchema } from "../validations/denunciaSchma";
+import { enviarDenuncia } from "../apis/apiDenuncia";
 
 export const Formulario = () => {
   const [formularioEnviado, setFormularioEnviado] = useState(false);
+  const fileInputRef = useRef();
 
   /* formState errors trae los errores (si es que hay), de cada fieldValue o input por así decirlo,  */
   const {
@@ -19,7 +21,18 @@ export const Formulario = () => {
     resolver: zodResolver(denunciaSchema), // Aquí le pasas el schema del cual se va a basar para resolver los errores (o eso entendí yo). Si pones el clic sobre resolver y denunciaSchema vas a ver
   }*/);
   console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
-
+  
+  const onSubmit = (data) => {
+    //console.log(files)
+    try {
+      const files = fileInputRef.current?.files;
+      enviarDenuncia(data, files);
+      console.log(data);
+      alert("Formulario enviado correctamente");
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <div className="bg-light min-vh-100 py-5">
       <div className="container ">
@@ -36,9 +49,7 @@ export const Formulario = () => {
           Completar Formulario con los siguientes datos:
         </p>
         <form
-          onSubmit={handleSubmit((data) => {
-            console.log("Esta es la data:", data);
-          })}
+          onSubmit={handleSubmit(onSubmit)}
         >
           <div className="row">
             <div className="col-6">
@@ -91,6 +102,7 @@ export const Formulario = () => {
                 type="file"
                 id="formFileMultiple"
                 multiple
+                ref={fileInputRef}
               />
             </div>
             <div className="text-center col-6">

@@ -37,9 +37,9 @@ const personaSchema = z.object({ // Creamos un esquema sobre persona, que es un 
 // Esquema de persona con delegado y rol
 const personaConDelegadoSchema = z.object({
     persona: personaSchema,
-    nombre_delegado: z.string().optional(),
-    apellido_delegado: z.string().optional(),
-    dni_delegado: z.string().optional(),
+    nombreDelegado: z.string().optional(),
+    apellidoDelegado: z.string().optional(),
+    dniDelegado: z.string().optional(),
 });
 
 // Este sería el esquema principal digamos, donde están las tres Personas, faltaría que le agregues dos más, uno para el motivo y otro para el objeto. Decime si te animas a hacerlo o sino lo hago yo
