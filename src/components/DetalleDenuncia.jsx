@@ -7,7 +7,8 @@ export default function DetalleDenuncia() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/denuncia/traerDenuncia/${id}`)
+    fetch("http://localhost:8080/denuncia/traerDenuncia")
+
 
       .then(res => res.json())
       .then(data => {
