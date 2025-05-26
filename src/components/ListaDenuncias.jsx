@@ -6,7 +6,7 @@ const ListaDenuncias = () => {
 
     useEffect(() => {
         axios
-            .get("http://127.0.0.1:8080/denuncia/traerDenuncia")
+            .get("http://localhost:8080/denuncia/traerDenuncia")
 
             .then((response) => {
                 setDenuncias(response.data);

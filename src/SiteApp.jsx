@@ -10,6 +10,7 @@ import MenuInterno from "./pages/MenuInterno";
 import NavBarInterno from "./components/NavBarInterno";
 import { Prueba } from "./pages/prueba";
 import ListaDenuncias from "./components/ListaDenuncias";
+import DetalleDenuncia from "./components/DetalleDenuncia";
 
 function SiteApp() {
   return (
@@ -79,12 +80,12 @@ function SiteApp() {
           }
         />
 
-        
+
         <Route
           path="/prueba"
           element={
             <>
-            <Prueba />
+              <Prueba />
               {/* Aqui podria ir otro footer */}
             </>
           }
@@ -99,6 +100,16 @@ function SiteApp() {
             </>
           }
         />
+        <Route
+          path="/denuncia/:id"
+          element={
+            <>
+              <NavBarInterno />
+              <DetalleDenuncia />
+            </>
+          }
+        />
+
       </Routes>
     </Router>
   );
