@@ -1,7 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { traerDenuncias } from "../apis/apiDenuncia";
 
-const Expedientetabla = ({ expedientes }) => {
+const Expedientetabla = () => {
+  const [expedientes, setExpedientes] = useState([]);
+
+  useEffect(() => {
+    const cargarExpedientes = async () => {
+      try {
+        const data = await traerDenuncias();
+        setExpedientes(data);
+      } catch (error) {
+        console.error("Error al cargar expedientes:", error);
+      }
+    };
+    cargarExpedientes();
+  }, []);
+
+  // Buscar el denunciante principal en cada expediente
+  const getSolicitante = (personas) => {
+    const denunciante = personas?.find((p) => p.rol === "denunciante");
+    return denunciante
+      ? `${denunciante.persona?.nombre || ""} ${denunciante.persona?.apellido || ""}`
+      : "";
+  };
+
+  const getDniSolicitante = (personas) => {
+    const denunciante = personas?.find((p) => p.rol === "denunciante");
+    return denunciante?.persona?.documento || "";
+  };
+
   return (
     <div className="overflow-x-auto shadow rounded-lg">
       <table className="min-w-full bg-white border border-gray-200 text-sm">
@@ -22,11 +50,13 @@ const Expedientetabla = ({ expedientes }) => {
               <tr key={exp.id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 border-b">{exp.id}</td>
                 <td className="px-4 py-2 border-b">
-                  {exp.solicitante?.nombre} {exp.solicitante?.apellido}
+                  {getSolicitante(exp.personas)}
                 </td>
                 <td className="px-4 py-2 border-b">{exp.objeto?.join(", ")}</td>
                 <td className="px-4 py-2 border-b">{exp.motivo?.join(", ")}</td>
-                <td className="px-4 py-2 border-b">{exp.solicitante?.dni}</td>
+                <td className="px-4 py-2 border-b">
+                  {getDniSolicitante(exp.personas)}
+                </td>
                 <td className="px-4 py-2 border-b">{exp.estado ?? "null"}</td>
                 <td className="px-4 py-2 border-b space-x-1">
                   <Link
