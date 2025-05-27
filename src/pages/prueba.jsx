@@ -26,8 +26,8 @@ export const Prueba = () => {
     // Ajusta los campos según la estructura real de tu backend
     return (
       den.descripcion?.toLowerCase().includes(texto) ||
-      den.personas?.[0]?.persona?.nombre?.toLowerCase().includes(texto) ||
-      den.personas?.[0]?.persona?.apellido?.toLowerCase().includes(texto)
+      den.personas?.[0]?.nombre?.toLowerCase().includes(texto) ||
+      den.personas?.[0]?.apellido?.toLowerCase().includes(texto)
     );
   });
 
@@ -67,12 +67,12 @@ export const Prueba = () => {
                   <td>{idx + 1}</td>
                   <td>{den.descripcion}</td>
                   <td>
-                    {den.personas?.find(p => p.rol === "denunciante")?.persona?.nombre}{" "}
-                    {den.personas?.find(p => p.rol === "denunciante")?.persona?.apellido}
+                    {den.personas?.find(p => p.rol === "denunciante")?.nombre}{" "}
+                    {den.personas?.find(p => p.rol === "denunciante")?.apellido}
                   </td>
                   <td>
-                    {den.personas?.find(p => p.rol === "denunciado")?.persona?.nombre}{" "}
-                    {den.personas?.find(p => p.rol === "denunciado")?.persona?.apellido}
+                    {den.personas?.find(p => p.rol === "denunciado")?.nombre}{" "}
+                    {den.personas?.find(p => p.rol === "denunciado")?.apellido}
                   </td>
                   <td>{den.motivo?.join(", ")}</td>
                   <td>{den.objeto?.join(", ")}</td>

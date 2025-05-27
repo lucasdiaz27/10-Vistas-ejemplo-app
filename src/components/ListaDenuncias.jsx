@@ -1,19 +1,14 @@
 import { useEffect,useState } from "react";
 import axios from "axios";
+import { traerDenuncias } from "../apis/apiDenuncia";
 
 const ListaDenuncias = () => {
     const [denuncias, setDenuncias] = useState([]);
 
     useEffect(() => {
-        axios
-            .get("http://localhost:8080/denuncia/traerDenuncia")
-
-            .then((response) => {
-                setDenuncias(response.data);
-            })
-            .catch((error) => {
-                console.error("Error al traer denuncias:", error);
-            });
+        traerDenuncias()
+        .then(data => setDenuncias(data))
+        .catch(err => console.error(err));
     }, []);
 
     return (
@@ -22,7 +17,12 @@ const ListaDenuncias = () => {
       <ul>
         {denuncias.map((denuncia, index) => (
           <li key={index}>
-            {JSON.stringify(denuncia)}
+            Nombre:
+            {denuncia.personas?.find(p => p.rol === "denunciante")?.nombre}
+            <br />
+            
+            Apellido:
+            {denuncia.personas?.find(p => p.rol === "denunciante")?.apellido}
           </li>
         ))}
       </ul>
