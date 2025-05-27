@@ -1,32 +1,44 @@
-import { useEffect,useState } from "react";
-import axios from "axios";
-import { traerDenuncias } from "../apis/apiDenuncia";
+import React, { useEffect, useState } from "react";
+import { traerDenuncias, eliminarDenuncia } from "../apis/apiDenuncia";
 
 const ListaDenuncias = () => {
-    const [denuncias, setDenuncias] = useState([]);
+  const [denuncias, setDenuncias] = useState([]);
 
-    useEffect(() => {
-        traerDenuncias()
-        .then(data => setDenuncias(data))
-        .catch(err => console.error(err));
-    }, []);
+  const cargarDenuncias = async () => {
+    try {
+      const data = await traerDenuncias();
+      setDenuncias(data);
+    } catch (error) {
+      console.error("Error al cargar denuncias:", error);
+    }
+  };
 
-    return (
+  useEffect(() => {
+    cargarDenuncias();
+  }, []);
+
+  const handleEliminar = async (id) => {
+    try {
+      await eliminarDenuncia(id);
+      setDenuncias(denuncias.filter((denuncia) => denuncia.id !== id));
+    } catch (error) {
+      console.error("Error al eliminar denuncia:", error);
+    }
+  };
+
+  return (
     <div>
       <h2>Lista de Denuncias</h2>
       <ul>
-        {denuncias.map((denuncia, index) => (
-          <li key={index}>
-            Nombre:
-            {denuncia.personas?.find(p => p.rol === "denunciante")?.nombre}
-            <br />
-            
-            Apellido:
-            {denuncia.personas?.find(p => p.rol === "denunciante")?.apellido}
+        {denuncias.map((denuncia) => (
+          <li key={denuncia.id}>
+            {denuncia.nombre} - {denuncia.descripcion}
+            <button onClick={() => handleEliminar(denuncia.id)}>Eliminar</button>
           </li>
         ))}
       </ul>
     </div>
   );
-}
+};
+
 export default ListaDenuncias;

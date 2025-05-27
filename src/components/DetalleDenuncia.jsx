@@ -1,55 +1,95 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { traerDenuncias, eliminarDenuncia, actualizarEstadoDenuncia } from "../apis/apiDenuncia";
 
-export default function DetalleDenuncia() {
+const DetalleDenuncia = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [denuncia, setDenuncia] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8080/denuncia/traerDenuncia")
+    const obtenerDenuncia = async () => {
+      try {
+        const data = await traerDenuncias();
+        const denunciaEncontrada = data.find((d) => d.id === parseInt(id));
+        setDenuncia(denunciaEncontrada);
+      } catch (error) {
+        console.error("Error al obtener denuncia:", error);
+      }
+    };
 
-
-      .then(res => res.json())
-      .then(data => {
-        setDenuncia(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error al cargar la denuncia:', error);
-        setLoading(false);
-      });
+    obtenerDenuncia();
   }, [id]);
 
-  
-  if (loading) return <p>Cargando denuncia...</p>;
-  if (!denuncia) return <p>No se encontró la denuncia.</p>;
+  const handleEliminar = async () => {
+    try {
+      await eliminarDenuncia(id);
+      navigate("/lista-denuncias");
+    } catch (error) {
+      console.error("Error al eliminar denuncia:", error);
+    }
+  };
+
+  const handleActualizarEstado = async (nuevoEstado) => {
+    try {
+      await actualizarEstadoDenuncia(denuncia.id, nuevoEstado);
+      // Opcional: recargar la denuncia para ver el nuevo estado
+      setDenuncia({ ...denuncia, estado: nuevoEstado });
+    } catch (error) {
+      console.error("Error al actualizar estado:", error);
+    }
+  };
+
+  if (!denuncia) {
+    return <p>Cargando denuncia...</p>;
+  }
 
   return (
-    <div className='p-4'>
-      <h2 className='text-2xl font-bold mb-4'>Detalle de la Denuncia</h2>
-
-      <div className='mb-4'>
-        <p><strong>ID:</strong> {denuncia.id}</p>
-        <p><strong>Estado:</strong> {denuncia.estado}</p>
-        <p><strong>Motivo:</strong> {denuncia.motivo}</p>
-      </div>
-
-      <div className='mb-4'>
-        <h3 className='font-semibold'>Denunciante</h3>
-        <p>{denuncia.denunciante?.nombre} - DNI: {denuncia.denunciante?.dni}</p>
-      </div>
-
-      <div className="mb-4">
-        <h3 className="font-semibold">Denunciado:</h3>
-        <p>{denuncia.denunciado?.nombre} - CUIT: {denuncia.denunciado?.cuit}</p>
-      </div>
-
-      <div>
-        <h3 className="font-semibold">Técnico:</h3>
-        <p>{denuncia.tecnico?.nombre}</p>
-      </div>
+    <div>
+      <h2>Detalle de Denuncia</h2>
+      <p><strong>ID:</strong> {denuncia.id}</p>
+      <p><strong>Objeto:</strong> {denuncia.objeto?.join(", ")}</p>
+      <p><strong>Motivo:</strong> {denuncia.motivo?.join(", ")}</p>
+      <p><strong>Estado:</strong> {denuncia.estado ?? "null"}</p>
+      <h4>Personas Involucradas</h4>
+      <ul>
+        {denuncia.personas?.map((p, idx) => (
+          <li key={idx}>
+            <strong>Rol:</strong> {p.rol}<br />
+            {p.persona ? (
+              <>
+                <strong>Nombre:</strong> {p.persona.nombre} {p.persona.apellido}<br />
+                <strong>DNI:</strong> {p.persona.documento}<br />
+                <strong>Email:</strong> {p.persona.email}<br />
+                <strong>Teléfono:</strong> {p.persona.telefono}<br />
+              </>
+            ) : (
+              <span className="text-danger">Datos de persona no disponibles</span>
+            )}
+            {p.nombre_delegado && (
+              <>
+                <strong>Delegado:</strong> {p.nombre_delegado} {p.apellido_delegado} (DNI: {p.dni_delegado})<br />
+              </>
+            )}
+            <hr />
+          </li>
+        ))}
+      </ul>
+      <button onClick={handleEliminar} className="btn btn-danger">Eliminar Denuncia</button>
+      <button
+        onClick={() => handleActualizarEstado("Aprobada")}
+        className="btn btn-success"
+      >
+        Aprobar
+      </button>
+      <button
+        onClick={() => handleActualizarEstado("Rechazada")}
+        className="btn btn-danger"
+      >
+        Rechazar
+      </button>
     </div>
   );
-}
+};
 
+export default DetalleDenuncia;

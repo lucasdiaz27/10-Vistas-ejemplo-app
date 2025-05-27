@@ -9,8 +9,6 @@ export const enviarDenuncia = async (data, files) => {
     }
   }
 
-  // Lo pasamos a JSON para que el backend lo entienda
-  // En el backend lo deserializamos
   formData.append("denuncia", JSON.stringify(data));
   
   return axios.post("http://localhost:8080/denuncia/subirDenuncia", formData, {
@@ -21,6 +19,18 @@ export const enviarDenuncia = async (data, files) => {
 };
 
 export const traerDenuncias = async () => {
-    const res = await axios.get("http://localhost:8080/denuncia/traerDenuncia");
-    return res.data;
-}
+  const res = await axios.get("http://localhost:8080/denuncia/traerDenuncia");
+  return res.data;
+};
+
+export const eliminarDenuncia = async (id) => {
+  return axios.delete(`http://localhost:8080/denuncia/eliminar/${id}`);
+};
+
+export const actualizarEstadoDenuncia = async (id, nuevoEstado) => {
+  // nuevoEstado debe ser un string, por ejemplo: "Aprobada", "En proceso", etc.
+  return axios.put(
+    `http://localhost:8080/denuncia/actualizarEstado/${id}`,
+    { estado: nuevoEstado } // El DTO debe tener un campo "estado"
+  );
+};
