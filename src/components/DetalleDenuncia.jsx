@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { traerDenuncias, eliminarDenuncia, actualizarEstadoDenuncia } from "../apis/apiDenuncia";
+import { useParams } from "react-router-dom";
+import { traerDenuncias } from "../apis/apiDenuncia";
 
 const DetalleDenuncia = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [denuncia, setDenuncia] = useState(null);
 
   useEffect(() => {
@@ -21,25 +20,6 @@ const DetalleDenuncia = () => {
     obtenerDenuncia();
   }, [id]);
 
-  const handleEliminar = async () => {
-    try {
-      await eliminarDenuncia(id);
-      navigate("/lista-denuncias");
-    } catch (error) {
-      console.error("Error al eliminar denuncia:", error);
-    }
-  };
-
-  const handleActualizarEstado = async (nuevoEstado) => {
-    try {
-      await actualizarEstadoDenuncia(denuncia.id, nuevoEstado);
-      // Opcional: recargar la denuncia para ver el nuevo estado
-      setDenuncia({ ...denuncia, estado: nuevoEstado });
-    } catch (error) {
-      console.error("Error al actualizar estado:", error);
-    }
-  };
-
   if (!denuncia) {
     return <p>Cargando denuncia...</p>;
   }
@@ -48,46 +28,27 @@ const DetalleDenuncia = () => {
     <div>
       <h2>Detalle de Denuncia</h2>
       <p><strong>ID:</strong> {denuncia.id}</p>
-      <p><strong>Objeto:</strong> {denuncia.objeto?.join(", ")}</p>
-      <p><strong>Motivo:</strong> {denuncia.motivo?.join(", ")}</p>
+      <p><strong>Objeto:</strong> {Array.isArray(denuncia.objeto) ? denuncia.objeto.join(", ") : denuncia.objeto}</p>
+      <p><strong>Motivo:</strong> {Array.isArray(denuncia.motivo) ? denuncia.motivo.join(", ") : denuncia.motivo}</p>
       <p><strong>Estado:</strong> {denuncia.estado ?? "null"}</p>
+      <p><strong>Fecha de ingreso:</strong> {denuncia.fechaIngreso || "-"}</p>
       <h4>Personas Involucradas</h4>
       <ul>
-        {denuncia.personas?.map((p, idx) => (
-          <li key={idx}>
-            <strong>Rol:</strong> {p.rol}<br />
-            {p.persona ? (
-              <>
-                <strong>Nombre:</strong> {p.persona.nombre} {p.persona.apellido}<br />
-                <strong>DNI:</strong> {p.persona.documento}<br />
-                <strong>Email:</strong> {p.persona.email}<br />
-                <strong>Teléfono:</strong> {p.persona.telefono}<br />
-              </>
-            ) : (
-              <span className="text-danger">Datos de persona no disponibles</span>
-            )}
-            {p.nombre_delegado && (
-              <>
-                <strong>Delegado:</strong> {p.nombre_delegado} {p.apellido_delegado} (DNI: {p.dni_delegado})<br />
-              </>
-            )}
-            <hr />
-          </li>
-        ))}
+        {Array.isArray(denuncia.personas) && denuncia.personas.length > 0 ? (
+          denuncia.personas.map((p, idx) => (
+            <li key={idx} style={{ marginBottom: "1em" }}>
+              <strong>Nombre:</strong> {p.nombre} {p.apellido}<br />
+              <strong>DNI:</strong> {p.documento}<br />
+              <strong>Email:</strong> {p.email}<br />
+              <strong>Teléfono:</strong> {p.telefono}<br />
+              {/* Agrega aquí cualquier otro campo que venga en el objeto persona */}
+            </li>
+          ))
+        ) : (
+          <li>No hay personas asociadas.</li>
+        )}
       </ul>
-      <button onClick={handleEliminar} className="btn btn-danger">Eliminar Denuncia</button>
-      <button
-        onClick={() => handleActualizarEstado("Aprobada")}
-        className="btn btn-success"
-      >
-        Aprobar
-      </button>
-      <button
-        onClick={() => handleActualizarEstado("Rechazada")}
-        className="btn btn-danger"
-      >
-        Rechazar
-      </button>
+      {/* Agrega aquí cualquier otro campo que venga en el objeto denuncia */}
     </div>
   );
 };

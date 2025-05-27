@@ -17,17 +17,14 @@ const Expedientetabla = () => {
     cargarExpedientes();
   }, []);
 
-  // Buscar el denunciante principal en cada expediente
   const getSolicitante = (personas) => {
-    const denunciante = personas?.find((p) => p.rol === "denunciante");
-    return denunciante
-      ? `${denunciante.persona?.nombre || ""} ${denunciante.persona?.apellido || ""}`
-      : "";
+    if (!Array.isArray(personas) || personas.length === 0) return "";
+    return `${personas[0].nombre || ""} ${personas[0].apellido || ""}`;
   };
 
   const getDniSolicitante = (personas) => {
-    const denunciante = personas?.find((p) => p.rol === "denunciante");
-    return denunciante?.persona?.documento || "";
+    if (!Array.isArray(personas) || personas.length === 0) return "";
+    return personas[0].documento || "";
   };
 
   return (
@@ -47,6 +44,7 @@ const Expedientetabla = () => {
         <tbody>
           {expedientes && expedientes.length > 0 ? (
             expedientes.map((exp) => (
+              console.log("Personas:", exp.personas),
               <tr key={exp.id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 border-b">{exp.id}</td>
                 <td className="px-4 py-2 border-b">
