@@ -28,9 +28,8 @@ export const eliminarDenuncia = async (id) => {
 };
 
 export const actualizarEstadoDenuncia = async (id, nuevoEstado) => {
-  // nuevoEstado debe ser un string, por ejemplo: "Aprobada", "En proceso", etc.
   return axios.put(
     `http://localhost:8080/denuncia/actualizarEstado/${id}`,
-    { estado: nuevoEstado } // El DTO debe tener un campo "estado"
+    { estado: nuevoEstado }
   );
 };

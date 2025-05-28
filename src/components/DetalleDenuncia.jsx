@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { traerDenuncias } from "../apis/apiDenuncia";
+import { traerDenuncias, actualizarEstadoDenuncia } from "../apis/apiDenuncia";
 
 const DetalleDenuncia = () => {
   const { id } = useParams();
@@ -20,6 +20,16 @@ const DetalleDenuncia = () => {
     obtenerDenuncia();
   }, [id]);
 
+  const handleActualizarEstado = async (nuevoEstado) => {
+    try {
+      await actualizarEstadoDenuncia(denuncia.id, nuevoEstado);
+      setDenuncia({ ...denuncia, estado: nuevoEstado });
+    } catch (error) {
+      alert("Error al actualizar el estado");
+      console.error(error);
+    }
+  };
+
   if (!denuncia) {
     return <p>Cargando denuncia...</p>;
   }
@@ -32,6 +42,21 @@ const DetalleDenuncia = () => {
       <p><strong>Motivo:</strong> {Array.isArray(denuncia.motivo) ? denuncia.motivo.join(", ") : denuncia.motivo}</p>
       <p><strong>Estado:</strong> {denuncia.estado ?? "null"}</p>
       <p><strong>Fecha de ingreso:</strong> {denuncia.fechaIngreso || "-"}</p>
+      <div style={{ margin: "1em 0" }}>
+        <button
+          className="btn btn-success"
+          onClick={() => handleActualizarEstado("Aprobada")}
+        >
+          Aprobar
+        </button>
+        <button
+          className="btn btn-danger"
+          style={{ marginLeft: "1em" }}
+          onClick={() => handleActualizarEstado("Rechazada")}
+        >
+          Rechazar
+        </button>
+      </div>
       <h4>Personas Involucradas</h4>
       <ul>
         {Array.isArray(denuncia.personas) && denuncia.personas.length > 0 ? (
@@ -41,14 +66,12 @@ const DetalleDenuncia = () => {
               <strong>DNI:</strong> {p.documento}<br />
               <strong>Email:</strong> {p.email}<br />
               <strong>Teléfono:</strong> {p.telefono}<br />
-              {/* Agrega aquí cualquier otro campo que venga en el objeto persona */}
             </li>
           ))
         ) : (
           <li>No hay personas asociadas.</li>
         )}
       </ul>
-      {/* Agrega aquí cualquier otro campo que venga en el objeto denuncia */}
     </div>
   );
 };
