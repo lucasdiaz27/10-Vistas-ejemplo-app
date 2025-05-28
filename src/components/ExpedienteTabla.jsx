@@ -4,6 +4,7 @@ import { traerDenuncias } from "../apis/apiDenuncia";
 
 const Expedientetabla = () => {
   const [expedientes, setExpedientes] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
     const cargarExpedientes = async () => {
@@ -27,8 +28,33 @@ const Expedientetabla = () => {
     return personas[0].documento || "";
   };
 
+  // Filtrado
+  const expedientesFiltrados = expedientes.filter((exp) => {
+    const solicitante = getSolicitante(exp.personas).toLowerCase();
+    const dni = getDniSolicitante(exp.personas).toLowerCase();
+    const estado = (exp.estado ?? "").toLowerCase();
+    const nroOrden = (exp.nroOrden ?? "").toLowerCase();
+    const texto = busqueda.toLowerCase();
+    return (
+      solicitante.includes(texto) ||
+      dni.includes(texto) ||
+      estado.includes(texto) ||
+      nroOrden.includes(texto)
+    );
+  });
+
   return (
     <div className="overflow-x-auto shadow rounded-lg">
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Buscar por nombre, estado, número o DNI"
+          className="form-control"
+          style={{ width: "300px" }}
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+      </div>
       <table className="min-w-full bg-white border border-gray-200 text-sm">
         <thead className="bg-gray-100 text-left">
           <tr>
@@ -42,9 +68,8 @@ const Expedientetabla = () => {
           </tr>
         </thead>
         <tbody>
-          {expedientes && expedientes.length > 0 ? (
-            expedientes.map((exp) => (
-              console.log("Personas:", exp.personas),
+          {expedientesFiltrados && expedientesFiltrados.length > 0 ? (
+            expedientesFiltrados.map((exp) => (
               <tr key={exp.id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 border-b">{exp.id}</td>
                 <td className="px-4 py-2 border-b">

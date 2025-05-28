@@ -78,18 +78,9 @@ const MenuInterno = () => {
       {vista === "mesa-entrada" && (
         <>
           {/* Buscador */}
-          <div className="mb-4">
-            <h4>Buscar solicitudes</h4>
+          
             <p>Filtrá por nombre, estado, número o DNI</p>
-            <input
-              type="text"
-              placeholder="Buscar..."
-              className="form-control"
-              style={{ width: "300px" }}
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
-          </div>
+            
 
           {/* Tabla filtrada */}
           <Expedientetabla
