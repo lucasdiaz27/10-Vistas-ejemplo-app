@@ -44,16 +44,16 @@ const Expedientetabla = () => {
   });
 
   return (
-    <div className="overflow-x-auto shadow rounded-lg">
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Buscar por nombre, estado, número o DNI"
-          className="form-control"
-          style={{ width: "300px" }}
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
+    <div className="mb-4">
+      <input
+        type="text"
+        placeholder="Buscar por nombre, estado, número o DNI"
+        className="form-control mb-3"
+        style={{ width: "300px" }}
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+      />
+      <div className="overflow-x-auto shadow rounded-lg">
       </div>
       <table className="min-w-full bg-white border border-gray-200 text-sm">
         <thead className="bg-gray-100 text-left">

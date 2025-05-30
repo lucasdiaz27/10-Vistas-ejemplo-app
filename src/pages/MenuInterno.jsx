@@ -73,44 +73,18 @@ const MenuInterno = () => {
 
   return (
     <div className="container mt-4">
-      <h2>Panel Interno</h2>
-
+      <h2>Mesa de Entrada</h2>
+      <div className="mb-4">
+        {/*<p>Filtrá por nombre, estado, número o DNI</p>*/}
+      </div>
+        {/* Buscador */}
+      {/*condicional de la Tabla filtrada */}
       {vista === "mesa-entrada" && (
-        <>
-          {/* Buscador */}
-          
-            <p>Filtrá por nombre, estado, número o DNI</p>
-            
-
-          {/* Tabla filtrada */}
-          <Expedientetabla
-            expedientes={expedientesFiltrados}
-            cambiarEstado={cambiarEstado}
-          />
-
-          {/* Tabla fija de pruebas */}
-          <div className="mt-5">
-            <h4>Tabla fija de pruebas</h4>
-            <table className="table table-bordered table-hover">
-              <thead className="table-light">
-                <tr>
-                  <th>Nombre</th>
-                  <th>Área</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Lucas Díaz</td>
-                  <td>Inspección</td>
-                </tr>
-                <tr>
-                  <td>Ale Rea</td>
-                  <td>Legales</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </>
+        
+        <Expedientetabla
+          expedientes={expedientesFiltrados}
+          cambiarEstado={cambiarEstado}
+        />
       )}
 
       {vista === "pases" && <p>Contenido de Pases (próximamente)</p>}
@@ -126,4 +100,9 @@ const MenuInterno = () => {
 export default MenuInterno;
 
 
-  
+
+
+
+        
+
+

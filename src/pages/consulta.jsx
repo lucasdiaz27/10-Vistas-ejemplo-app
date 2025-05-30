@@ -3,7 +3,7 @@ import { ConsultaTexto } from "../components/ConsultaTexto";
 
 const Consulta = () => {
     return (
-        <>
+        <div className="min-h-screen bg-neutral-100">
             <div class="row vh-100">
                 <div className="col-6 d-flex align-items-center justify-content-center">
                     <ConsultaTexto />
@@ -13,7 +13,7 @@ const Consulta = () => {
                     <FormConsultas />
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 
