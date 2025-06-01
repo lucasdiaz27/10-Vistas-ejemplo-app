@@ -35,45 +35,53 @@ const DetalleDenuncia = () => {
   }
 
   return (
-    <div>
-      <h2>Detalle de Denuncia</h2>
-      <p><strong>ID:</strong> {denuncia.id}</p>
-      <p><strong>Objeto:</strong> {Array.isArray(denuncia.objeto) ? denuncia.objeto.join(", ") : denuncia.objeto}</p>
-      <p><strong>Motivo:</strong> {Array.isArray(denuncia.motivo) ? denuncia.motivo.join(", ") : denuncia.motivo}</p>
-      <p><strong>Estado:</strong> {denuncia.estado ?? "null"}</p>
-      <p><strong>Fecha de ingreso:</strong> {denuncia.fechaIngreso || "-"}</p>
-      <div style={{ margin: "1em 0" }}>
-        <button
-          className="btn btn-success"
-          onClick={() => handleActualizarEstado("Aprobada")}
-        >
-          Aprobar
-        </button>
-        <button
-          className="btn btn-danger"
-          style={{ marginLeft: "1em" }}
-          onClick={() => handleActualizarEstado("Rechazada")}
-        >
-          Rechazar
-        </button>
+  <div className="container py-5">
+    <div className="row justify-content-center">
+      {/* Box Izquierdo */}
+      <div className="col-md-5 m-3">
+        <div className="p-4 bg-white shadow rounded">
+          <h2>Detalle de Denuncia</h2>
+          <p><strong>ID:</strong> {denuncia.id}</p>
+          <p><strong>Objeto:</strong> {Array.isArray(denuncia.objeto) ? denuncia.objeto.join(", ") : denuncia.objeto}</p>
+          <p><strong>Motivo:</strong> {Array.isArray(denuncia.motivo) ? denuncia.motivo.join(", ") : denuncia.motivo}</p> 
+          <p><strong>Estado:</strong></p>
+<select
+  className="form-select mt-2"
+  value={denuncia.estado || "Pendiente"}
+  onChange={(e) => handleActualizarEstado(e.target.value)}
+>
+  <option value="Pendiente">Pendiente</option>
+  <option value="En Proceso">En Proceso</option>
+  <option value="No Admitido">No Admitido</option>
+</select>
+
+        </div>
       </div>
-      <h4>Personas Involucradas</h4>
-      <ul>
-        {Array.isArray(denuncia.personas) && denuncia.personas.length > 0 ? (
-          denuncia.personas.map((p, idx) => (
-            <li key={idx} style={{ marginBottom: "1em" }}>
-              <strong>Nombre:</strong> {p.nombre} {p.apellido}<br />
-              <strong>DNI:</strong> {p.documento}<br />
-              <strong>Email:</strong> {p.email}<br />
-              <strong>Teléfono:</strong> {p.telefono}<br />
-            </li>
-          ))
-        ) : (
-          <li>No hay personas asociadas.</li>
-        )}
-      </ul>
+
+      {/* Box Derecho */}
+      <div className="col-md-5 m-3">
+        <div className="p-4 bg-white shadow rounded">
+          <h4>Personas Involucradas</h4>
+          <ul className="mt-3">
+            {Array.isArray(denuncia.personas) && denuncia.personas.length > 0 ? (
+              denuncia.personas.map((p, idx) => (
+                <li key={idx} className="mb-3">
+                  <strong>Nombre:</strong> {p.nombre} {p.apellido}<br />
+                  <strong>DNI:</strong> {p.documento}<br />
+                  <strong>Email:</strong> {p.email}<br />
+                  <strong>Teléfono:</strong> {p.telefono}<br />
+                </li>
+              ))
+            ) : (
+              <li>No hay personas asociadas.</li>
+            )}
+          </ul>
+        </div>
+      </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default DetalleDenuncia;

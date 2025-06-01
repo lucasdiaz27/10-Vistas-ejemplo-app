@@ -49,8 +49,7 @@ export const NavBar = () => {
                 </Link>
               </li>
             </ul>
-           
-          </div>
+            </div>
         </div>
       </nav>
     </>

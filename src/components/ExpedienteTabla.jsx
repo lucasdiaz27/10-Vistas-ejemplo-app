@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { traerDenuncias } from "../apis/apiDenuncia";
+import { date } from "zod";
+import { FaEye, FaEdit } from "react-icons/fa";
+
 
 const Expedientetabla = () => {
   const [expedientes, setExpedientes] = useState([]);
@@ -62,7 +65,8 @@ const Expedientetabla = () => {
             <th className="px-4 py-2 border-b">Solicitante</th>
             <th className="px-4 py-2 border-b">Objeto</th>
             <th className="px-4 py-2 border-b">Motivo</th>
-            <th className="px-4 py-2 border-b">DNI</th>
+            <th className="px-4 py-2 border-b">Descripcion</th>
+            <th className="px-4 py-2 border-b">Fecha de Ingreso</th>
             <th className="px-4 py-2 border-b">Estado</th>
             <th className="px-4 py-2 border-b">Acciones</th>
           </tr>
@@ -80,17 +84,26 @@ const Expedientetabla = () => {
                 <td className="px-4 py-2 border-b">
                   {getDniSolicitante(exp.personas)}
                 </td>
+                <td className="px-4 py-2 border-b">{date}</td> {/* tratandod de poner fecha*/}
                 <td className="px-4 py-2 border-b">{exp.estado ?? "null"}</td>
-                <td className="px-4 py-2 border-b space-x-1">
-                  <Link
-                    to={`/denuncia/${exp.id}`}
-                    className="btn btn-primary btn-sm"
-                  >
-                    Ver detalle
-                  </Link>
-                  <button className="btn btn-success btn-sm">✔</button>
-                  <button className="btn btn-danger btn-sm">✖</button>
-                </td>
+                <td className="px-4 py-2  d-flex align-items-center gap-2">
+  <Link
+    to={`/denuncia/${exp.id}`}
+    className="btn btn-link p-0 text-primary"
+    title="Ver detalle"
+  >
+    <FaEye />
+  </Link>
+
+  <button
+    className="btn btn-link p-0 text-secondary"
+    title="Editar"
+    onClick={() => alert("Todavía no anda esto xD")}
+  >
+    <FaEdit />
+  </button>
+</td>
+
               </tr>
             ))
           ) : (

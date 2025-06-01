@@ -10,7 +10,7 @@ export const NavBarInterno = () => {
       >
         <div className="container-fluid">
           <Link
-            to="/menu-interno"
+            to="/menu-interno?vista=mesa-entrada"
             className="navbar-brand d-flex align-items-center "
             style={{ height: "60px" }}
           >
