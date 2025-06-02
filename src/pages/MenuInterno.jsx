@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import React from "react";
 import Expedientetabla from "../components/Expedientetabla";
+import Pases from "../components/pases/Pases";
 
 const MenuInterno = () => {
   const location = useLocation();
@@ -87,7 +88,7 @@ const MenuInterno = () => {
         />
       )}
 
-      {vista === "pases" && <p>Contenido de Pases (próximamente)</p>}
+      {vista === "pases" && <Pases />}
       {vista === "expedientes" && <p>Listado de expedientes</p>}
       {vista === "formulario" && <p>Formulario interno</p>}
       {vista === "usuarios" && <p>Gestión de usuarios</p>}
@@ -103,6 +104,5 @@ export default MenuInterno;
 
 
 
-        
 
 

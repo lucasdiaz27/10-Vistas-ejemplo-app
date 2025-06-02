@@ -4,7 +4,6 @@ import { traerDenuncias } from "../apis/apiDenuncia";
 import { date } from "zod";
 import { FaEye, FaEdit } from "react-icons/fa";
 
-
 const Expedientetabla = () => {
   const [expedientes, setExpedientes] = useState([]);
   const [busqueda, setBusqueda] = useState("");
@@ -56,8 +55,7 @@ const Expedientetabla = () => {
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
       />
-      <div className="overflow-x-auto shadow rounded-lg">
-      </div>
+      <div className="overflow-x-auto shadow rounded-lg"></div>
       <table className="min-w-full bg-white border border-gray-200 text-sm">
         <thead className="bg-gray-100 text-left">
           <tr>
@@ -76,34 +74,29 @@ const Expedientetabla = () => {
             expedientesFiltrados.map((exp) => (
               <tr key={exp.id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 border-b">{exp.id}</td>
-                <td className="px-4 py-2 border-b">
-                  {getSolicitante(exp.personas)}
-                </td>
+                <td className="px-4 py-2 border-b">{getSolicitante(exp.personas)}</td>
                 <td className="px-4 py-2 border-b">{exp.objeto?.join(", ")}</td>
                 <td className="px-4 py-2 border-b">{exp.motivo?.join(", ")}</td>
-                <td className="px-4 py-2 border-b">
-                  {getDniSolicitante(exp.personas)}
-                </td>
-                <td className="px-4 py-2 border-b">{date}</td> {/* tratandod de poner fecha*/}
+                <td className="px-4 py-2 border-b">{getDniSolicitante(exp.personas)}</td>
+                <td className="px-4 py-2 border-b">{exp.fechaIngreso}</td>
                 <td className="px-4 py-2 border-b">{exp.estado ?? "null"}</td>
-                <td className="px-4 py-2  d-flex align-items-center gap-2">
-  <Link
-    to={`/denuncia/${exp.id}`}
-    className="btn btn-link p-0 text-primary"
-    title="Ver detalle"
-  >
-    <FaEye />
-  </Link>
+                <td className="px-4 py-2 d-flex align-items-center gap-2">
+                  <Link
+                    to={`/denuncia/${exp.id}`}
+                    className="btn btn-link p-0 text-primary"
+                    title="Ver detalle"
+                  >
+                    <FaEye />
+                  </Link>
 
-  <button
-    className="btn btn-link p-0 text-secondary"
-    title="Editar"
-    onClick={() => alert("Todavía no anda esto xD")}
-  >
-    <FaEdit />
-  </button>
-</td>
-
+                  <button
+                    className="btn btn-link p-0 text-secondary"
+                    title="Editar"
+                    onClick={() => alert("Todavía no anda esto xD")}
+                  >
+                    <FaEdit />
+                  </button>
+                </td>
               </tr>
             ))
           ) : (
