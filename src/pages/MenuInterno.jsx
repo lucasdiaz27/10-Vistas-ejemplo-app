@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import Expedientetabla from "../components/Expedientetabla";
 import Pases from "../components/pases/Pases";
+import Expedientes from "../components/expedientes/Expedientes";
 
 const MenuInterno = () => {
   const location = useLocation();
@@ -89,7 +90,7 @@ const MenuInterno = () => {
       )}
 
       {vista === "pases" && <Pases />}
-      {vista === "expedientes" && <p>Listado de expedientes</p>}
+      {vista === "expedientes" && <Expedientes />}
       {vista === "formulario" && <p>Formulario interno</p>}
       {vista === "usuarios" && <p>Gestión de usuarios</p>}
       {vista === "ajustes" && <p>Configuración del sistema</p>}
