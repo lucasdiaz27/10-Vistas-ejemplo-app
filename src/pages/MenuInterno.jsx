@@ -8,6 +8,8 @@ import { FaEye } from "react-icons/fa";
 import { traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
 import MesaEntradaModal from "../components/MesaEntradaModal";
+import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
+// import VistaAjustes from "../components/ajustes/VistaAjustes";
 
 const MenuInterno = () => {
   const location = useLocation();
@@ -215,8 +217,8 @@ const MenuInterno = () => {
       {vista === "pases" && <Pases />}
       {vista === "expedientes" && <Expedientes />}
       {vista === "formulario" && <p>Formulario interno</p>}
-      {vista === "usuarios" && <p>Gestión de usuarios</p>}
-      {vista === "ajustes" && <p>Configuración del sistema</p>}
+      {vista === "usuarios" && <VistaUsuarios2 />}
+      {vista === "ajustes" && <p>Vista de ajustes (en construcción)</p>}
       {!vista && <p>Seleccioná una opción del menú superior.</p>}
     </div>
   );

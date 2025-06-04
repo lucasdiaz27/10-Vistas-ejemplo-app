@@ -16,7 +16,7 @@ export default function Pases() {
 
   return (
     <div className="p-4 bg-white rounded shadow-sm">
-      <div className="d-flex justify-between items-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold">Gestión de Pases</h2>
         <button className="btn btn-primary" onClick={() => abrirModal('nuevo')}>
           <i className="bi bi-plus-lg me-2"></i> Nuevo Pase
@@ -32,6 +32,7 @@ export default function Pases() {
             <i className="bi bi-list me-1"></i> Lista de Pases
           </button>
         </li>
+        {/*
         <li className="nav-item">
           <button
             className={`nav-link ${vistaActiva === 'tarjetas' ? 'active' : ''}`}
@@ -40,6 +41,7 @@ export default function Pases() {
             <i className="bi bi-grid me-1"></i> Vista Tarjetas
           </button>
         </li>
+        */}
       </ul>
 
       {vistaActiva === 'lista' ? <ListaDePases abrirModal={abrirModal} /> : <VistaTarjetas abrirModal={abrirModal} />}
