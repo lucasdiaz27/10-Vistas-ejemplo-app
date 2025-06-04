@@ -10,7 +10,7 @@ import MenuInterno from "./pages/MenuInterno";
 import NavBarInterno from "./components/NavBarInterno";
 import { Prueba } from "./pages/prueba";
 import ListaDenuncias from "./components/ListaDenuncias";
-import DetalleDenuncia from "./components/DetalleDenuncia";
+import { DetalleDenuncia } from "./pages/DetalleDenuncia";
 
 function SiteApp() {
   return (
