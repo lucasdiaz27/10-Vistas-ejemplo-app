@@ -23,13 +23,19 @@ export const traerDenuncias = async () => {
   return res.data;
 };
 
+export const traerDenunciaPorId = async (id) => {
+  const res = await axios.get(`http://localhost:8080/denuncia/traerDenunciaPorId/${id}`);
+  return res.data;
+}
+
+
 export const eliminarDenuncia = async (id) => {
   return axios.delete(`http://localhost:8080/denuncia/eliminar/${id}`);
 };
 
-export const actualizarEstadoDenuncia = async (id, nuevoEstado) => {
+export const actualizarEstadoDenuncia = async (id, nuevoEstado, motivoEstado) => {
   return axios.put(
     `http://localhost:8080/denuncia/actualizarEstado/${id}`,
-    { estado: nuevoEstado }
+    { estado: nuevoEstado, motivo: motivoEstado }
   );
 };
