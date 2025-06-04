@@ -13,7 +13,6 @@ export default function TablaExpedientes({ filtro }) {
     const fetchExpedientes = async () => {
       try {
         const data = await traerExpedientes();
-        console.log("Expedientes traídos:", data); // <-- así ves los datos reales
         setExpedientes(data);
       } catch (err) {
         console.error('Error al traer expedientes:', err);
@@ -33,32 +32,18 @@ export default function TablaExpedientes({ filtro }) {
     setExpedienteSeleccionado(null);
   };
 
+  // Solo filtra por los campos que existen en la respuesta de la API
   const texto = filtro.trim().toLowerCase();
-
   const filtrados = texto
-    ? expedientes.filter(exp => {
-        const denunciante = exp.denuncia?.personas?.find(
-          p => (p.rol || "").toLowerCase() === "denunciante"
-        );
-        return (
-          (exp.nro_exp ?? '').toLowerCase().includes(texto) ||
-          (denunciante?.nombre ?? '').toLowerCase().includes(texto) ||
-          (denunciante?.apellido ?? '').toLowerCase().includes(texto) ||
-          (denunciante?.documento ?? '').toLowerCase().includes(texto) ||
-          (exp.denuncia?.estado ?? '').toLowerCase().includes(texto) ||
-          (exp.denuncia?.motivo?.join(", ") ?? '').toLowerCase().includes(texto)
-        );
-      })
+    ? expedientes.filter(exp =>
+        (exp.nro_exp ?? '').toLowerCase().includes(texto) ||
+        (exp.cant_folios?.toString() ?? '').toLowerCase().includes(texto) ||
+        (exp.fecha_inicio ?? '').toLowerCase().includes(texto) ||
+        (exp.fecha_finalizacion ?? '').toLowerCase().includes(texto) ||
+        (exp.hipervulnerable ?? '').toLowerCase().includes(texto) ||
+        (exp.delegacion ?? '').toLowerCase().includes(texto)
+      )
     : expedientes;
-
-  const badgeEstado = (estado) => {
-    const map = {
-      'Pendiente': 'bg-warning text-dark',
-      'En proceso': 'bg-info text-white',
-      'Finalizado': 'bg-success'
-    };
-    return <span className={`badge ${map[estado] || 'bg-secondary'}`}>{estado}</span>;
-  };
 
   return (
     <>

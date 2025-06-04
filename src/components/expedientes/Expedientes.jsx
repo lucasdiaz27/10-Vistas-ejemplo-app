@@ -23,7 +23,7 @@ export default function Expedientes() {
               <input
                 type="text"
                 className="form-control ps-5"
-                placeholder="Buscar por nombre, DNI, estado o tipo..."
+                placeholder="Buscar por N° de orden, Cant. folios, Fecha de ingreso, Fecha de finalización, Hipervulnerable, Delegación..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
