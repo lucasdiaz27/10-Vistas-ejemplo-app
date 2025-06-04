@@ -11,6 +11,7 @@ import NavBarInterno from "./components/NavBarInterno";
 import { Prueba } from "./pages/prueba";
 import ListaDenuncias from "./components/ListaDenuncias";
 import DetalleDenuncia from "./components/DetalleDenuncia";
+import DetalleExpediente from './components/expedientes/DetalleExpediente';
 
 function SiteApp() {
   return (
@@ -109,6 +110,11 @@ function SiteApp() {
             </>
           }
         />
+        <Route
+          path="/expedientes/:id"
+          element={
+            <DetalleExpediente />} 
+            />
 
       </Routes>
     </Router>

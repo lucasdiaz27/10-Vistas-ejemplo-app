@@ -1,42 +1,27 @@
-// TablaExpedientes.jsx
-
-import { useState } from 'react';
-import ModalVerExpediente from './modales/ModalVerExpediente';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ModalEditarExpediente from './modales/ModalEditarExpediente';
-
-const datosEjemplo = [
-  {
-    id: 1,
-    nroOrden: 'EXP-2023-00124',
-    nombre: 'Martín González',
-    dni: '28456789',
-    tipo: 'Reclamo',
-    fechaIngreso: '2023-11-15',
-    estado: 'Pendiente'
-  },
-  {
-    id: 2,
-    nroOrden: 'EXP-2023-00123',
-    nombre: 'Laura Fernández',
-    dni: '33789456',
-    tipo: 'Denuncia',
-    fechaIngreso: '2023-11-14',
-    estado: 'En proceso'
-  },
-  {
-    id: 3,
-    nroOrden: 'EXP-2023-00122',
-    nombre: 'Carlos Rodríguez',
-    dni: '25123789',
-    tipo: 'Reclamo',
-    fechaIngreso: '2023-11-12',
-    estado: 'Finalizado'
-  }
-];
+import { traerExpedientes } from '../../apis/expedientesApi';
 
 export default function TablaExpedientes({ filtro }) {
-  const [modal, setModal] = useState(null); // 'ver' | 'editar'
+  const [expedientes, setExpedientes] = useState([]);
+  const [modal, setModal] = useState(null);
   const [expedienteSeleccionado, setExpedienteSeleccionado] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchExpedientes = async () => {
+      try {
+        const data = await traerExpedientes();
+        console.log("Expedientes traídos:", data); // <-- así ves los datos reales
+        setExpedientes(data);
+      } catch (err) {
+        console.error('Error al traer expedientes:', err);
+      }
+    };
+
+    fetchExpedientes();
+  }, []);
 
   const abrirModal = (tipo, expediente) => {
     setExpedienteSeleccionado(expediente);
@@ -48,15 +33,23 @@ export default function TablaExpedientes({ filtro }) {
     setExpedienteSeleccionado(null);
   };
 
-  const normalizado = filtro.toLowerCase();
+  const texto = filtro.trim().toLowerCase();
 
-  const datosFiltrados = datosEjemplo.filter(exp =>
-    exp.nroOrden.toLowerCase().includes(normalizado) ||
-    exp.nombre.toLowerCase().includes(normalizado) ||
-    exp.dni.toLowerCase().includes(normalizado) ||
-    exp.estado.toLowerCase().includes(normalizado) ||
-    exp.tipo.toLowerCase().includes(normalizado)
-  );
+  const filtrados = texto
+    ? expedientes.filter(exp => {
+        const denunciante = exp.denuncia?.personas?.find(
+          p => (p.rol || "").toLowerCase() === "denunciante"
+        );
+        return (
+          (exp.nro_exp ?? '').toLowerCase().includes(texto) ||
+          (denunciante?.nombre ?? '').toLowerCase().includes(texto) ||
+          (denunciante?.apellido ?? '').toLowerCase().includes(texto) ||
+          (denunciante?.documento ?? '').toLowerCase().includes(texto) ||
+          (exp.denuncia?.estado ?? '').toLowerCase().includes(texto) ||
+          (exp.denuncia?.motivo?.join(", ") ?? '').toLowerCase().includes(texto)
+        );
+      })
+    : expedientes;
 
   const badgeEstado = (estado) => {
     const map = {
@@ -64,7 +57,7 @@ export default function TablaExpedientes({ filtro }) {
       'En proceso': 'bg-info text-white',
       'Finalizado': 'bg-success'
     };
-    return <span className={`badge ${map[estado]}`}>{estado}</span>;
+    return <span className={`badge ${map[estado] || 'bg-secondary'}`}>{estado}</span>;
   };
 
   return (
@@ -74,29 +67,29 @@ export default function TablaExpedientes({ filtro }) {
           <thead className="table-light">
             <tr>
               <th>N° de orden</th>
-              <th>Nombre</th>
-              <th>DNI</th>
-              <th>Tipo</th>
+              <th>Cant. folios</th>
               <th>Fecha de ingreso</th>
-              <th>Estado</th>
+              <th>Fecha de finalización</th>
+              <th>Hipervulnerable</th>
+              <th>Delegación</th>
               <th className="text-end">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {datosFiltrados.map((exp) => (
+            {filtrados.map((exp) => (
               <tr key={exp.id}>
-                <td>{exp.nroOrden}</td>
-                <td>{exp.nombre}</td>
-                <td>{exp.dni}</td>
-                <td>{exp.tipo}</td>
-                <td>{exp.fechaIngreso}</td>
-                <td>{badgeEstado(exp.estado)}</td>
+                <td>{exp.nro_exp ?? exp.id ?? "-"}</td>
+                <td>{exp.cant_folios ?? "-"}</td>
+                <td>{exp.fecha_inicio ?? "-"}</td>
+                <td>{exp.fecha_finalizacion ?? "-"}</td>
+                <td>{exp.hipervulnerable ?? "-"}</td>
+                <td>{exp.delegacion ?? "-"}</td>
                 <td className="text-end">
                   <div className="btn-group btn-group-sm">
                     <button
                       className="btn btn-outline-primary"
                       title="Ver expediente"
-                      onClick={() => abrirModal('ver', exp)}
+                      onClick={() => navigate(`/expedientes/${exp.id}`)}
                     >
                       <i className="bi bi-eye"></i>
                     </button>
@@ -113,14 +106,10 @@ export default function TablaExpedientes({ filtro }) {
             ))}
           </tbody>
         </table>
-        {datosFiltrados.length === 0 && (
+        {filtrados.length === 0 && (
           <div className="alert alert-light text-center">No se encontraron resultados.</div>
         )}
       </div>
-
-      {modal === 'ver' && expedienteSeleccionado && (
-        <ModalVerExpediente expediente={expedienteSeleccionado} onClose={cerrarModal} />
-      )}
 
       {modal === 'editar' && expedienteSeleccionado && (
         <ModalEditarExpediente expediente={expedienteSeleccionado} onClose={cerrarModal} />

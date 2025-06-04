@@ -1,6 +1,6 @@
 // ModalVerExpediente.jsx
 
-export default function ModalVerExpediente({ onClose, expediente }) {
+/*export default function ModalVerExpediente({ onClose, expediente }) {
   return (
     <div className="modal fade show d-block" tabIndex="-1" role="dialog">
       <div className="modal-dialog modal-lg" role="document">
@@ -24,4 +24,4 @@ export default function ModalVerExpediente({ onClose, expediente }) {
       </div>
     </div>
   );
-}
+}*/
