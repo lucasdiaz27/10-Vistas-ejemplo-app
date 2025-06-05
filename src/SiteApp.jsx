@@ -13,10 +13,12 @@ import ListaDenuncias from "./components/ListaDenuncias";
 import { DetalleDenuncia as DetalleDenunciaPage } from "./pages/DetalleDenuncia";
 import DetalleExpediente from "./components/expedientes/DetalleExpediente";
 import Ajustes from "./pages/Ajustes";
+import ScrollToTop from "./components/ScrollToTop";
 
 function SiteApp() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Páginas normales con NavBar y Footer */}
         <Route

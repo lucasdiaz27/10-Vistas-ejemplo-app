@@ -50,11 +50,6 @@ export const NavBarInterno = () => {
                 </Link>
               </li>
               <li className="nav-item me-5">
-                <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=completar-formulario">
-                  Completar Formulario
-                </Link>
-              </li>
-              <li className="nav-item me-5">
                 <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=usuarios">
                   Usuarios
                 </Link>
