@@ -1,7 +1,7 @@
 import React from "react";
 import { FaEye } from "react-icons/fa";
 
-const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDenuncia, setBusquedaDenuncia, abrirModal, aceptar, rechazar, estadoConfig }) => {
+const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDenuncia, setBusquedaDenuncia, abrirDetalle, aceptar, rechazar, estadoConfig }) => {
   return (
     <>
       <div className="row mb-3 g-2">
@@ -70,7 +70,7 @@ const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDe
                         <button
                           className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 px-2 py-1"
                           title="Ver detalles"
-                          onClick={() => abrirModal(d)}
+                          onClick={() => abrirDetalle(d)}
                         >
                           <FaEye /> <span className="d-none d-md-inline">Detalle</span>
                         </button>

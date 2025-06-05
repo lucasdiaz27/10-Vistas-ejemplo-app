@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import React from "react";
 import Expedientetabla from "../components/Expedientetabla";
@@ -7,12 +7,12 @@ import Expedientes from "../components/expedientes/Expedientes";
 import { FaEye } from "react-icons/fa";
 import { traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
-import MesaEntradaModal from "../components/MesaEntradaModal";
 import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
 // import VistaAjustes from "../components/ajustes/VistaAjustes";
 
 const MenuInterno = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [vista, setVista] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [expedientes, setExpedientes] = useState([
@@ -174,8 +174,7 @@ const MenuInterno = () => {
   });
 
   // Acciones
-  const abrirModal = (denuncia) => setModal({ abierto: true, denuncia });
-  const cerrarModal = () => setModal({ abierto: false, denuncia: null });
+  const abrirDetalle = (denuncia) => navigate(`/denuncia/${denuncia.id}`);
   const aceptar = (id) => alert(`Denuncia ${id} aceptada (ejemplo)`);
   const rechazar = (id) => alert(`Denuncia ${id} rechazada (ejemplo)`);
 
@@ -201,15 +200,9 @@ const MenuInterno = () => {
             setFiltroEstado={setFiltroEstado}
             busquedaDenuncia={busquedaDenuncia}
             setBusquedaDenuncia={setBusquedaDenuncia}
-            abrirModal={abrirModal}
+            abrirDetalle={abrirDetalle}
             aceptar={aceptar}
             rechazar={rechazar}
-            estadoConfig={ESTADO_CONFIG}
-          />
-          <MesaEntradaModal
-            abierto={modal.abierto}
-            denuncia={modal.denuncia}
-            cerrarModal={cerrarModal}
             estadoConfig={ESTADO_CONFIG}
           />
         </>

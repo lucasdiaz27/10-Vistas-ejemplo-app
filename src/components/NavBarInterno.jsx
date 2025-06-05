@@ -59,8 +59,8 @@ export const NavBarInterno = () => {
                   Usuarios
                 </Link>
               </li>
-              <li className="nav-item ">
-                <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=ajustes">
+              <li className="nav-item me-5">
+                <Link className="nav-link text-white fw-semibold" to="/ajustes">
                   Ajustes
                 </Link>
               </li>

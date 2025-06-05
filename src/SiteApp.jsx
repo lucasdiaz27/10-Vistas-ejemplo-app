@@ -11,7 +11,8 @@ import NavBarInterno from "./components/NavBarInterno";
 import { Prueba } from "./pages/prueba";
 import ListaDenuncias from "./components/ListaDenuncias";
 import { DetalleDenuncia as DetalleDenunciaPage } from "./pages/DetalleDenuncia";
-import DetalleExpediente from "./components/expedientes/DetalleExpediente"
+import DetalleExpediente from "./components/expedientes/DetalleExpediente";
+import Ajustes from "./pages/Ajustes";
 
 function SiteApp() {
   return (
@@ -81,7 +82,6 @@ function SiteApp() {
           }
         />
 
-
         <Route
           path="/prueba"
           element={
@@ -112,10 +112,17 @@ function SiteApp() {
         />
         <Route
           path="/expedientes/:id"
-          element={
-            <DetalleExpediente />}
+          element={<DetalleExpediente />}
         />
-
+        <Route
+          path="/ajustes"
+          element={
+            <>
+              <NavBarInterno />
+              <Ajustes />
+            </>
+          }
+        />
       </Routes>
     </Router>
   );
