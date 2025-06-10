@@ -49,7 +49,7 @@ export default function TablaExpedientes({ filtro }) {
     <>
       <div className="table-responsive">
         <table className="table table-hover">
-          <thead className="table-light">
+          <thead className="table-primary">
             <tr>
               <th>N° de orden</th>
               <th>Cant. folios</th>

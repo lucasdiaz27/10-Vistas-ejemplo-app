@@ -4,6 +4,7 @@ import { FaEye } from "react-icons/fa";
 const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDenuncia, setBusquedaDenuncia, abrirDetalle, aceptar, rechazar, estadoConfig }) => {
   return (
     <>
+      <h2 className="fw-bold">Mesa de Entrada - Denuncias</h2>
       <div className="row mb-3 g-2">
         <div className="col-md-8">
           <input

@@ -9,6 +9,7 @@ import { enviarDenuncia } from "../apis/apiDenuncia";
 
 export const Formulario = () => {
   const [formularioEnviado, setFormularioEnviado] = useState(false);
+  const [toast, setToast] = useState({ show: false, success: true, message: "" });
   const fileInputRef = useRef();
 
   /* formState errors trae los errores (si es que hay), de cada fieldValue o input por así decirlo,  */
@@ -23,13 +24,22 @@ export const Formulario = () => {
   console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
   
   const onSubmit = (data) => {
-    //console.log(files)
     try {
       const files = fileInputRef.current?.files;
       enviarDenuncia(data, files);
-      console.log(data);
-      alert("Formulario enviado correctamente");
+      setToast({
+        show: true,
+        success: true,
+        message: "¡Formulario enviado correctamente!",
+      });
+      setFormularioEnviado(true);
     } catch (error) {
+      setToast({
+        show: true,
+        success: false,
+        message: "No se pudo enviar el formulario.",
+      });
+      setFormularioEnviado(false);
       console.log(error);
     }
   }
@@ -40,11 +50,7 @@ export const Formulario = () => {
           {/* A esto borralo cuando quieras, es para que se vean todos los campos nomas. */}
         </div>
         <h2 className="text-center mb-4">Formulario de Expedientes</h2>
-        {formularioEnviado && (
-          <div className="alert alert-success text-center" role="alert">
-            Formulario enviado
-          </div>
-        )}
+        
         <p className="text-center">
           Completar Formulario con los siguientes datos:
         </p>
@@ -112,6 +118,27 @@ export const Formulario = () => {
             </div>
           </div>
         </form>
+        {toast.show && (
+          <div
+            className={`toast align-items-center text-white ${toast.success ? "bg-success" : "bg-danger"} position-fixed top-0 start-50 translate-middle-x mt-4 show`}
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            style={{ zIndex: 9999, minWidth: 300 }}
+          >
+            <div className="d-flex">
+              <div className="toast-body">
+                {toast.message}
+              </div>
+              <button
+                type="button"
+                className="btn-close btn-close-white me-2 m-auto"
+                aria-label="Close"
+                onClick={() => setToast({ ...toast, show: false })}
+              ></button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ function TablaUsuarios({ usuarios, onEditar }) {
   return (
     <div className="table-responsive">
       <table className="table table-hover">
-        <thead className="table-light">
+        <thead className="table-primary">
           <tr>
             <th>Nombre</th>
             <th>Email</th>
