@@ -1,25 +1,10 @@
-// Simulación de datos y configuración de estados (puedes mover esto al padre si lo necesitas)
-const pases = [
-  {
-    id: 1,
-    expediente: "EXP-2023-00123",
-    fecha: "15/05/2023",
-    iniciador: "Juan Pérez",
-    asunto: "Solicitud de materiales",
-    origen: "Administración",
-    destino: "Compras",
-    folios: 12,
-    estado: "Completado",
-  },
-  // ...otros pases
-];
-
 const estadoConfig = {
   pendiente: { label: "Pendiente", color: "warning" },
-  completado: { label: "Completado", color: "success" },
-  rechazado: { label: "Rechazado", color: "danger" },
+  aprobada: { label: "Aprobada", color: "success" },
   "en proceso": { label: "En Proceso", color: "primary" },
-  // agrega más estados si los necesitas
+  "no admitido": { label: "No Admitido", color: "secondary" },
+  rechazada: { label: "Rechazada", color: "danger" },
+  completado: { label: "Completado", color: "success" },
 };
 
 export default function ListaDePases({ abrirModal }) {
@@ -59,36 +44,37 @@ export default function ListaDePases({ abrirModal }) {
             </tr>
           </thead>
           <tbody>
-            {pases.map((pase) => {
-              const estadoKey = (pase.estado || "").toLowerCase().trim();
-              const estado = estadoConfig[estadoKey] || { label: pase.estado, color: "secondary" };
-              return (
-                <tr key={pase.id}>
-                  <td>{pase.expediente}</td>
-                  <td>{pase.fecha}</td>
-                  <td>{pase.iniciador}</td>
-                  <td>{pase.asunto}</td>
-                  <td>{pase.origen}</td>
-                  <td>{pase.destino}</td>
-                  <td>{pase.folios}</td>
-                  <td>
-                    <span className={`badge rounded-pill bg-${estado.color} px-3 py-2 fs-6 fw-semibold`} style={{ letterSpacing: 1 }}>
+            <tr>
+              <td>EXP-2023-00123</td>
+              <td>15/05/2023</td>
+              <td>Juan Pérez</td>
+              <td>Solicitud de materiales</td>
+              <td>Administración</td>
+              <td>Compras</td>
+              <td>12</td>
+              <td>
+                {(() => {
+                  const estadoKey = ("Completado" || "").toLowerCase().trim(); // Reemplaza "Completado" por pase.estado si usás un array
+                  const estado = estadoConfig[estadoKey] || { label: "Completado", color: "secondary" };
+                  return (
+                    <span className={`badge bg-${estado.color}`}>
                       {estado.label}
                     </span>
-                  </td>
-                  <td>
-                    <div className="btn-group btn-group-sm">
-                      <button className="btn btn-outline-primary" onClick={() => abrirModal('ver')}>
-                        <i className="bi bi-eye"></i>
-                      </button>
-                      <button className="btn btn-outline-primary" onClick={() => abrirModal('editar')}>
-                        <i className="bi bi-pencil"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+                  );
+                })()}
+              </td>
+              <td>
+                <div className="btn-group btn-group-sm">
+                  <button className="btn btn-outline-primary" onClick={() => abrirModal('ver')}>
+                    <i className="bi bi-eye"></i>
+                  </button>
+                  <button className="btn btn-outline-primary" onClick={() => abrirModal('editar')}>
+                    <i className="bi bi-pencil"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {/* Puedes agregar más filas fijas aquí si lo necesitas */}
           </tbody>
         </table>
       </div>

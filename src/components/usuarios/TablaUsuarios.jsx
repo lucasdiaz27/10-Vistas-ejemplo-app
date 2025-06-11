@@ -31,7 +31,7 @@ function TablaUsuarios({ usuarios, onEditar }) {
                     title="Editar usuario"
                     onClick={() => onEditar(u)}
                   >
-                    <i className="bi bi-pencil"></i>
+                    <i className="bi bi-pencil-fill"></i>
                   </button>
                 </div>
               </td>

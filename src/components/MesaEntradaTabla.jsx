@@ -1,7 +1,17 @@
 import React from "react";
 import { FaEye } from "react-icons/fa";
 
-const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDenuncia, setBusquedaDenuncia, abrirDetalle, aceptar, rechazar, estadoConfig }) => {
+const estadoConfig = {
+  pendiente: { label: "Pendiente", color: "warning" },
+  aprobada: { label: "Aprobada", color: "success" },
+  "en proceso": { label: "En Proceso", color: "primary" },
+  "no admitido": { label: "No Admitido", color: "secondary" },
+  rechazada: { label: "Rechazada", color: "danger" },
+  completado: { label: "Completado", color: "success" },
+  // Puedes agregar más estados si los necesitas
+};
+
+const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDenuncia, setBusquedaDenuncia, abrirDetalle, aceptar, rechazar }) => {
   return (
     <>
       <h2 className="fw-bold">Mesa de Entrada - Denuncias</h2>
@@ -52,7 +62,7 @@ const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDe
             ) : (
               denuncias.map((d) => {
                 const estadoKey = (d.estado || "").toLowerCase().trim();
-                const estado = estadoConfig[estadoKey] || { label: d.estado, color: "secondary" };
+                const estado = estadoConfig[estadoKey] || { label: d.estado || "Sin estado", color: "secondary" };
                 return (
                   <tr key={d.id}>
                     <td>{d.id}</td>
@@ -62,7 +72,7 @@ const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDe
                     <td>{d.descripcion}</td>
                     <td>{d.fechaIngreso}</td>
                     <td>
-                      <span className={`badge rounded-pill bg-${estado.color} px-3 py-2 fs-6 fw-semibold`} style={{letterSpacing:1}}>
+                      <span className={`badge bg-${estado.color}`}>
                         {estado.label}
                       </span>
                     </td>
@@ -74,20 +84,6 @@ const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDe
                           onClick={() => abrirDetalle(d)}
                         >
                           <FaEye /> <span className="d-none d-md-inline">Detalle</span>
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-success d-flex align-items-center gap-1 px-2 py-1"
-                          title="Aceptar"
-                          onClick={() => aceptar(d.id)}
-                        >
-                          <span style={{fontSize: "1.2em", fontWeight: "bold", lineHeight: 1}}>&#10003;</span>
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 px-2 py-1"
-                          title="Rechazar"
-                          onClick={() => rechazar(d.id)}
-                        >
-                          <span style={{fontSize: "1.2em", fontWeight: "bold", lineHeight: 1}}>&#10005;</span>
                         </button>
                       </div>
                     </td>
