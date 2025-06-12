@@ -57,36 +57,44 @@ export default function VistaUsuarios2() {
   });
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-4 mb-6">
-        <input
-          type="text"
-          className="form-control w-100 w-md-50 mb-2 mb-md-0"
-          placeholder="Buscar por nombre, correo o rol"
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-        />
-        <select
-          className="form-select w-100 w-md-25 mb-2 mb-md-0"
-          value={rolFiltro}
-          onChange={(e) => setRolFiltro(e.target.value)}
-        >
-          <option value="">Todos los roles</option>
-          <option value="Administrador">Administrador</option>
-          <option value="Empleado">Empleado</option>
-          <option value="Inspector">Inspector</option>
-        </select>
-        <button
-          className="btn btn-primary align-self-md-end"
-          style={{ minWidth: 160 }}
-          onClick={() => abrirModal('nuevo')}
-        >
-          Nuevo Usuario
+    <div className="p-4 bg-white rounded shadow-sm">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="fw-bold">Usuarios</h2>
+        <button className="btn btn-primary d-flex align-items-center" style={{ minWidth: 180 }} onClick={() => abrirModal('nuevo')}>
+          <i className="bi bi-plus-lg me-2"></i> Nuevo Usuario
         </button>
       </div>
-
-      <TablaUsuarios usuarios={usuariosFiltrados} onEditar={(u) => abrirModal('editar', u)} />
-
+      <div className="bg-light border p-3 mb-0" style={{ borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+        <div className="row g-2 align-items-center">
+          <div className="col-md-9 col-12 mb-2 mb-md-0">
+            <div className="position-relative">
+              <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+              <input
+                type="text"
+                className="form-control ps-5"
+                placeholder="Buscar por nombre, correo o rol"
+                value={filtro}
+                onChange={(e) => setFiltro(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="col-md-3 col-12 mb-2 mb-md-0">
+            <select
+              className="form-select"
+              value={rolFiltro}
+              onChange={(e) => setRolFiltro(e.target.value)}
+            >
+              <option value="">Todos los roles</option>
+              <option value="Administrador">Administrador</option>
+              <option value="Empleado">Empleado</option>
+              <option value="Inspector">Inspector</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: '0.5rem', borderBottomRightRadius: '0.5rem', overflow: 'hidden' }}>
+        <TablaUsuarios usuarios={usuariosFiltrados} onEditar={(u) => abrirModal('editar', u)} />
+      </div>
       {modal && (
         <ModalUsuario
           tipo={modal}
