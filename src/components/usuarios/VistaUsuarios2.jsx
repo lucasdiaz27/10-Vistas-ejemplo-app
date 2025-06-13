@@ -60,7 +60,7 @@ export default function VistaUsuarios2() {
     <div className="p-4 bg-white rounded shadow-sm">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold">Usuarios</h2>
-        <button className="btn btn-primary d-flex align-items-center" style={{ minWidth: 180 }} onClick={() => abrirModal('nuevo')}>
+        <button className="btn btn-primary d-flex align-items-center px-3 py-2" style={{ fontSize: '1em', borderRadius: '0.5rem', minHeight: '40px', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }} onClick={() => abrirModal('nuevo')}>
           <i className="bi bi-plus-lg me-2"></i> Nuevo Usuario
         </button>
       </div>

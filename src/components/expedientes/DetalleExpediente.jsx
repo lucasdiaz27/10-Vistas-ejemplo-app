@@ -33,31 +33,162 @@ export default function DetalleExpediente() {
   );
 
   return (
-    <div className="container mt-4">
+    <div className="container py-4">
       <button className="btn btn-outline-secondary mb-3" onClick={() => navigate(-1)}>
         <i className="bi bi-arrow-left"></i> Volver
       </button>
-      <div className="card">
-        <div className="card-header">
-          <h4>Detalle del Expediente #{expediente.id}</h4>
+      <div className="row g-4">
+        {/* Información General */}
+        <div className="col-lg-8">
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title mb-3">
+                <i className="bi bi-info-circle me-2"></i>Información General
+              </h5>
+              <p><strong>Número de Expediente:</strong> {expediente.nro_exp ?? '-'}</p>
+              <p><strong>Número de Orden:</strong> {expediente.id}</p>
+              <p><strong>Cant. folios:</strong> {expediente.cant_folios ?? "-"}</p>
+              <p><strong>Fecha de ingreso:</strong> {expediente.fecha_inicio ?? "-"}</p>
+              <p><strong>Fecha de finalización:</strong> {expediente.fecha_finalizacion ?? "-"}</p>
+              <p><strong>HV:</strong> {expediente.hipervulnerable ?? "-"}</p>
+              <p><strong>Delegación:</strong> {expediente.delegacion ?? "-"}</p>
+              {/* Motivo en chips celestes, título arriba y chips debajo */}
+              <div className="mb-2">
+                <div style={{fontWeight: 500, fontSize: '1em', marginBottom: 2}}><strong>Motivo:</strong></div>
+                <div>
+                  {Array.isArray(expediente.denuncia?.motivo) && expediente.denuncia.motivo.length > 0 ? (
+                    expediente.denuncia.motivo.map((motivo, idx) => (
+                      <span
+                        key={idx}
+                        className="badge me-2 mb-1"
+                        style={{
+                          backgroundColor: '#e3f2fd', color: '#1976d2', fontWeight: 500, fontSize: '1em', borderRadius: '0.5rem', padding: '0.5em 0.9em', verticalAlign: 'middle'
+                        }}
+                      >
+                        {motivo}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-muted">-</span>
+                  )}
+                </div>
+              </div>
+              {/* Estado, título arriba y chip debajo */}
+              <div className="mb-2">
+                <div style={{fontWeight: 500, fontSize: '1em', marginBottom: 2}}><strong>Estado:</strong></div>
+                <div>
+                  {(() => {
+                    const estado = (expediente.denuncia?.estado || '').toUpperCase();
+                    let color = '#fff3cd', text = 'Pendiente', icon = <i className="bi bi-hourglass-split me-1"></i>, textColor = '#856404';
+                    if (estado === 'EN PROCESO') {
+                      color = '#ffe5b4'; // naranja suave
+                      textColor = '#a05a00';
+                      text = 'En Proceso';
+                      icon = <i className="bi bi-arrow-repeat me-1"></i>;
+                    } else if (estado === 'FINALIZADO' || estado === 'APROBADO') {
+                      color = '#d4edda'; // verde suave
+                      textColor = '#256029';
+                      text = estado.charAt(0) + estado.slice(1).toLowerCase();
+                      icon = <i className="bi bi-check-circle me-1"></i>;
+                    } else if (estado && estado !== 'PENDIENTE') {
+                      color = '#e2e3e5'; // gris suave
+                      textColor = '#383d41';
+                      text = estado.charAt(0) + estado.slice(1).toLowerCase();
+                      icon = <i className="bi bi-info-circle me-1"></i>;
+                    }
+                    return (
+                      <span
+                        className="badge d-inline-flex align-items-center"
+                        style={{ backgroundColor: color, color: textColor, fontWeight: 500, fontSize: '1em', borderRadius: '0.5rem', padding: '0.5em 1em', verticalAlign: 'middle' }}
+                      >
+                        {icon}{text}
+                      </span>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Resumen de Pases */}
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title mb-3">
+                <i className="bi bi-arrow-left-right me-2"></i>Resumen de Pases
+              </h5>
+              {Array.isArray(expediente.pases) && expediente.pases.length > 0 ? (
+                <div className="table-responsive">
+                  <table className="table table-sm table-bordered mb-0">
+                    <thead className="table-light">
+                      <tr>
+                        <th>Fecha</th>
+                        <th>Origen</th>
+                        <th>Destino</th>
+                        <th>Estado</th>
+                        <th>Asunto</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {expediente.pases.map((pase, idx) => (
+                        <tr key={idx}>
+                          <td>{pase.fecha || '-'}</td>
+                          <td>{pase.origen || '-'}</td>
+                          <td>{pase.destino || '-'}</td>
+                          <td>{pase.estado || '-'}</td>
+                          <td>{pase.asunto || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-muted">No hay pases registrados para este expediente.</div>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="card-body">
-          <p><strong>Número de Orden:</strong> {expediente.nro_exp ?? expediente.id}</p>
-          <p><strong>Cant. folios:</strong> {expediente.cant_folios ?? "-"}</p>
-          <p><strong>Fecha de ingreso:</strong> {expediente.fecha_inicio ?? "-"}</p>
-          <p><strong>Fecha de finalización:</strong> {expediente.fecha_finalizacion ?? "-"}</p>
-          <p><strong>Hipervulnerable:</strong> {expediente.hipervulnerable ?? "-"}</p>
-          <p><strong>Delegación:</strong> {expediente.delegacion ?? "-"}</p>
-          <p><strong>Motivo:</strong> {expediente.denuncia?.motivo?.join(", ") ?? "-"}</p>
-          <p><strong>Estado:</strong> {expediente.denuncia?.estado ?? "-"}</p>
-          <p><strong>Denunciante:</strong> {denunciante ? `${denunciante.nombre} ${denunciante.apellido}` : "-"}</p>
-          <p><strong>DNI Denunciante:</strong> {denunciante ? denunciante.documento : "-"}</p>
-          {/* Podés agregar más campos según lo que necesites */}
-          {expediente.denuncia?.personas?.map(persona => (
-            <p key={persona.id}>
-              <strong>{persona.rol.charAt(0).toUpperCase() + persona.rol.slice(1)}:</strong> {persona.nombre} {persona.apellido} - DNI: {persona.documento}
-            </p>
-          ))}
+        {/* Personas involucradas y Archivos Adjuntos */}
+        <div className="col-lg-4">
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title mb-3">
+                <i className="bi bi-people me-2"></i>Personas Involucradas
+              </h5>
+              {expediente.denuncia?.personas?.map(persona => (
+                <div key={persona.id} className="mb-2">
+                  <strong>{persona.rol.charAt(0).toUpperCase() + persona.rol.slice(1)}:</strong> {persona.nombre} {persona.apellido} - DNI: {persona.documento}
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Archivos Adjuntos */}
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title mb-3">
+                <i className="bi bi-paperclip me-2"></i>Archivos Adjuntos
+              </h5>
+              {Array.isArray(expediente.archivos) && expediente.archivos.length > 0 ? (
+                <ul className="list-group">
+                  {expediente.archivos.map((archivo, idx) => (
+                    <li key={idx} className="list-group-item d-flex align-items-center">
+                      <i className="bi bi-file-earmark me-2"></i>
+                      <span className="me-auto">{archivo.nombre || `Archivo ${idx+1}`}</span>
+                      <a
+                        href={archivo.url || archivo.enlace || archivo.base64 || '#'}
+                        className="btn btn-outline-secondary btn-sm"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download={archivo.nombre}
+                      >
+                        <i className="bi bi-eye"></i> Ver
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="text-muted">No hay archivos adjuntos.</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
