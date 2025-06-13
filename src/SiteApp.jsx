@@ -14,6 +14,7 @@ import { DetalleDenuncia as DetalleDenunciaPage } from "./pages/DetalleDenuncia"
 import DetalleExpediente from "./components/expedientes/DetalleExpediente";
 import Ajustes from "./pages/Ajustes";
 import ScrollToTop from "./components/ScrollToTop";
+import SideBar from "./components/SideBar";
 
 function SiteApp() {
   return (
@@ -76,11 +77,13 @@ function SiteApp() {
         <Route
           path="/menu-interno"
           element={
-            <>
-              <NavBarInterno />
+            <div className="d-flex">
+              <SideBar />
+              <div className="flex-grow-1 p-3">
               <MenuInterno />
+              </div>
               {/* Aqui podria ir otro footer */}
-            </>
+            </div>
           }
         />
 
@@ -119,10 +122,12 @@ function SiteApp() {
         <Route
           path="/ajustes"
           element={
-            <>
-              <NavBarInterno />
+            <div className="d-flex">
+              <SideBar />
+              <div className="flex-grow-1 p-3">
               <Ajustes />
-            </>
+              </div>
+            </div>
           }
         />
       </Routes>

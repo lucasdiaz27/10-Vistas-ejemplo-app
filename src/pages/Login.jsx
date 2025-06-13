@@ -17,7 +17,7 @@ const Login = () => {
 
     const onSubmit = (data) => {
         console.log("Datos del login:", data);
-        navigate("/menu-interno");
+        navigate("/menu-interno?vista=mesa-entrada");
 
  // Redirige a la ruta "/MenuInterno" después de enviar el formulario
     };
