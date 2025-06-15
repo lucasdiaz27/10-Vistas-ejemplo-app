@@ -60,16 +60,16 @@ export default function TablaExpedientes({ filtro }) {
   return (
     <>
       <div className="table-responsive">
-        <table className="table table-hover">
+        <table className="table table-hover align-middle">
           <thead className="table-primary">
             <tr>
-              <th>N° de orden</th>
-              <th>Cant. folios</th>
-              <th>Fecha de ingreso</th>
-              <th>Fecha de finalización</th>
-              <th>Hipervulnerable</th>
-              <th>Delegación</th>
-              <th className="text-end">Acciones</th>
+              <th style={{ minWidth: 110 }}>N° de orden</th>
+              <th style={{ minWidth: 90 }}>Cant. folios</th>
+              <th style={{ minWidth: 130 }}>Fecha de ingreso</th>
+              <th style={{ minWidth: 150 }}>Fecha de finalización</th>
+              <th style={{ minWidth: 60, textAlign: 'center' }}>HV</th>
+              <th style={{ minWidth: 110 }}>Delegación</th>
+              <th className="text-end" style={{ minWidth: 110 }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -79,7 +79,7 @@ export default function TablaExpedientes({ filtro }) {
                 <td>{exp.cant_folios ?? "-"}</td>
                 <td>{exp.fecha_inicio ?? "-"}</td>
                 <td>{exp.fecha_finalizacion ?? "-"}</td>
-                <td>{exp.hipervulnerable ?? "-"}</td>
+                <td className="text-center">{exp.hipervulnerable ?? "-"}</td>
                 <td>{exp.delegacion ?? "-"}</td>
                 <td className="text-end">
                   <div className="btn-group btn-group-sm">

@@ -42,10 +42,9 @@ export default function Expedientes() {
           </button>
         </div>
       </div>
-
-      <div className="card p-3 mb-4">
-        <div className="row g-3">
-          <div className="col-md-8">
+      <div className="bg-light border p-3 mb-0" style={{ borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+        <div className="row g-3 align-items-center">
+          <div className="col-md-8 col-12 mb-2 mb-md-0">
             <div className="position-relative">
               <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
               <input
@@ -57,7 +56,7 @@ export default function Expedientes() {
               />
             </div>
           </div>
-          <div className="col-md-4">
+          <div className="col-md-4 col-12 d-flex justify-content-md-end justify-content-start gap-2">
             <select className="form-select">
               <option>10 registros</option>
               <option>25 registros</option>
@@ -68,7 +67,7 @@ export default function Expedientes() {
         </div>
       </div>
 
-      <TablaExpedientes expedientes={expedientes} filtro={busqueda} />
+      <TablaExpedientes filtro={busqueda} />
     </div>
   );
 }
