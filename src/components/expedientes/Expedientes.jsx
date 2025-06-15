@@ -1,18 +1,46 @@
 // Componente principal: Expedientes.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import TablaExpedientes from './TablaExpedientes';
+import { traerExpedientes } from '../../apis/expedientesApi';
 
 export default function Expedientes() {
   const [busqueda, setBusqueda] = useState('');
+  const [expedientes, setExpedientes] = useState([]);
+
+  useEffect(() => {
+    const fetchExpedientes = async () => {
+      const data = await traerExpedientes();
+      setExpedientes(data);
+    };
+    fetchExpedientes();
+  }, []);
+
+  // Función para eliminar duplicados por id
+  const eliminarDuplicados = () => {
+    const vistos = new Set();
+    const unicos = [];
+    for (const exp of expedientes) {
+      if (!vistos.has(String(exp.id))) {
+        unicos.push(exp);
+        vistos.add(String(exp.id));
+      }
+    }
+    setExpedientes(unicos);
+  };
 
   return (
     <div className="p-4 bg-white rounded shadow-sm">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold">Gestión de Expedientes</h2>
-        <button className="btn btn-primary">
-          <i className="bi bi-plus-lg me-2"></i> Nuevo Expediente
-        </button>
+        <div>
+          <button className="btn btn-danger me-2" onClick={eliminarDuplicados}>
+            <i className="bi bi-trash me-2"></i>Eliminar duplicados
+          </button>
+          <button className="btn btn-primary">
+            <i className="bi bi-plus-lg me-2"></i> Nuevo Expediente
+          </button>
+        </div>
       </div>
 
       <div className="card p-3 mb-4">
@@ -40,7 +68,7 @@ export default function Expedientes() {
         </div>
       </div>
 
-      <TablaExpedientes filtro={busqueda} />
+      <TablaExpedientes expedientes={expedientes} filtro={busqueda} />
     </div>
   );
 }

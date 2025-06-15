@@ -45,6 +45,18 @@ export default function TablaExpedientes({ filtro }) {
       )
     : expedientes;
 
+  const eliminarDuplicados = () => {
+    const vistos = new Set();
+    const unicos = [];
+    for (const exp of expedientes) {
+      if (!vistos.has(String(exp.id))) {
+        unicos.push(exp);
+        vistos.add(String(exp.id));
+      }
+    }
+    setExpedientes(unicos);
+  };
+
   return (
     <>
       <div className="table-responsive">

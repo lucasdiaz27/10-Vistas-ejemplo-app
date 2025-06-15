@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   traerDenunciaPorId,
   actualizarEstadoDenuncia,
 } from "../apis/apiDenuncia";
 import { DescDetalle } from "../components/detalle-denuncia/DescDetalle";
 import { PersonaDetalle } from "../components/detalle-denuncia/PersonaDetalle";
+import { validarYActualizarExpediente } from "../apis/expedientesApi";
 
 const ESTADOS = ["NO ADMITIDO", "RECHAZADO", "EN PROCESO", "PENDIENTE"];
 
 export const DetalleDenuncia = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [denuncia, setDenuncia] = useState(null);
   const [estadoNuevo, setEstadoNuevo] = useState("");
   const [motivoCambio, setMotivoCambio] = useState("");
@@ -40,6 +42,9 @@ export const DetalleDenuncia = () => {
       setDenuncia({ ...denuncia, estado: estadoNuevo });
       setShowMotivo(false);
       setMotivoCambio("");
+      navigate(
+        `/menu-interno?vista=mesa-entrada&actualizarExpediente=1&id=${denuncia.id}&estado=${estadoNuevo}`
+      );
     } catch (error) {
       alert("Error al actualizar el estado");
     }

@@ -8,6 +8,7 @@ import { FaEye } from "react-icons/fa";
 import { traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
 import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
+import { existeExpedienteParaDenuncia, crearExpedienteDesdeDenuncia, actualizarExpediente, traerExpedientes } from "../apis/expedientesApi";
 // import VistaAjustes from "../components/ajustes/VistaAjustes";
 
 const MenuInterno = () => {
@@ -154,6 +155,72 @@ const MenuInterno = () => {
     setExpedientes(nuevos);
   };
 
+  // Actualiza el estado del expediente existente según el id de la denuncia
+  const actualizarEstadoExpediente = (denunciaId, nuevoEstado, datosDenuncia = null) => {
+    setExpedientes((prev) => {
+      // Convertí ambos a string para comparar SIEMPRE
+      const existe = prev.some(exp => String(exp.id) === String(denunciaId));
+
+      let nuevos;
+      if (existe) {
+        // Solo actualiza el estado del expediente existente
+        nuevos = prev.map((exp) =>
+          String(exp.id) === String(denunciaId)
+            ? { ...exp, estado: nuevoEstado }
+            : exp
+        );
+      } else if (datosDenuncia) {
+        // Si no existe, crea un nuevo expediente con los datos de la denuncia
+        const nuevoExpediente = {
+          id: String(datosDenuncia.id),
+          nombre: datosDenuncia.solicitante,
+          tipoDocumento: datosDenuncia.objeto,
+          dni: "", // o datosDenuncia.dni si lo tenés
+          fechaIngreso: datosDenuncia.fechaIngreso,
+          estado: nuevoEstado,
+        };
+        nuevos = [...prev, nuevoExpediente];
+      } else {
+        return prev;
+      }
+
+      // Ordena por fechaIngreso (o por id si preferís)
+      nuevos = nuevos
+        .sort((a, b) => new Date(a.fechaIngreso) - new Date(b.fechaIngreso))
+        .map((exp, idx) => ({
+          ...exp,
+          nroOrden: (idx + 1).toString().padStart(3, "0"),
+        }));
+
+      return nuevos;
+    });
+  };
+
+  const handleActualizarExpediente = async (denunciaId, nuevoEstado, dataParaActualizarOCrear) => {
+    const expedientes = await traerExpedientes();
+    // Buscá el expediente relacionado a la denuncia
+    const expediente = expedientes.find(
+      exp => exp.denuncia && String(exp.denuncia.id) === String(denunciaId)
+    );
+
+    if (nuevoEstado.toLowerCase() === "en proceso") {
+      if (expediente) {
+        // Si ya existe, solo actualizá el estado
+        await actualizarExpediente(expediente.id, { ...expediente, estado: "En proceso" });
+      } else {
+        // Si no existe, creá el expediente
+        await crearExpedienteDesdeDenuncia(denunciaId);
+      }
+    } else {
+      // Para otros estados, actualizá el expediente si existe
+      if (expediente) {
+        await actualizarExpediente(expediente.id, { ...expediente, estado: nuevoEstado });
+      } else {
+        alert("No existe expediente para esta denuncia.");
+      }
+    }
+  };
+
   // Filtrado y búsqueda de denuncias
   const denunciasFiltradas = denuncias.filter((d) => {
     const texto = busquedaDenuncia.toLowerCase();
@@ -175,8 +242,20 @@ const MenuInterno = () => {
 
   // Acciones
   const abrirDetalle = (denuncia) => navigate(`/denuncia/${denuncia.id}`);
-  const aceptar = (id) => alert(`Denuncia ${id} aceptada (ejemplo)`);
-  const rechazar = (id) => alert(`Denuncia ${id} rechazada (ejemplo)`);
+  const aceptar = (id) => {
+    setDenuncias((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, estado: "Aprobada" } : d))
+    );
+    const datosDenuncia = denuncias.find(d => d.id === id);
+    handleActualizarExpediente(id, "Aprobada", datosDenuncia);
+  };
+  const rechazar = (id) => {
+    setDenuncias((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, estado: "Rechazada" } : d))
+    );
+    const datosDenuncia = denuncias.find(d => d.id === id);
+    handleActualizarExpediente(id, "Rechazada", datosDenuncia);
+  };
 
   //  Filtro general (por nombre, estado, nroOrden o dni)
   const texto = busqueda.toLowerCase();
@@ -188,6 +267,31 @@ const MenuInterno = () => {
       exp.estado.toLowerCase().includes(texto)
     );
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("actualizarExpediente") === "1") {
+      const id = params.get("id");
+      const estado = params.get("estado");
+      if (denuncias.length > 0) {
+        const datosDenuncia = denuncias.find(d => String(d.id) === String(id));
+        if (id && estado && datosDenuncia) {
+          handleActualizarExpediente(id, estado, datosDenuncia);
+          navigate("/menu-interno?vista=mesa-entrada", { replace: true });
+        }
+      }
+    }
+  }, [location.search, denuncias, navigate]);
+
+  const handleCrearExpedienteEnProceso = async (denunciaId) => {
+    const yaExiste = await existeExpedienteParaDenuncia(denunciaId);
+    if (yaExiste) {
+      alert("Ya existe un expediente para esta denuncia. No se puede crear otro.");
+      return;
+    }
+    await crearExpedienteDesdeDenuncia(denunciaId);
+    // Opcional: recargá la lista de expedientes
+  };
 
   return (
     <div className="container mt-4">
