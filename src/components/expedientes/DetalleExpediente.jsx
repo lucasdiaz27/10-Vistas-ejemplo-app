@@ -3,12 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { traerExpedientePorId } from "../../apis/expedientesApi";
+import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+import ExpedientePDF from './ExpedientePDF';
+
 export default function DetalleExpediente() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [expediente, setExpediente] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [mostrarPDF, setMostrarPDF] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -34,9 +38,36 @@ export default function DetalleExpediente() {
 
   return (
     <div className="container py-4">
-      <button className="btn btn-outline-secondary mb-3" onClick={() => navigate(-1)}>
-        <i className="bi bi-arrow-left"></i> Volver
-      </button>
+      <div className="mb-3 d-flex gap-2">
+        <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
+          <i className="bi bi-arrow-left"></i> Volver
+        </button>
+        <button className="btn btn-success" onClick={() => setMostrarPDF(true)}>
+          <i className="bi bi-file-earmark-pdf"></i> Generar PDF
+        </button>
+        <PDFDownloadLink
+          document={<ExpedientePDF expediente={expediente} />}
+          fileName={`expediente_${expediente.id}.pdf`}
+          className="btn btn-primary"
+        >
+          Descargar PDF
+        </PDFDownloadLink>
+      </div>
+
+      {mostrarPDF && (
+        <div className="mb-4">
+          <h5>Previsualización del PDF:</h5>
+          <PDFViewer width="100%" height={500}>
+            <ExpedientePDF expediente={expediente} />
+          </PDFViewer>
+          <div className="mt-2">
+            <button className="btn btn-secondary" onClick={() => setMostrarPDF(false)}>
+              Cerrar previsualización
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="row g-4">
         {/* Información General */}
         <div className="col-lg-8">
