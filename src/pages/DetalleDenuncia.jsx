@@ -7,6 +7,7 @@ import {
 import { DescDetalle } from "../components/detalle-denuncia/DescDetalle";
 import { PersonaDetalle } from "../components/detalle-denuncia/PersonaDetalle";
 import { validarYActualizarExpediente } from "../apis/expedientesApi";
+import { jwtDecode } from "jwt-decode";
 
 const ESTADOS = ["NO ADMITIDO", "RECHAZADO", "EN PROCESO", "PENDIENTE"];
 
@@ -19,10 +20,17 @@ export const DetalleDenuncia = () => {
   const [showMotivo, setShowMotivo] = useState(false);
   const [tab, setTab] = useState("Denunciante");
 
+
   useEffect(() => {
     const obtenerDenuncia = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");  if (token) {
+        // Decodifica el token
+        const decoded = jwtDecode(token)
+        // Accede al rol (ajusta el nombre según tu backend, puede ser 'role', 'rol', 'authorities', etc.)
+        const rol = decoded.rol;
+        console.log("Rol del usuario:", rol);
+      }
         const data = await traerDenunciaPorId(id, token);
         setDenuncia(data);
       } catch (error) {
