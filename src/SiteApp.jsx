@@ -112,8 +112,10 @@ function SiteApp() {
           path="/denuncia/:id"
           element={
             <>
-              <NavBarInterno />
+              <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
+              <div className={`contenido-principal ${sidebarAbierta ? "con-sidebar" : ""}`}>
               <DetalleDenunciaPage />
+              </div>
             </>
           }
         />
