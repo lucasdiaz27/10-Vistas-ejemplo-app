@@ -3,12 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { traerExpedientePorId } from "../../apis/expedientesApi";
+import TablaAudiencias from "./TablaAudiencias";
+import ModalAudiencia from "./ModalAudiencia";
+
 export default function DetalleExpediente() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [expediente, setExpediente] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [tab, setTab] = useState("pases");
+  const [modalAudiencia, setModalAudiencia] = useState({ show: false, modo: null, audiencia: null });
+  const [audiencias, setAudiencias] = useState([]);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -25,6 +31,33 @@ export default function DetalleExpediente() {
     fetchExpediente();
   }, [id]);
 
+  useEffect(() => {
+    if (expediente && Array.isArray(expediente.audiencias)) {
+      setAudiencias(expediente.audiencias);
+    }
+  }, [expediente]);
+
+  const handleNuevaAudiencia = () => {
+    setModalAudiencia({ show: true, modo: "crear", audiencia: null });
+  };
+
+  const handleEditarAudiencia = (audiencia) => {
+    setModalAudiencia({ show: true, modo: "editar", audiencia });
+  };
+
+  const handleGuardarAudiencia = (audiencia) => {
+    if (modalAudiencia.modo === "crear") {
+      setAudiencias([...audiencias, { ...audiencia, id: Date.now() }]);
+    } else if (modalAudiencia.modo === "editar") {
+      setAudiencias(audiencias.map(a => a.id === audiencia.id ? audiencia : a));
+    }
+    setModalAudiencia({ show: false, modo: null, audiencia: null });
+  };
+
+  const handleCerrarModal = () => {
+    setModalAudiencia({ show: false, modo: null, audiencia: null });
+  };
+
   if (cargando) return <div className="container mt-4">Cargando expediente...</div>;
   if (error) return <div className="alert alert-danger mt-4">{error}</div>;
 
@@ -38,7 +71,6 @@ export default function DetalleExpediente() {
         <i className="bi bi-arrow-left"></i> Volver
       </button>
       <div className="row g-4">
-        {/* Información General */}
         <div className="col-lg-8">
           <div className="card mb-4">
             <div className="card-body">
@@ -109,40 +141,63 @@ export default function DetalleExpediente() {
               </div>
             </div>
           </div>
-          {/* Resumen de Pases */}
+          {/* Selector de pestañas */}
           <div className="card mb-4">
-            <div className="card-body">
-              <h5 className="card-title mb-3">
-                <i className="bi bi-arrow-left-right me-2"></i>Resumen de Pases
-              </h5>
-              {Array.isArray(expediente.pases) && expediente.pases.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-sm table-bordered mb-0">
-                    <thead className="table-light">
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Origen</th>
-                        <th>Destino</th>
-                        <th>Estado</th>
-                        <th>Asunto</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {expediente.pases.map((pase, idx) => (
-                        <tr key={idx}>
-                          <td>{pase.fecha || '-'}</td>
-                          <td>{pase.origen || '-'}</td>
-                          <td>{pase.destino || '-'}</td>
-                          <td>{pase.estado || '-'}</td>
-                          <td>{pase.asunto || '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-muted">No hay pases registrados para este expediente.</div>
-              )}
+            <div className="card-body pb-0">
+              <div className="d-flex align-items-center mb-3">
+                <button
+                  className={`btn btn-link px-3 py-2 ${tab === "pases" ? "fw-bold text-primary" : "text-secondary"}`}
+                  style={{ textDecoration: "none" }}
+                  onClick={() => setTab("pases")}
+                >
+                  <i className="bi bi-arrow-left-right me-2"></i>Historial de Pases
+                </button>
+                <button
+                  className={`btn btn-link px-3 py-2 ${tab === "audiencias" ? "fw-bold text-primary" : "text-secondary"}`}
+                  style={{ textDecoration: "none" }}
+                  onClick={() => setTab("audiencias")}
+                >
+                  <i className="bi bi-calendar-event me-2"></i>Audiencias
+                </button>
+              </div>
+              <div>
+                {tab === "pases" ? (
+                  Array.isArray(expediente.pases) && expediente.pases.length > 0 ? (
+                    <div className="table-responsive">
+                      <table className="table table-sm table-bordered mb-0">
+                        <thead className="table-light">
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Estado</th>
+                            <th>Asunto</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {expediente.pases.map((pase, idx) => (
+                            <tr key={idx}>
+                              <td>{pase.fecha || '-'}</td>
+                              <td>{pase.origen || '-'}</td>
+                              <td>{pase.destino || '-'}</td>
+                              <td>{pase.estado || '-'}</td>
+                              <td>{pase.asunto || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-muted">No hay pases registrados para este expediente.</div>
+                  )
+                ) : (
+                  <TablaAudiencias
+                    audiencias={audiencias}
+                    onNueva={handleNuevaAudiencia}
+                    onEditar={handleEditarAudiencia}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -191,6 +246,14 @@ export default function DetalleExpediente() {
           </div>
         </div>
       </div>
+      {/* Modal para crear/editar audiencia */}
+      <ModalAudiencia
+        show={modalAudiencia.show}
+        modo={modalAudiencia.modo}
+        audiencia={modalAudiencia.audiencia}
+        onGuardar={handleGuardarAudiencia}
+        onClose={handleCerrarModal}
+      />
     </div>
   );
 }
