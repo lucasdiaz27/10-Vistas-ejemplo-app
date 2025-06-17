@@ -8,7 +8,12 @@ import { FaEye } from "react-icons/fa";
 import { traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
 import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
-import { existeExpedienteParaDenuncia, crearExpedienteDesdeDenuncia, actualizarExpediente, traerExpedientes } from "../apis/expedientesApi";
+import {
+  existeExpedienteParaDenuncia,
+  crearExpedienteDesdeDenuncia,
+  actualizarExpediente,
+  traerExpedientes,
+} from "../apis/expedientesApi";
 // import VistaAjustes from "../components/ajustes/VistaAjustes";
 
 const MenuInterno = () => {
@@ -56,7 +61,9 @@ const MenuInterno = () => {
     setVista(vistaParam);
     if (vistaParam === "mesa-entrada") {
       setDenuncias([]);
-      traerDenuncias()
+      const token = localStorage.getItem("token"); // <-- Obtén el token aquí
+      console.log(token)
+      traerDenuncias(token)
         .then((data) => {
           if (Array.isArray(data) && data.length > 0) {
             setDenuncias(
@@ -65,7 +72,9 @@ const MenuInterno = () => {
                   id: d.id,
                   solicitante:
                     d.personas && d.personas.length > 0
-                      ? `${d.personas[0].nombre || ""} ${d.personas[0].apellido || ""}`.trim()
+                      ? `${d.personas[0].nombre || ""} ${
+                          d.personas[0].apellido || ""
+                        }`.trim()
                       : "",
                   objeto: Array.isArray(d.objeto)
                     ? d.objeto.join(", ")
@@ -74,7 +83,8 @@ const MenuInterno = () => {
                     ? d.motivo.join(", ")
                     : d.motivo || "",
                   descripcion: d.descripcion || "",
-                  fechaIngreso: d.fechaIngreso || d.fechaCreacion || d.fecha || "",
+                  fechaIngreso:
+                    d.fechaIngreso || d.fechaCreacion || d.fecha || "",
                   estado: d.estado || "",
                   archivo: d.archivo || null,
                 };
@@ -100,7 +110,8 @@ const MenuInterno = () => {
           solicitante: "Juan Pérez",
           objeto: "Ruidos molestos",
           motivo: "Vecino con música alta",
-          descripcion: "El vecino del departamento 3B pone música fuerte todas las noches.",
+          descripcion:
+            "El vecino del departamento 3B pone música fuerte todas las noches.",
           fechaIngreso: "2025-06-04",
           estado: "Pendiente",
           archivo: null,
@@ -110,7 +121,8 @@ const MenuInterno = () => {
           solicitante: "Ana Gómez",
           objeto: "Obra sin permiso",
           motivo: "Construcción ilegal",
-          descripcion: "Se está construyendo una ampliación sin cartel de obra.",
+          descripcion:
+            "Se está construyendo una ampliación sin cartel de obra.",
           fechaIngreso: "2025-06-03",
           estado: "Aprobada",
           archivo: null,
@@ -156,10 +168,14 @@ const MenuInterno = () => {
   };
 
   // Actualiza el estado del expediente existente según el id de la denuncia
-  const actualizarEstadoExpediente = (denunciaId, nuevoEstado, datosDenuncia = null) => {
+  const actualizarEstadoExpediente = (
+    denunciaId,
+    nuevoEstado,
+    datosDenuncia = null
+  ) => {
     setExpedientes((prev) => {
       // Convertí ambos a string para comparar SIEMPRE
-      const existe = prev.some(exp => String(exp.id) === String(denunciaId));
+      const existe = prev.some((exp) => String(exp.id) === String(denunciaId));
 
       let nuevos;
       if (existe) {
@@ -196,17 +212,24 @@ const MenuInterno = () => {
     });
   };
 
-  const handleActualizarExpediente = async (denunciaId, nuevoEstado, dataParaActualizarOCrear) => {
+  const handleActualizarExpediente = async (
+    denunciaId,
+    nuevoEstado,
+    dataParaActualizarOCrear
+  ) => {
     const expedientes = await traerExpedientes();
     // Buscá el expediente relacionado a la denuncia
     const expediente = expedientes.find(
-      exp => exp.denuncia && String(exp.denuncia.id) === String(denunciaId)
+      (exp) => exp.denuncia && String(exp.denuncia.id) === String(denunciaId)
     );
 
     if (nuevoEstado.toLowerCase() === "en proceso") {
       if (expediente) {
         // Si ya existe, solo actualizá el estado
-        await actualizarExpediente(expediente.id, { ...expediente, estado: "En proceso" });
+        await actualizarExpediente(expediente.id, {
+          ...expediente,
+          estado: "En proceso",
+        });
       } else {
         // Si no existe, creá el expediente
         await crearExpedienteDesdeDenuncia(denunciaId);
@@ -214,7 +237,10 @@ const MenuInterno = () => {
     } else {
       // Para otros estados, actualizá el expediente si existe
       if (expediente) {
-        await actualizarExpediente(expediente.id, { ...expediente, estado: nuevoEstado });
+        await actualizarExpediente(expediente.id, {
+          ...expediente,
+          estado: nuevoEstado,
+        });
       } else {
         alert("No existe expediente para esta denuncia.");
       }
@@ -229,14 +255,12 @@ const MenuInterno = () => {
     const estadoFiltro = (filtroEstado || "").toLowerCase().trim();
     return (
       (!filtroEstado || estadoDenuncia === estadoFiltro) &&
-      (
-        d.id?.toString().includes(texto) ||
+      (d.id?.toString().includes(texto) ||
         (d.solicitante || "").toLowerCase().includes(texto) ||
         (d.objeto || "").toLowerCase().includes(texto) ||
         (d.motivo || "").toLowerCase().includes(texto) ||
         (d.descripcion || "").toLowerCase().includes(texto) ||
-        (d.fechaIngreso || "").toLowerCase().includes(texto)
-      )
+        (d.fechaIngreso || "").toLowerCase().includes(texto))
     );
   });
 
@@ -246,14 +270,14 @@ const MenuInterno = () => {
     setDenuncias((prev) =>
       prev.map((d) => (d.id === id ? { ...d, estado: "Aprobada" } : d))
     );
-    const datosDenuncia = denuncias.find(d => d.id === id);
+    const datosDenuncia = denuncias.find((d) => d.id === id);
     handleActualizarExpediente(id, "Aprobada", datosDenuncia);
   };
   const rechazar = (id) => {
     setDenuncias((prev) =>
       prev.map((d) => (d.id === id ? { ...d, estado: "Rechazada" } : d))
     );
-    const datosDenuncia = denuncias.find(d => d.id === id);
+    const datosDenuncia = denuncias.find((d) => d.id === id);
     handleActualizarExpediente(id, "Rechazada", datosDenuncia);
   };
 
@@ -274,7 +298,9 @@ const MenuInterno = () => {
       const id = params.get("id");
       const estado = params.get("estado");
       if (denuncias.length > 0) {
-        const datosDenuncia = denuncias.find(d => String(d.id) === String(id));
+        const datosDenuncia = denuncias.find(
+          (d) => String(d.id) === String(id)
+        );
         if (id && estado && datosDenuncia) {
           handleActualizarExpediente(id, estado, datosDenuncia);
           navigate("/menu-interno?vista=mesa-entrada", { replace: true });
@@ -286,7 +312,9 @@ const MenuInterno = () => {
   const handleCrearExpedienteEnProceso = async (denunciaId) => {
     const yaExiste = await existeExpedienteParaDenuncia(denunciaId);
     if (yaExiste) {
-      alert("Ya existe un expediente para esta denuncia. No se puede crear otro.");
+      alert(
+        "Ya existe un expediente para esta denuncia. No se puede crear otro."
+      );
       return;
     }
     await crearExpedienteDesdeDenuncia(denunciaId);
@@ -295,7 +323,6 @@ const MenuInterno = () => {
 
   return (
     <div className="container mt-4">
-      
       {vista === "mesa-entrada" && (
         <>
           <MesaEntradaTabla

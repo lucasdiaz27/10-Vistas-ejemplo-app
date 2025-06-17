@@ -6,7 +6,8 @@ const ListaDenuncias = () => {
 
   const cargarDenuncias = async () => {
     try {
-      const data = await traerDenuncias();
+      const token = localStorage.getItem("token");
+      const data = await traerDenuncias(token);
       setDenuncias(data);
     } catch (error) {
       console.error("Error al cargar denuncias:", error);

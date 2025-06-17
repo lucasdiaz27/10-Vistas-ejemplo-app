@@ -22,7 +22,8 @@ export const DetalleDenuncia = () => {
   useEffect(() => {
     const obtenerDenuncia = async () => {
       try {
-        const data = await traerDenunciaPorId(id);
+        const token = localStorage.getItem("token");
+        const data = await traerDenunciaPorId(id, token);
         setDenuncia(data);
       } catch (error) {
         console.error("Error al obtener denuncia:", error);

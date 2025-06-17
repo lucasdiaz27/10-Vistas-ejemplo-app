@@ -26,7 +26,8 @@ const Login = () => {
 
             const response = await axios.post("http://localhost:8080/auth/login", payload);
 
-            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("token", response.data.access_token);
+            console.log("TOKEN ENVIADO:", response.data.access_token); 
             navigate("/menu-interno");
         } catch (error) {
             alert("Usuario o contraseña incorrectos");
