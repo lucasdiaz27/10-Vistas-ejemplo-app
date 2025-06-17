@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../validations/loginSchema';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 
 const Login = () => {
@@ -15,11 +16,21 @@ const Login = () => {
         resolver: zodResolver(loginSchema),
     });
 
-    const onSubmit = (data) => {
-        console.log("Datos del login:", data);
-        navigate("/menu-interno");
+    const onSubmit = async (data) => {
+        try {
+            // nombres llave
+            const payload = {
+                email: data.usuario,
+                password: data.contraseña,
+            };
 
- // Redirige a la ruta "/MenuInterno" después de enviar el formulario
+            const response = await axios.post("http://localhost:8080/auth/login", payload);
+
+            localStorage.setItem("token", response.data.token);
+            navigate("/menu-interno");
+        } catch (error) {
+            alert("Usuario o contraseña incorrectos");
+        }
     };
 
     return ( 

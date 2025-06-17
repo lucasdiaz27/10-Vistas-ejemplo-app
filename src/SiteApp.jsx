@@ -14,6 +14,7 @@ import { DetalleDenuncia as DetalleDenunciaPage } from "./pages/DetalleDenuncia"
 import DetalleExpediente from "./components/expedientes/DetalleExpediente";
 import Ajustes from "./pages/Ajustes";
 import ScrollToTop from "./components/ScrollToTop";
+import PrivateRoute from "./routes/PrivateRoute";
 
 function SiteApp() {
   return (
@@ -76,11 +77,12 @@ function SiteApp() {
         <Route
           path="/menu-interno"
           element={
-            <>
-              <NavBarInterno />
-              <MenuInterno />
-              {/* Aqui podria ir otro footer */}
-            </>
+            <PrivateRoute>
+              <>
+                <NavBarInterno />
+                <MenuInterno />
+              </>
+            </PrivateRoute>
           }
         />
 

@@ -1,6 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const NavBarInterno = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
     <>
       <nav
@@ -62,9 +69,12 @@ export const NavBarInterno = () => {
             </ul>
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <Link className="nav-link text-white fw-semibold" to="/login">
+                <button
+                  className="nav-link text-white fw-semibold btn btn-link"
+                  onClick={handleLogout}
+                >
                   Cerrar Sesión
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
