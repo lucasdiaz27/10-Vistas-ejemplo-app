@@ -5,17 +5,16 @@ import { useState } from "react";
 
 
 
-export const SideBar = () => {
-    const [abierto, setAbierto] = useState(true);
+export const SideBar = ({ abierto, setAbierto }) => {
     const toggleSidebar = () => {
         setAbierto(!abierto);
     };
+
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const vistaActual = params.get("vista");
 
     return (
-
         <>
             <button
                 onClick={toggleSidebar}
@@ -86,7 +85,7 @@ export const SideBar = () => {
                         Ajustes
                     </Link>
                     <li>
-                        <Link to="/login" className={`nav-link text-white ${vistaActual === "usuarios" ? "active" : ""}`}>
+                        <Link to="/login" className={`nav-link text-white ${vistaActual === "cerrarsesion  " ? "active" : ""}`}>
                             <i className="bi bi-grid me-2"></i>
                             Cerrar Sesión
                         </Link>
@@ -118,6 +117,7 @@ export const SideBar = () => {
                 </div>
             </div>
         </>
+        
     );
 };
 

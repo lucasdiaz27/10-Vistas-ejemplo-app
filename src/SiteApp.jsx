@@ -15,8 +15,10 @@ import DetalleExpediente from "./components/expedientes/DetalleExpediente";
 import Ajustes from "./pages/Ajustes";
 import ScrollToTop from "./components/ScrollToTop";
 import SideBar from "./components/SideBar";
+import { useState } from "react";
 
 function SiteApp() {
+  const [sidebarAbierta, setSidebarAbierta] = useState(false);
   return (
     <Router>
       <ScrollToTop />
@@ -78,9 +80,9 @@ function SiteApp() {
           path="/menu-interno"
           element={
             <div className="d-flex">
-              <SideBar />
-              <div className="flex-grow-1 p-3">
-              <MenuInterno />
+              <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
+              <div className={`contenido-principal ${sidebarAbierta ? "con-sidebar" : ""}`}>
+                <MenuInterno />
               </div>
               {/* Aqui podria ir otro footer */}
             </div>
@@ -123,9 +125,9 @@ function SiteApp() {
           path="/ajustes"
           element={
             <div className="d-flex">
-              <SideBar />
-              <div className="flex-grow-1 p-3">
-              <Ajustes />
+              <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
+              <div className={`contenido-principal ${sidebarAbierta ? "con-sidebar" : ""}`}>
+                <Ajustes />
               </div>
             </div>
           }
@@ -134,5 +136,6 @@ function SiteApp() {
     </Router>
   );
 }
+
 
 export default SiteApp;
