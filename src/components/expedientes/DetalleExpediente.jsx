@@ -39,8 +39,9 @@ export default function DetalleExpediente() {
   }, [id]);
 
   useEffect(() => {
+    const token = localStorage.getItem("token")
     if (expediente?.id) {
-      traerAudienciasPorExpediente(expediente.id)
+      traerAudienciasPorExpediente(expediente.id, token)
         .then(auds => {
           console.log('Audiencias cargadas:', auds);
           setAudiencias(auds);
@@ -58,10 +59,11 @@ export default function DetalleExpediente() {
   };
 
   const handleGuardarAudiencia = async (audiencia) => {
+    const token = localStorage.getItem("token")
     if (modalAudiencia.modo === "crear") {
       try {
-        await crearAudiencia(audiencia);
-        const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+        await crearAudiencia(audiencia, token);
+        const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id, token);
         setAudiencias(nuevasAudiencias);
         setMensaje("Audiencia creada correctamente");
       } catch (err) {
@@ -69,8 +71,8 @@ export default function DetalleExpediente() {
       }
     } else if (modalAudiencia.modo === "editar") {
       try {
-        await editarAudiencia(modalAudiencia.audiencia.id, audiencia);
-        const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+        await editarAudiencia(modalAudiencia.audiencia.id, audiencia, token);
+        const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id, token);
         setAudiencias(nuevasAudiencias);
         setMensaje("Audiencia editada correctamente");
       } catch (err) {
@@ -85,9 +87,10 @@ export default function DetalleExpediente() {
   };
 
   const handleEliminarAudiencia = async (id) => {
+    const token = localStorage.getItem("token")
     try {
-      await eliminarAudiencia(id);
-      const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+      await eliminarAudiencia(id, token);
+      const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id, token);
       setAudiencias(nuevasAudiencias);
       setMensaje("Audiencia eliminada correctamente");
     } catch (err) {
