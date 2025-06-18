@@ -212,40 +212,40 @@ const MenuInterno = () => {
     });
   };
 
-  const handleActualizarExpediente = async (
-    denunciaId,
-    nuevoEstado,
-    dataParaActualizarOCrear
-  ) => {
-    const expedientes = await traerExpedientes();
-    // Buscá el expediente relacionado a la denuncia
-    const expediente = expedientes.find(
-      (exp) => exp.denuncia && String(exp.denuncia.id) === String(denunciaId)
-    );
+  // const handleActualizarExpediente = async (
+  //   denunciaId,
+  //   nuevoEstado,
+  //   dataParaActualizarOCrear
+  // ) => {
+  //   const expedientes = await traerExpedientes();
+  //   // Buscá el expediente relacionado a la denuncia
+  //   const expediente = expedientes.find(
+  //     (exp) => exp.denuncia && String(exp.denuncia.id) === String(denunciaId)
+  //   );
 
-    if (nuevoEstado.toLowerCase() === "en proceso") {
-      if (expediente) {
-        // Si ya existe, solo actualizá el estado
-        await actualizarExpediente(expediente.id, {
-          ...expediente,
-          estado: "En proceso",
-        });
-      } else {
-        // Si no existe, creá el expediente
-        await crearExpedienteDesdeDenuncia(denunciaId);
-      }
-    } else {
-      // Para otros estados, actualizá el expediente si existe
-      if (expediente) {
-        await actualizarExpediente(expediente.id, {
-          ...expediente,
-          estado: nuevoEstado,
-        });
-      } else {
-        alert("No existe expediente para esta denuncia.");
-      }
-    }
-  };
+  //   if (nuevoEstado.toLowerCase() === "en proceso") {
+  //     if (expediente) {
+  //       // Si ya existe, solo actualizá el estado
+  //       await actualizarExpediente(expediente.id, {
+  //         ...expediente,
+  //         estado: "En proceso",
+  //       });
+  //     } else {
+  //       // Si no existe, creá el expediente
+  //       await crearExpedienteDesdeDenuncia(denunciaId);
+  //     }
+  //   } else {
+  //     // Para otros estados, actualizá el expediente si existe
+  //     if (expediente) {
+  //       await actualizarExpediente(expediente.id, {
+  //         ...expediente,
+  //         estado: nuevoEstado,
+  //       });
+  //     } else {
+  //       alert("No existe expediente para esta denuncia.");
+  //     }
+  //   }
+  // };
 
   // Filtrado y búsqueda de denuncias
   const denunciasFiltradas = denuncias.filter((d) => {
@@ -271,14 +271,14 @@ const MenuInterno = () => {
       prev.map((d) => (d.id === id ? { ...d, estado: "Aprobada" } : d))
     );
     const datosDenuncia = denuncias.find((d) => d.id === id);
-    handleActualizarExpediente(id, "Aprobada", datosDenuncia);
+    //handleActualizarExpediente(id, "Aprobada", datosDenuncia);
   };
   const rechazar = (id) => {
     setDenuncias((prev) =>
       prev.map((d) => (d.id === id ? { ...d, estado: "Rechazada" } : d))
     );
     const datosDenuncia = denuncias.find((d) => d.id === id);
-    handleActualizarExpediente(id, "Rechazada", datosDenuncia);
+    //handleActualizarExpediente(id, "Rechazada", datosDenuncia);
   };
 
   //  Filtro general (por nombre, estado, nroOrden o dni)
@@ -302,7 +302,7 @@ const MenuInterno = () => {
           (d) => String(d.id) === String(id)
         );
         if (id && estado && datosDenuncia) {
-          handleActualizarExpediente(id, estado, datosDenuncia);
+          //handleActualizarExpediente(id, estado, datosDenuncia);
           navigate("/menu-interno?vista=mesa-entrada", { replace: true });
         }
       }

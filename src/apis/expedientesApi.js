@@ -37,7 +37,7 @@ export const validarYActualizarExpediente = async (id, nuevoEstado, callbackActu
 };
 
 export const crearExpedienteDesdeDenuncia = async (denunciaId, token) => {
-  const res = await axios.post(`${BASE_URL}/desde-denuncia/${denunciaId}`, null, {
+  const res = await axios.post(`denuncia/actualizarEstado/${denunciaId}`, null, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
