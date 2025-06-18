@@ -1,15 +1,15 @@
+import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import React from "react";
-import Expedientetabla from "../components/Expedientetabla";
-import Pases from "../components/pases/Pases";
-import Expedientes from "../components/expedientes/Expedientes";
-import { FaEye } from "react-icons/fa";
 import { traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
 import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
 import { existeExpedienteParaDenuncia, crearExpedienteDesdeDenuncia, actualizarExpediente, traerExpedientes } from "../apis/expedientesApi";
-// import VistaAjustes from "../components/ajustes/VistaAjustes";
+import Swal from 'sweetalert2';
+import ExpedienteTabla from "../components/ExpedienteTabla";
+import { FaEye } from "react-icons/fa";
+import Pases from '../components/pases/Pases';
+import Expedientes from '../components/expedientes/Expedientes';
 
 const MenuInterno = () => {
   const location = useLocation();
@@ -216,7 +216,24 @@ const MenuInterno = () => {
       if (expediente) {
         await actualizarExpediente(expediente.id, { ...expediente, estado: nuevoEstado });
       } else {
-        alert("No existe expediente para esta denuncia.");
+        Swal.fire({
+          icon: 'warning',
+          title: 'No existe expediente',
+          text: 'No existe expediente para esta denuncia.',
+          confirmButtonText: 'Aceptar',
+          confirmButtonColor: '#ff9800',
+          background: '#f8fafc',
+          customClass: {
+            title: 'swal2-title-modern',
+            popup: 'swal2-popup-modern',
+          },
+          showClass: {
+            popup: 'animate__animated animate__fadeInDown'
+          },
+          hideClass: {
+            popup: 'animate__animated animate__fadeOutUp'
+          }
+        });
       }
     }
   };
@@ -286,7 +303,24 @@ const MenuInterno = () => {
   const handleCrearExpedienteEnProceso = async (denunciaId) => {
     const yaExiste = await existeExpedienteParaDenuncia(denunciaId);
     if (yaExiste) {
-      alert("Ya existe un expediente para esta denuncia. No se puede crear otro.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Expediente existente',
+        text: 'Ya existe un expediente para esta denuncia. No se puede crear otro.',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#ff9800',
+        background: '#f8fafc',
+        customClass: {
+          title: 'swal2-title-modern',
+          popup: 'swal2-popup-modern',
+        },
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
       return;
     }
     await crearExpedienteDesdeDenuncia(denunciaId);

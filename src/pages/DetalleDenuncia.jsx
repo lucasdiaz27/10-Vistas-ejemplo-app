@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { validarYActualizarExpediente } from "../apis/expedientesApi";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   traerDenunciaPorId,
@@ -6,7 +7,7 @@ import {
 } from "../apis/apiDenuncia";
 import { DescDetalle } from "../components/detalle-denuncia/DescDetalle";
 import { PersonaDetalle } from "../components/detalle-denuncia/PersonaDetalle";
-import { validarYActualizarExpediente } from "../apis/expedientesApi";
+import Swal from "sweetalert2";
 
 const ESTADOS = ["NO ADMITIDO", "RECHAZADO", "EN PROCESO", "PENDIENTE"];
 
@@ -45,8 +46,25 @@ export const DetalleDenuncia = () => {
       navigate(
         `/menu-interno?vista=mesa-entrada&actualizarExpediente=1&id=${denuncia.id}&estado=${estadoNuevo}`
       );
-    } catch (error) {
-      alert("Error al actualizar el estado");
+    } catch {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al actualizar',
+        text: 'No se pudo actualizar el estado. Intenta nuevamente.',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#e53935',
+        background: '#f8fafc',
+        customClass: {
+          title: 'swal2-title-modern',
+          popup: 'swal2-popup-modern',
+        },
+        showClass: {
+          popup: 'animate__animated animate__shakeX'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
     }
   };
 

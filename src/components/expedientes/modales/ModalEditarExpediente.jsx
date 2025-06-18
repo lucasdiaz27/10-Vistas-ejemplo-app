@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import Swal from 'sweetalert2';
+import PropTypes from 'prop-types';
 
 export default function ModalEditarExpediente({ onClose, expediente }) {
   const [form, setForm] = useState({ ...expediente });
@@ -10,7 +12,24 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Expediente actualizado (funcionalidad pendiente)');
+    Swal.fire({
+      icon: 'info',
+      title: 'Funcionalidad pendiente',
+      text: 'Expediente actualizado (funcionalidad pendiente)',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: '#00bcd4',
+      background: '#f8fafc',
+      customClass: {
+        title: 'swal2-title-modern',
+        popup: 'swal2-popup-modern',
+      },
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      }
+    });
     onClose();
   };
 
@@ -84,3 +103,8 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
     </div>
   );
 }
+
+ModalEditarExpediente.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  expediente: PropTypes.object.isRequired,
+};

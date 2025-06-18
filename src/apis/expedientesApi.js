@@ -1,4 +1,5 @@
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 const BASE_URL = "http://localhost:8080/expediente";
 
@@ -15,13 +16,30 @@ export const validarYActualizarExpediente = async (id, nuevoEstado, callbackActu
   try {
     const expediente = await traerExpedientePorId(id);
     if (expediente && expediente.estado === nuevoEstado) {
-      alert("El expediente ya tiene ese estado. No se puede actualizar.");
+      Swal.fire({
+        icon: 'warning',
+        title: 'Estado repetido',
+        text: 'El expediente ya tiene ese estado. No se puede actualizar.',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#3085d6',
+        background: '#f8fafc',
+        customClass: {
+          title: 'swal2-title-modern',
+          popup: 'swal2-popup-modern',
+        },
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
       return false;
     }
     // Si el estado es diferente, ejecutá el callback y pasale el expediente existente
     await callbackActualizarOCrear(expediente);
     return true;
-  } catch (error) {
+  } catch {
     // Si no existe el expediente, ejecutá el callback con null
     await callbackActualizarOCrear(null);
     return true;

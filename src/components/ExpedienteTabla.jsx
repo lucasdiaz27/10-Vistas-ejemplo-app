@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { date } from "zod";
 import { Link } from "react-router-dom";
 import { traerDenuncias } from "../apis/apiDenuncia";
-import { date } from "zod";
 import { FaEye, FaEdit } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const Expedientetabla = () => {
   const [expedientes, setExpedientes] = useState([]);
@@ -92,7 +93,24 @@ const Expedientetabla = () => {
                   <button
                     className="btn btn-link p-0 text-secondary"
                     title="Editar"
-                    onClick={() => alert("Todavía no anda esto xD")}
+                    onClick={() => Swal.fire({
+                      icon: 'info',
+                      title: 'Funcionalidad pendiente',
+                      text: 'Todavía no anda esto xD',
+                      confirmButtonText: 'Ok',
+                      confirmButtonColor: '#00bcd4',
+                      background: '#f8fafc',
+                      customClass: {
+                        title: 'swal2-title-modern',
+                        popup: 'swal2-popup-modern',
+                      },
+                      showClass: {
+                        popup: 'animate__animated animate__fadeInDown'
+                      },
+                      hideClass: {
+                        popup: 'animate__animated animate__fadeOutUp'
+                      }
+                    })}
                   >
                     <FaEdit />
                   </button>

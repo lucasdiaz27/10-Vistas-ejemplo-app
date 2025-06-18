@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import SiteApp from './SiteApp';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './swal2-custom.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
