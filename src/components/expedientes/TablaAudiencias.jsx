@@ -1,8 +1,14 @@
 import React from "react";
 
-export default function TablaAudiencias({ audiencias, onNueva, onEditar }) {
+export default function TablaAudiencias({ audiencias, onNueva, onEditar, onEliminar }) {
+  const handleEliminarClick = (id) => {
+    if (window.confirm("¿Estás seguro que deseas eliminar esta audiencia?")) {
+      onEliminar(id);
+    }
+  };
+
   return (
-    <div>
+    <div style={{ paddingBottom: '2rem' }}>
       <div className="d-flex justify-content-end mb-2">
         <button className="btn btn-primary btn-sm" onClick={onNueva}>
           <i className="bi bi-plus-lg me-1"></i> Nueva Audiencia
@@ -10,14 +16,13 @@ export default function TablaAudiencias({ audiencias, onNueva, onEditar }) {
       </div>
       {audiencias.length > 0 ? (
         <div className="table-responsive">
-          <table className="table table-sm table-bordered mb-0">
+          <table className="table table-sm table-bordered mb-0 align-middle" style={{ borderRadius: '0.5rem', overflow: 'hidden' }}>
             <thead className="table-light">
               <tr>
                 <th>Fecha</th>
                 <th>Hora</th>
                 <th>Lugar</th>
-                <th>Persona Llamada</th>
-                <th>Empresa Llamada</th>
+                <th>Personas llamadas</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -28,21 +33,28 @@ export default function TablaAudiencias({ audiencias, onNueva, onEditar }) {
                   <td>{a.hora || "-"}</td>
                   <td>{a.lugar || "-"}</td>
                   <td>
-                    {a.persona_llamada
-                      ? `${a.persona_llamada.nombre} (${a.persona_llamada.dni})`
-                      : "-"}
+                    {Array.isArray(a.nombresPersonas) && a.nombresPersonas.length > 0 ? (
+                      <ul className="mb-0 ps-3" style={{listStyle: 'disc'}}>
+                        {a.nombresPersonas.map((nombre, i) => (
+                          <li key={i}>{nombre}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      "-"
+                    )}
                   </td>
-                  <td>
-                    {a.empresa_llamada
-                      ? `${a.empresa_llamada.nombre || "-"}`
-                      : "-"}
-                  </td>
-                  <td>
+                  <td className="d-flex gap-2">
                     <button
                       className="btn btn-outline-secondary btn-sm"
                       onClick={() => onEditar(a)}
                     >
                       <i className="bi bi-pencil"></i> Editar
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => handleEliminarClick(a.id)}
+                    >
+                      <i className="bi bi-trash"></i> Eliminar
                     </button>
                   </td>
                 </tr>

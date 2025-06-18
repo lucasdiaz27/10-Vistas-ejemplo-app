@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { traerExpedientePorId } from "../../apis/expedientesApi";
-import { traerAudienciasPorExpediente } from "../../apis/audienciasApi";
+import { traerAudienciasPorExpediente, crearAudiencia, eliminarAudiencia, editarAudiencia } from "../../apis/audienciasApi";
 import TablaAudiencias from "./TablaAudiencias";
 import ModalAudiencia from "./ModalAudiencia";
 
@@ -16,6 +16,7 @@ export default function DetalleExpediente() {
   const [tab, setTab] = useState("pases");
   const [modalAudiencia, setModalAudiencia] = useState({ show: false, modo: null, audiencia: null });
   const [audiencias, setAudiencias] = useState([]);
+  const [mensaje, setMensaje] = useState("");
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -35,7 +36,10 @@ export default function DetalleExpediente() {
   useEffect(() => {
     if (expediente?.id) {
       traerAudienciasPorExpediente(expediente.id)
-        .then(setAudiencias)
+        .then(auds => {
+          console.log('Audiencias cargadas:', auds);
+          setAudiencias(auds);
+        })
         .catch(() => setAudiencias([]));
     }
   }, [expediente]);
@@ -48,17 +52,42 @@ export default function DetalleExpediente() {
     setModalAudiencia({ show: true, modo: "editar", audiencia });
   };
 
-  const handleGuardarAudiencia = (audiencia) => {
+  const handleGuardarAudiencia = async (audiencia) => {
     if (modalAudiencia.modo === "crear") {
-      setAudiencias([...audiencias, { ...audiencia, id: Date.now() }]);
+      try {
+        await crearAudiencia(audiencia);
+        const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+        setAudiencias(nuevasAudiencias);
+        setMensaje("Audiencia creada correctamente");
+      } catch (err) {
+        alert("Error al crear la audiencia");
+      }
     } else if (modalAudiencia.modo === "editar") {
-      setAudiencias(audiencias.map(a => a.id === audiencia.id ? audiencia : a));
+      try {
+        await editarAudiencia(modalAudiencia.audiencia.id, audiencia);
+        const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+        setAudiencias(nuevasAudiencias);
+        setMensaje("Audiencia editada correctamente");
+      } catch (err) {
+        alert("Error al editar la audiencia");
+      }
     }
     setModalAudiencia({ show: false, modo: null, audiencia: null });
   };
 
   const handleCerrarModal = () => {
     setModalAudiencia({ show: false, modo: null, audiencia: null });
+  };
+
+  const handleEliminarAudiencia = async (id) => {
+    try {
+      await eliminarAudiencia(id);
+      const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+      setAudiencias(nuevasAudiencias);
+      setMensaje("Audiencia eliminada correctamente");
+    } catch (err) {
+      alert("Error al eliminar la audiencia");
+    }
   };
 
   if (cargando) return <div className="container mt-4">Cargando expediente...</div>;
@@ -70,6 +99,12 @@ export default function DetalleExpediente() {
 
   return (
     <div className="container py-4">
+      {mensaje && (
+        <div className="alert alert-success alert-dismissible fade show" role="alert">
+          {mensaje}
+          <button type="button" className="btn-close" onClick={() => setMensaje("")}></button>
+        </div>
+      )}
       <button className="btn btn-outline-secondary mb-3" onClick={() => navigate(-1)}>
         <i className="bi bi-arrow-left"></i> Volver
       </button>
@@ -166,8 +201,8 @@ export default function DetalleExpediente() {
               <div>
                 {tab === "pases" ? (
                   Array.isArray(expediente.pases) && expediente.pases.length > 0 ? (
-                    <div className="table-responsive">
-                      <table className="table table-sm table-bordered mb-0">
+                    <div className="table-responsive" style={{ paddingBottom: '2rem' }}>
+                      <table className="table table-sm table-bordered mb-0 align-middle" style={{ borderRadius: '0.5rem', overflow: 'hidden' }}>
                         <thead className="table-light">
                           <tr>
                             <th>Fecha</th>
@@ -191,13 +226,15 @@ export default function DetalleExpediente() {
                       </table>
                     </div>
                   ) : (
-                    <div className="text-muted">No hay pases registrados para este expediente.</div>
+                    <div className="text-muted" style={{ paddingBottom: '2rem' }}>No hay pases registrados para este expediente.</div>
                   )
                 ) : (
                   <TablaAudiencias
                     audiencias={audiencias}
                     onNueva={handleNuevaAudiencia}
                     onEditar={handleEditarAudiencia}
+                    onEliminar={handleEliminarAudiencia}
+                    personasInvolucradas={expediente.denuncia?.personas || []}
                   />
                 )}
               </div>
@@ -256,6 +293,8 @@ export default function DetalleExpediente() {
         audiencia={modalAudiencia.audiencia}
         onGuardar={handleGuardarAudiencia}
         onClose={handleCerrarModal}
+        expedienteId={expediente.id} // id real del expediente, no nro_exp
+        personasInvolucradas={expediente.denuncia?.personas || []}
       />
     </div>
   );

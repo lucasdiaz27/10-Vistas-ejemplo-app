@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
 
-export default function ModalAudiencia({ show, modo, audiencia, onGuardar, onClose }) {
+export default function ModalAudiencia({ show, modo, audiencia, onGuardar, onClose, expedienteId, personasInvolucradas }) {
   const [form, setForm] = useState({
     fecha: "",
     hora: "",
     lugar: "",
-    persona_llamada: { nombre: "", dni: "" },
-    empresa_llamada: { nombre: "" }
+    personasIds: []
   });
 
   useEffect(() => {
@@ -15,16 +14,14 @@ export default function ModalAudiencia({ show, modo, audiencia, onGuardar, onClo
         fecha: audiencia.fecha || "",
         hora: audiencia.hora || "",
         lugar: audiencia.lugar || "",
-        persona_llamada: audiencia.persona_llamada || { nombre: "", dni: "" },
-        empresa_llamada: audiencia.empresa_llamada || { nombre: "" }
+        personasIds: audiencia.personasIds || []
       });
     } else if (modo === "crear") {
       setForm({
         fecha: "",
         hora: "",
         lugar: "",
-        persona_llamada: { nombre: "", dni: "" },
-        empresa_llamada: { nombre: "" }
+        personasIds: []
       });
     }
   }, [show, modo, audiencia]);
@@ -32,16 +29,14 @@ export default function ModalAudiencia({ show, modo, audiencia, onGuardar, onClo
   if (!show) return null;
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name.startsWith("persona_")) {
+    const { name, value, type, checked } = e.target;
+    if (name === "personasIds") {
+      const id = Number(value); // Siempre id numérico
       setForm(f => ({
         ...f,
-        persona_llamada: { ...f.persona_llamada, [name.replace("persona_", "")]: value }
-      }));
-    } else if (name.startsWith("empresa_")) {
-      setForm(f => ({
-        ...f,
-        empresa_llamada: { ...f.empresa_llamada, [name.replace("empresa_", "")]: value }
+        personasIds: checked
+          ? [...f.personasIds, id]
+          : f.personasIds.filter(pid => pid !== id)
       }));
     } else {
       setForm(f => ({ ...f, [name]: value }));
@@ -50,7 +45,19 @@ export default function ModalAudiencia({ show, modo, audiencia, onGuardar, onClo
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onGuardar({ ...audiencia, ...form });
+    let fechaLocalDateTime = form.fecha;
+    if (form.fecha && form.hora) {
+      fechaLocalDateTime = form.fecha + 'T' + form.hora;
+    }
+    const data = {
+      fecha: fechaLocalDateTime,
+      hora: form.hora,
+      lugar: form.lugar,
+      expedienteId: expedienteId, // id real del expediente
+      personasIds: form.personasIds
+    };
+    console.log('JSON enviado al backend:', data); // DEBUG
+    onGuardar(data);
   };
 
   return (
@@ -77,19 +84,25 @@ export default function ModalAudiencia({ show, modo, audiencia, onGuardar, onClo
               <input type="text" className="form-control" name="lugar" value={form.lugar} onChange={handleChange} required />
             </div>
             <div className="mb-2">
-              <label className="form-label">Persona llamada</label>
-              <div className="row g-2">
-                <div className="col">
-                  <input type="text" className="form-control" placeholder="Nombre" name="persona_nombre" value={form.persona_llamada.nombre} onChange={handleChange} required />
-                </div>
-                <div className="col">
-                  <input type="text" className="form-control" placeholder="DNI" name="persona_dni" value={form.persona_llamada.dni} onChange={handleChange} required />
-                </div>
+              <label className="form-label">Personas Involucradas</label>
+              <div>
+                {personasInvolucradas && personasInvolucradas.map((p) => (
+                  <div key={p.id} className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      name="personasIds"
+                      value={p.id}
+                      id={`persona-${p.id}`}
+                      checked={form.personasIds.includes(p.id)}
+                      onChange={handleChange}
+                    />
+                    <label className="form-check-label" htmlFor={`persona-${p.id}`}>
+                      {p.nombre} {p.apellido} (DNI: {p.documento})
+                    </label>
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="mb-2">
-              <label className="form-label">Empresa llamada</label>
-              <input type="text" className="form-control" placeholder="Nombre empresa" name="empresa_nombre" value={form.empresa_llamada.nombre} onChange={handleChange} required />
             </div>
           </div>
           <div className="modal-footer">
