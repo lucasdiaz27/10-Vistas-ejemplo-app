@@ -47,7 +47,9 @@ export const DetalleDenuncia = () => {
 
   const handleEnviarMotivo = async () => {
     try {
-      await actualizarEstadoDenuncia(denuncia.id, estadoNuevo, motivoCambio);
+      const token = localStorage.getItem("token");
+      console.log(token)
+      await actualizarEstadoDenuncia(denuncia.id, estadoNuevo, motivoCambio, token);
       setDenuncia({ ...denuncia, estado: estadoNuevo });
       setShowMotivo(false);
       setMotivoCambio("");
