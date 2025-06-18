@@ -9,6 +9,11 @@ export const SideBar = ({ abierto, setAbierto }) => {
     const toggleSidebar = () => {
         setAbierto(!abierto);
     };
+    
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        navigate("/login");
+    };
 
     const location = useLocation();
     const params = new URLSearchParams(location.search);
@@ -85,7 +90,9 @@ export const SideBar = ({ abierto, setAbierto }) => {
                         Ajustes
                     </Link>
                     <li>
-                        <Link to="/login" className={`nav-link text-white ${vistaActual === "cerrarsesion  " ? "active" : ""}`}>
+                        <Link to="/login" className={`nav-link text-white ${vistaActual === "cerrarsesion  " ? "active" : ""}`}
+                            onClick={handleLogout}
+                            style={{cursor: "pointer"}}>
                             <i className="bi bi-grid me-2"></i>
                             Cerrar Sesión
                         </Link>

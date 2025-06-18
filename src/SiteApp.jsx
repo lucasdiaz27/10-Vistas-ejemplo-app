@@ -82,7 +82,7 @@ function SiteApp() {
           element={
             <PrivateRoute>
               <>
-                <NavBarInterno />
+                <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
                 <MenuInterno />
               </>
             </PrivateRoute>
@@ -102,7 +102,7 @@ function SiteApp() {
           path="/lista-denuncias"
           element={
             <>
-              <NavBarInterno />
+              <SideBar />
               <ListaDenuncias />
               {/* Aqui podria ir otro footer pero me da paja hacerlo*/}
             </>
