@@ -2,18 +2,26 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:8080/expediente";
 
-export const traerExpedientes = async () => {
-  const res = await axios.get(`${BASE_URL}/traerExpedientes`);
+export const traerExpedientes = async (token) => {
+  const res = await axios.get(`${BASE_URL}/traerExpedientes`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
 };
-export const traerExpedientePorId = async (id) => {
-  const res = await axios.get(`http://localhost:8080/expediente/traerExpedientePorId/${id}`);
+export const traerExpedientePorId = async (id, token) => {
+  const res = await axios.get(`http://localhost:8080/expediente/traerExpedientePorId/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
 };
 
-export const validarYActualizarExpediente = async (id, nuevoEstado, callbackActualizarOCrear) => {
+export const validarYActualizarExpediente = async (id, nuevoEstado, callbackActualizarOCrear, token) => {
   try {
-    const expediente = await traerExpedientePorId(id);
+    const expediente = await traerExpedientePorId(id, token);
     if (expediente && expediente.estado === nuevoEstado) {
       alert("El expediente ya tiene ese estado. No se puede actualizar.");
       return false;
@@ -28,22 +36,35 @@ export const validarYActualizarExpediente = async (id, nuevoEstado, callbackActu
   }
 };
 
-export const crearExpedienteDesdeDenuncia = async (denunciaId) => {
-  const res = await axios.post(`${BASE_URL}/desde-denuncia/${denunciaId}`);
+export const crearExpedienteDesdeDenuncia = async (denunciaId, token) => {
+  const res = await axios.post(`${BASE_URL}/desde-denuncia/${denunciaId}`, null, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
 };
 
-export const actualizarExpediente = async (id, expedienteActualizado) => {
-  const res = await axios.put(`${BASE_URL}/${id}`, expedienteActualizado);
+export const actualizarExpediente = async (id, expedienteActualizado, token) => {
+  const res = await axios.put(`${BASE_URL}/${id}`, expedienteActualizado, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return res.data;
 };
 
-export const existeExpedienteParaDenuncia = async (denunciaId) => {
-  const expedientes = await traerExpedientes();
+export const existeExpedienteParaDenuncia = async (denunciaId, token) => {
+  const expedientes = await traerExpedientes(token);
   // Ajustá según cómo venga el objeto expediente desde el backend:
   return expedientes.some(
     exp => exp.denuncia && String(exp.denuncia.id) === String(denunciaId)
   );
 };
 
-// despues agregar funciones como eliminarExpediente(id), etc.
+// despues agregar funciones como eliminarExpediente(id, token), etc.
+
+await crearExpedienteDesdeDenuncia(denunciaId, token);
+// Recargar expedientes después de crear uno nuevo
+const nuevosExpedientes = await traerExpedientes(token);
+setExpedientes(nuevosExpedientes);

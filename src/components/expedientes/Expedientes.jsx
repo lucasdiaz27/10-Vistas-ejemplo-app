@@ -10,7 +10,8 @@ export default function Expedientes() {
 
   useEffect(() => {
     const fetchExpedientes = async () => {
-      const data = await traerExpedientes();
+      const token = localStorage.getItem("token");
+      const data = await traerExpedientes(token);
       setExpedientes(data);
     };
     fetchExpedientes();
@@ -67,7 +68,7 @@ export default function Expedientes() {
         </div>
       </div>
 
-      <TablaExpedientes filtro={busqueda} />
+      <TablaExpedientes filtro={busqueda} expedientes={expedientes} setExpedientes={setExpedientes} />
     </div>
   );
 }

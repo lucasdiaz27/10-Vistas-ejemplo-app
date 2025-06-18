@@ -12,7 +12,8 @@ export default function TablaExpedientes({ filtro }) {
   useEffect(() => {
     const fetchExpedientes = async () => {
       try {
-        const data = await traerExpedientes();
+        const token = localStorage.getItem("token");
+        const data = await traerExpedientes(token);
         setExpedientes(data);
       } catch (err) {
         console.error('Error al traer expedientes:', err);

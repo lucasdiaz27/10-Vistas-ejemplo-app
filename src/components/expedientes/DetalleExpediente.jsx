@@ -17,7 +17,8 @@ export default function DetalleExpediente() {
   useEffect(() => {
     const fetchExpediente = async () => {
       try {
-        const data = await traerExpedientePorId(id);
+        const token = localStorage.getItem("token");
+        const data = await traerExpedientePorId(id, token);
         setExpediente(data);
       } catch (err) {
         setError('Error al cargar el expediente');
