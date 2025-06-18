@@ -3,12 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { traerExpedientePorId } from "../../apis/expedientesApi";
+import FormularioPaseModal from './modales/FormularioPaseModal';
+
 export default function DetalleExpediente() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [expediente, setExpediente] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const abrirModal = () => setMostrarModal(true);
+  const cerrarModal = () => setMostrarModal(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -52,9 +57,8 @@ export default function DetalleExpediente() {
               <p><strong>Fecha de finalización:</strong> {expediente.fecha_finalizacion ?? "-"}</p>
               <p><strong>HV:</strong> {expediente.hipervulnerable ?? "-"}</p>
               <p><strong>Delegación:</strong> {expediente.delegacion ?? "-"}</p>
-              {/* Motivo en chips celestes, título arriba y chips debajo */}
               <div className="mb-2">
-                <div style={{fontWeight: 500, fontSize: '1em', marginBottom: 2}}><strong>Motivo:</strong></div>
+                <div style={{ fontWeight: 500, fontSize: '1em', marginBottom: 2 }}><strong>Motivo:</strong></div>
                 <div>
                   {Array.isArray(expediente.denuncia?.motivo) && expediente.denuncia.motivo.length > 0 ? (
                     expediente.denuncia.motivo.map((motivo, idx) => (
@@ -73,25 +77,24 @@ export default function DetalleExpediente() {
                   )}
                 </div>
               </div>
-              {/* Estado, título arriba y chip debajo */}
               <div className="mb-2">
-                <div style={{fontWeight: 500, fontSize: '1em', marginBottom: 2}}><strong>Estado:</strong></div>
+                <div style={{ fontWeight: 500, fontSize: '1em', marginBottom: 2 }}><strong>Estado:</strong></div>
                 <div>
                   {(() => {
                     const estado = (expediente.denuncia?.estado || '').toUpperCase();
                     let color = '#fff3cd', text = 'Pendiente', icon = <i className="bi bi-hourglass-split me-1"></i>, textColor = '#856404';
                     if (estado === 'EN PROCESO') {
-                      color = '#ffe5b4'; // naranja suave
+                      color = '#ffe5b4';
                       textColor = '#a05a00';
                       text = 'En Proceso';
                       icon = <i className="bi bi-arrow-repeat me-1"></i>;
                     } else if (estado === 'FINALIZADO' || estado === 'APROBADO') {
-                      color = '#d4edda'; // verde suave
+                      color = '#d4edda';
                       textColor = '#256029';
                       text = estado.charAt(0) + estado.slice(1).toLowerCase();
                       icon = <i className="bi bi-check-circle me-1"></i>;
                     } else if (estado && estado !== 'PENDIENTE') {
-                      color = '#e2e3e5'; // gris suave
+                      color = '#e2e3e5';
                       textColor = '#383d41';
                       text = estado.charAt(0) + estado.slice(1).toLowerCase();
                       icon = <i className="bi bi-info-circle me-1"></i>;
@@ -109,7 +112,6 @@ export default function DetalleExpediente() {
               </div>
             </div>
           </div>
-          {/* Resumen de Pases */}
           <div className="card mb-4">
             <div className="card-body">
               <h5 className="card-title mb-3">
@@ -143,10 +145,14 @@ export default function DetalleExpediente() {
               ) : (
                 <div className="text-muted">No hay pases registrados para este expediente.</div>
               )}
+              <div className="mt-3 text-end">
+                <button className="btn btn-primary" onClick={abrirModal}>
+                  <i className="bi bi-plus-lg me-1"></i> Nuevo Pase
+                </button>
+              </div>
             </div>
           </div>
         </div>
-        {/* Personas involucradas y Archivos Adjuntos */}
         <div className="col-lg-4">
           <div className="card mb-4">
             <div className="card-body">
@@ -160,7 +166,6 @@ export default function DetalleExpediente() {
               ))}
             </div>
           </div>
-          {/* Archivos Adjuntos */}
           <div className="card mb-4">
             <div className="card-body">
               <h5 className="card-title mb-3">
@@ -171,7 +176,7 @@ export default function DetalleExpediente() {
                   {expediente.archivos.map((archivo, idx) => (
                     <li key={idx} className="list-group-item d-flex align-items-center">
                       <i className="bi bi-file-earmark me-2"></i>
-                      <span className="me-auto">{archivo.nombre || `Archivo ${idx+1}`}</span>
+                      <span className="me-auto">{archivo.nombre || `Archivo ${idx + 1}`}</span>
                       <a
                         href={archivo.url || archivo.enlace || archivo.base64 || '#'}
                         className="btn btn-outline-secondary btn-sm"
@@ -191,6 +196,14 @@ export default function DetalleExpediente() {
           </div>
         </div>
       </div>
+
+      {/* MODAL DE NUEVO PASE */}
+      <FormularioPaseModal
+        show={mostrarModal}
+        handleClose={cerrarModal}
+        expedienteId={expediente.id}
+        usuarioId={1234} // Reemplazar si tenés el ID del usuario actual
+      />
     </div>
   );
 }
