@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { traerExpedientePorId } from "../../apis/expedientesApi";
+import { traerAudienciasPorExpediente } from "../../apis/audienciasApi";
 import TablaAudiencias from "./TablaAudiencias";
 import ModalAudiencia from "./ModalAudiencia";
 
@@ -32,8 +33,10 @@ export default function DetalleExpediente() {
   }, [id]);
 
   useEffect(() => {
-    if (expediente && Array.isArray(expediente.audiencias)) {
-      setAudiencias(expediente.audiencias);
+    if (expediente?.id) {
+      traerAudienciasPorExpediente(expediente.id)
+        .then(setAudiencias)
+        .catch(() => setAudiencias([]));
     }
   }, [expediente]);
 
