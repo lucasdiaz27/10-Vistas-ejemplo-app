@@ -1,10 +1,6 @@
+import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import React from "react";
-import Expedientetabla from "../components/Expedientetabla";
-import Pases from "../components/pases/Pases";
-import Expedientes from "../components/expedientes/Expedientes";
-import { FaEye } from "react-icons/fa";
 import { traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
 import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
@@ -315,6 +311,24 @@ const MenuInterno = () => {
       alert(
         "Ya existe un expediente para esta denuncia. No se puede crear otro."
       );
+      Swal.fire({
+        icon: 'warning',
+        title: 'Expediente existente',
+        text: 'Ya existe un expediente para esta denuncia. No se puede crear otro.',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#ff9800',
+        background: '#f8fafc',
+        customClass: {
+          title: 'swal2-title-modern',
+          popup: 'swal2-popup-modern',
+        },
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
       return;
     }
     await crearExpedienteDesdeDenuncia(denunciaId);
