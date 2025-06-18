@@ -64,7 +64,7 @@ export const existeExpedienteParaDenuncia = async (denunciaId, token) => {
 
 // despues agregar funciones como eliminarExpediente(id, token), etc.
 
-await crearExpedienteDesdeDenuncia(denunciaId, token);
+//await crearExpedienteDesdeDenuncia(denunciaId, token);
 // Recargar expedientes después de crear uno nuevo
-const nuevosExpedientes = await traerExpedientes(token);
-setExpedientes(nuevosExpedientes);
+// const nuevosExpedientes = await traerExpedientes(token);
+// setExpedientes(nuevosExpedientes);
