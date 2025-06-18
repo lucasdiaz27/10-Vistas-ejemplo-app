@@ -1,4 +1,16 @@
+import { useState } from "react";
+import { TablaEstados } from "./denuncia-estado/TablaEstados";
+
 export const ConsultaTuExpediente = () => {
+
+  const [nroExp, setNroExp] = useState("");
+  const [expedienteBuscado, setExpedienteBuscado] = useState("");
+
+  const handleBuscarExp = () => {
+    setExpedienteBuscado(nroExp); // Solo busca cuando se hace clic
+    console.log(expedienteBuscado)
+  };
+
   return (
     <div className="container my-5">
       <h2 className="text-center fw-bold mb-4">CONSULTA TU EXPEDIENTE</h2>
@@ -11,8 +23,10 @@ export const ConsultaTuExpediente = () => {
               type="text"
               className="form-control me-2"
               placeholder="Número de expediente"
+              value={nroExp}
+              onChange={e => setNroExp(e.target.value)}
             />
-            <button className="btn btn-dark">BUSCAR</button>
+            <button className="btn btn-dark" onClick={handleBuscarExp}>BUSCAR</button>
           </div>
           <p className="fw-bold">
             <span className="me-2">✔</span>
@@ -31,45 +45,7 @@ export const ConsultaTuExpediente = () => {
             id="accordionExample"
             style={{ backgroundColor: "" }}
           >
-            <table className="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th className="text-center">Fecha</th>
-                  <th className="text-center">Estado</th>
-                  <th className="text-center">Descripción</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="text-center">01/01/2023</td>
-                  <td className="text-center">En Espera</td>
-                  <td className="text-center">
-                    Tu denuncia está en espera de ser revisada.
-                  </td>
-                </tr>
-                <tr>
-                  <td className="text-center">15/01/2023</td>
-                  <td className="text-center">En Proceso</td>
-                  <td className="text-center">
-                    Tu denuncia ha sido aprobada.
-                  </td>
-                </tr>
-                <tr>
-                  <td className="text-center">18/01/2023</td>
-                  <td className="text-center">En Proceso</td>
-                  <td className="text-center">
-                    Tu denuncia está en Abogados
-                  </td>
-                </tr>
-                <tr>
-                  <td className="text-center">20/01/2023</td>
-                  <td className="text-center">Finalizado</td>
-                  <td className="text-center">
-                    Tu expediente ha sido finalizado.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <TablaEstados nroExp={expedienteBuscado} />
           </div>
         </div>
       </div>

@@ -68,3 +68,11 @@ export const existeExpedienteParaDenuncia = async (denunciaId, token) => {
 // Recargar expedientes después de crear uno nuevo
 // const nuevosExpedientes = await traerExpedientes(token);
 // setExpedientes(nuevosExpedientes);
+
+
+// ale
+
+export const traerEstadoExpediente = async (nroExp) => {
+  const res = await axios.get(`${BASE_URL}/traerEstados/${nroExp}`);
+  return res.data;
+}

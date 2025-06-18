@@ -8,6 +8,9 @@ import { DescDetalle } from "../components/detalle-denuncia/DescDetalle";
 import { PersonaDetalle } from "../components/detalle-denuncia/PersonaDetalle";
 import { validarYActualizarExpediente } from "../apis/expedientesApi";
 import { jwtDecode } from "jwt-decode";
+import { ArchivosDenuncia } from "../components/detalle-denuncia/ArchivosDenuncia";
+import { ModalPDF } from "../components/detalle-denuncia/ModalPDF";
+import { traerArchivoPDF } from "../apis/apiDocumento";
 
 const ESTADOS = ["NO ADMITIDO", "RECHAZADO", "EN PROCESO", "PENDIENTE"];
 
@@ -19,6 +22,10 @@ export const DetalleDenuncia = () => {
   const [motivoCambio, setMotivoCambio] = useState("");
   const [showMotivo, setShowMotivo] = useState(false);
   const [tab, setTab] = useState("Denunciante");
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
+
+    const [pdfUrl, setPdfUrl] = useState(null);
+
 
 
   useEffect(() => {
@@ -43,6 +50,16 @@ export const DetalleDenuncia = () => {
   const handleEstadoChange = (e) => {
     setEstadoNuevo(e.target.value);
     setShowMotivo(true);
+  };
+
+  const handleVerArchivo = async (archivo) => {
+    const token = localStorage.getItem("token");
+    const blob = await traerArchivoPDF(archivo.id, token);
+    const url = URL.createObjectURL(blob);
+    setPdfUrl(url);
+    setArchivoSeleccionado(archivo);
+    //window.open(url);
+    //console.log(blob.size);
   };
 
   const handleEnviarMotivo = async () => {
@@ -84,34 +101,18 @@ export const DetalleDenuncia = () => {
           {/* Archivos adjuntos */}
           <div className="card mb-4">
             <div className="card-body">
-              <h5 className="card-title mb-3">
-                <i className="bi bi-paperclip me-2"></i>Archivos Adjuntos
-              </h5>
-              {denuncia.archivos?.length > 0 ? (
-                <ul className="list-group">
-                  {denuncia.archivos.map((archivo, idx) => (
-                    <li
-                      className="list-group-item d-flex align-items-center"
-                      key={idx}
-                    >
-                      <i className="bi bi-file-earmark me-2"></i>
-                      <span className="me-auto">{archivo.nombre}</span>
-                      <a
-                        href={archivo.url}
-                        className="btn btn-outline-secondary btn-sm"
-                        download
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <i className="bi bi-download"></i>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="text-muted">No hay archivos adjuntos.</div>
-              )}
+              <ArchivosDenuncia id={id} onVerArchivo={handleVerArchivo} />
             </div>
+            {
+              archivoSeleccionado && pdfUrl && (
+              <ModalPDF 
+                archivo={archivoSeleccionado} 
+                pdfUrl={pdfUrl} 
+                onClose={() => {setArchivoSeleccionado(null)
+                setPdfUrl(null)
+              }} />
+              )
+            }
           </div>
         </div>
         {/* Estado y info adicional */}
