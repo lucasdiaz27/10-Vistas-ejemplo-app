@@ -14,9 +14,12 @@ import { DetalleDenuncia as DetalleDenunciaPage } from "./pages/DetalleDenuncia"
 import DetalleExpediente from "./components/expedientes/DetalleExpediente";
 import Ajustes from "./pages/Ajustes";
 import ScrollToTop from "./components/ScrollToTop";
+import SideBar from "./components/SideBar";
+import { useState } from "react";
 import PrivateRoute from "./routes/PrivateRoute";
 
 function SiteApp() {
+  const [sidebarAbierta, setSidebarAbierta] = useState(false);
   return (
     <Router>
       <ScrollToTop />
@@ -109,8 +112,10 @@ function SiteApp() {
           path="/denuncia/:id"
           element={
             <>
-              <NavBarInterno />
+              <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
+              <div className={`contenido-principal ${sidebarAbierta ? "con-sidebar" : ""}`}>
               <DetalleDenunciaPage />
+              </div>
             </>
           }
         />
@@ -121,15 +126,18 @@ function SiteApp() {
         <Route
           path="/ajustes"
           element={
-            <>
-              <NavBarInterno />
-              <Ajustes />
-            </>
+            <div className="d-flex">
+              <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
+              <div className={`contenido-principal ${sidebarAbierta ? "con-sidebar" : ""}`}>
+                <Ajustes />
+              </div>
+            </div>
           }
         />
       </Routes>
     </Router>
   );
 }
+
 
 export default SiteApp;

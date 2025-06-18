@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+
 const Ajustes = () => {
   const [tab, setTab] = useState("personal");
   const [form, setForm] = useState({
