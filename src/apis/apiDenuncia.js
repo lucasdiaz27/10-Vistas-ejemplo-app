@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const enviarDenuncia = async (data, files, token) => {
+export const enviarDenuncia = async (data, files) => {
   const formData = new FormData();
   if (files && files.length > 0) {
     for (let i = 0; i < files.length; i++) {
@@ -10,8 +10,7 @@ export const enviarDenuncia = async (data, files, token) => {
   formData.append("denuncia", JSON.stringify(data));
   return axios.post("http://localhost:8080/denuncia/subirDenuncia", formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data"
     },
   });
 };
@@ -53,3 +52,15 @@ export const actualizarEstadoDenuncia = async (id, nuevoEstado, motivoEstado, to
     }
   );
 };
+
+
+// ale
+
+export const traerDocDenuncia = async (id, token) => {
+  const res = await axios.get(`http://localhost:8080/doc/traerPorDenuncia/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+}
