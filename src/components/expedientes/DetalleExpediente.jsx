@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { traerExpedientePorId } from "../../apis/expedientesApi";
 import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
 import ExpedientePDF from './ExpedientePDF';
+import ModalEditarExpediente from "./modales/ModalEditarExpediente";
 
 export default function DetalleExpediente() {
   const { id } = useParams();
@@ -13,6 +14,7 @@ export default function DetalleExpediente() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [mostrarPDF, setMostrarPDF] = useState(false);
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -73,10 +75,20 @@ export default function DetalleExpediente() {
         {/* Información General */}
         <div className="col-lg-8">
           <div className="card mb-4">
-            <div className="card-body">
-              <h5 className="card-title mb-3">
-                <i className="bi bi-info-circle me-2"></i>Información General
+            <div className="card-body position-relative">
+              <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
+                <span>
+                  <i className="bi bi-info-circle me-2"></i>Información General
+                </span>
+                <button
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => setMostrarModalEditar(true)}
+                  title="Editar expediente"
+                >
+                  <i className="bi bi-pencil"></i>
+                </button>
               </h5>
+
               <p><strong>Número de Expediente:</strong> {expediente.nro_exp ?? '-'}</p>
               <p><strong>Número de Orden:</strong> {expediente.id}</p>
               <p><strong>Cant. folios:</strong> {expediente.cant_folios ?? "-"}</p>
@@ -86,7 +98,7 @@ export default function DetalleExpediente() {
               <p><strong>Delegación:</strong> {expediente.delegacion ?? "-"}</p>
               {/* Motivo en chips celestes, título arriba y chips debajo */}
               <div className="mb-2">
-                <div style={{fontWeight: 500, fontSize: '1em', marginBottom: 2}}><strong>Motivo:</strong></div>
+                <div style={{ fontWeight: 500, fontSize: '1em', marginBottom: 2 }}><strong>Motivo:</strong></div>
                 <div>
                   {Array.isArray(expediente.denuncia?.motivo) && expediente.denuncia.motivo.length > 0 ? (
                     expediente.denuncia.motivo.map((motivo, idx) => (
@@ -107,7 +119,7 @@ export default function DetalleExpediente() {
               </div>
               {/* Estado, título arriba y chip debajo */}
               <div className="mb-2">
-                <div style={{fontWeight: 500, fontSize: '1em', marginBottom: 2}}><strong>Estado:</strong></div>
+                <div style={{ fontWeight: 500, fontSize: '1em', marginBottom: 2 }}><strong>Estado:</strong></div>
                 <div>
                   {(() => {
                     const estado = (expediente.denuncia?.estado || '').toUpperCase();
@@ -203,7 +215,7 @@ export default function DetalleExpediente() {
                   {expediente.archivos.map((archivo, idx) => (
                     <li key={idx} className="list-group-item d-flex align-items-center">
                       <i className="bi bi-file-earmark me-2"></i>
-                      <span className="me-auto">{archivo.nombre || `Archivo ${idx+1}`}</span>
+                      <span className="me-auto">{archivo.nombre || `Archivo ${idx + 1}`}</span>
                       <a
                         href={archivo.url || archivo.enlace || archivo.base64 || '#'}
                         className="btn btn-outline-secondary btn-sm"
@@ -223,6 +235,13 @@ export default function DetalleExpediente() {
           </div>
         </div>
       </div>
+      {mostrarModalEditar && (
+  <ModalEditarExpediente
+    expediente={expediente}
+    onClose={() => setMostrarModalEditar(false)}
+    actualizarExpediente={setExpediente} // si lo necesitás para refrescar luego de editar
+  />
+)}
     </div>
   );
 }

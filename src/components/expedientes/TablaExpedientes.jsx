@@ -91,13 +91,15 @@ export default function TablaExpedientes({ filtro }) {
                     >
                       <i className="bi bi-eye"></i>
                     </button>
-                    <button
+                    {/*
+                      <button
                       className="btn btn-outline-primary"
                       title="Editar expediente"
                       onClick={() => abrirModal('editar', exp)}
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
+                    */}
                   </div>
                 </td>
               </tr>

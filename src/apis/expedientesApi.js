@@ -62,6 +62,21 @@ export const existeExpedienteParaDenuncia = async (denunciaId, token) => {
   );
 };
 
+export const editarExpediente = async (id, expedienteUpdateDTO, token) => {
+  const res = await axios.put(
+    `http://localhost:8080/expediente/editarExpediente/${id}`,
+    expedienteUpdateDTO,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+};
+
+
+
 // despues agregar funciones como eliminarExpediente(id, token), etc.
 
 //await crearExpedienteDesdeDenuncia(denunciaId, token);
