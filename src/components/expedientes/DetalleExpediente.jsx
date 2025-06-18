@@ -6,13 +6,16 @@ import { traerExpedientePorId } from "../../apis/expedientesApi";
 import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
 import ExpedientePDF from './ExpedientePDF';
 
+import { traerAudienciasPorExpediente, crearAudiencia, eliminarAudiencia, editarAudiencia } from "../../apis/audienciasApi";
+import TablaAudiencias from "./TablaAudiencias";
+import ModalAudiencia from "./ModalAudiencia";
+
 export default function DetalleExpediente() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [expediente, setExpediente] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-  const [mostrarPDF, setMostrarPDF] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -30,6 +33,63 @@ export default function DetalleExpediente() {
     fetchExpediente();
   }, [id]);
 
+  useEffect(() => {
+    if (expediente?.id) {
+      traerAudienciasPorExpediente(expediente.id)
+        .then(auds => {
+          console.log('Audiencias cargadas:', auds);
+          setAudiencias(auds);
+        })
+        .catch(() => setAudiencias([]));
+    }
+  }, [expediente]);
+
+  const handleNuevaAudiencia = () => {
+    setModalAudiencia({ show: true, modo: "crear", audiencia: null });
+  };
+
+  const handleEditarAudiencia = (audiencia) => {
+    setModalAudiencia({ show: true, modo: "editar", audiencia });
+  };
+
+  const handleGuardarAudiencia = async (audiencia) => {
+    if (modalAudiencia.modo === "crear") {
+      try {
+        await crearAudiencia(audiencia);
+        const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+        setAudiencias(nuevasAudiencias);
+        setMensaje("Audiencia creada correctamente");
+      } catch (err) {
+        alert("Error al crear la audiencia");
+      }
+    } else if (modalAudiencia.modo === "editar") {
+      try {
+        await editarAudiencia(modalAudiencia.audiencia.id, audiencia);
+        const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+        setAudiencias(nuevasAudiencias);
+        setMensaje("Audiencia editada correctamente");
+      } catch (err) {
+        alert("Error al editar la audiencia");
+      }
+    }
+    setModalAudiencia({ show: false, modo: null, audiencia: null });
+  };
+
+  const handleCerrarModal = () => {
+    setModalAudiencia({ show: false, modo: null, audiencia: null });
+  };
+
+  const handleEliminarAudiencia = async (id) => {
+    try {
+      await eliminarAudiencia(id);
+      const nuevasAudiencias = await traerAudienciasPorExpediente(expediente.id);
+      setAudiencias(nuevasAudiencias);
+      setMensaje("Audiencia eliminada correctamente");
+    } catch (err) {
+      alert("Error al eliminar la audiencia");
+    }
+  };
+
   if (cargando) return <div className="container mt-4">Cargando expediente...</div>;
   if (error) return <div className="alert alert-danger mt-4">{error}</div>;
 
@@ -39,38 +99,10 @@ export default function DetalleExpediente() {
 
   return (
     <div className="container py-4">
-      <div className="mb-3 d-flex gap-2">
-        <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
-          <i className="bi bi-arrow-left"></i> Volver
-        </button>
-        <button className="btn btn-success" onClick={() => setMostrarPDF(true)}>
-          <i className="bi bi-file-earmark-pdf"></i> Generar PDF
-        </button>
-        <PDFDownloadLink
-          document={<ExpedientePDF expediente={expediente} />}
-          fileName={`expediente_${expediente.id}.pdf`}
-          className="btn btn-primary"
-        >
-          Descargar PDF
-        </PDFDownloadLink>
-      </div>
-
-      {mostrarPDF && (
-        <div className="mb-4">
-          <h5>Previsualización del PDF:</h5>
-          <PDFViewer width="100%" height={500}>
-            <ExpedientePDF expediente={expediente} />
-          </PDFViewer>
-          <div className="mt-2">
-            <button className="btn btn-secondary" onClick={() => setMostrarPDF(false)}>
-              Cerrar previsualización
-            </button>
-          </div>
-        </div>
-      )}
-
+      <button className="btn btn-outline-secondary mb-3" onClick={() => navigate(-1)}>
+        <i className="bi bi-arrow-left"></i> Volver
+      </button>
       <div className="row g-4">
-        {/* Información General */}
         <div className="col-lg-8">
           <div className="card mb-4">
             <div className="card-body">
@@ -141,40 +173,65 @@ export default function DetalleExpediente() {
               </div>
             </div>
           </div>
-          {/* Resumen de Pases */}
+          {/* Selector de pestañas */}
           <div className="card mb-4">
-            <div className="card-body">
-              <h5 className="card-title mb-3">
-                <i className="bi bi-arrow-left-right me-2"></i>Resumen de Pases
-              </h5>
-              {Array.isArray(expediente.pases) && expediente.pases.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-sm table-bordered mb-0">
-                    <thead className="table-light">
-                      <tr>
-                        <th>Fecha</th>
-                        <th>Origen</th>
-                        <th>Destino</th>
-                        <th>Estado</th>
-                        <th>Asunto</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {expediente.pases.map((pase, idx) => (
-                        <tr key={idx}>
-                          <td>{pase.fecha || '-'}</td>
-                          <td>{pase.origen || '-'}</td>
-                          <td>{pase.destino || '-'}</td>
-                          <td>{pase.estado || '-'}</td>
-                          <td>{pase.asunto || '-'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-muted">No hay pases registrados para este expediente.</div>
-              )}
+            <div className="card-body pb-0">
+              <div className="d-flex align-items-center mb-3">
+                <button
+                  className={`btn btn-link px-3 py-2 ${tab === "pases" ? "fw-bold text-primary" : "text-secondary"}`}
+                  style={{ textDecoration: "none" }}
+                  onClick={() => setTab("pases")}
+                >
+                  <i className="bi bi-arrow-left-right me-2"></i>Historial de Pases
+                </button>
+                <button
+                  className={`btn btn-link px-3 py-2 ${tab === "audiencias" ? "fw-bold text-primary" : "text-secondary"}`}
+                  style={{ textDecoration: "none" }}
+                  onClick={() => setTab("audiencias")}
+                >
+                  <i className="bi bi-calendar-event me-2"></i>Audiencias
+                </button>
+              </div>
+              <div>
+                {tab === "pases" ? (
+                  Array.isArray(expediente.pases) && expediente.pases.length > 0 ? (
+                    <div className="table-responsive" style={{ paddingBottom: '2rem' }}>
+                      <table className="table table-sm table-bordered mb-0 align-middle" style={{ borderRadius: '0.5rem', overflow: 'hidden' }}>
+                        <thead className="table-light">
+                          <tr>
+                            <th>Fecha</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Estado</th>
+                            <th>Asunto</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {expediente.pases.map((pase, idx) => (
+                            <tr key={idx}>
+                              <td>{pase.fecha || '-'}</td>
+                              <td>{pase.origen || '-'}</td>
+                              <td>{pase.destino || '-'}</td>
+                              <td>{pase.estado || '-'}</td>
+                              <td>{pase.asunto || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-muted" style={{ paddingBottom: '2rem' }}>No hay pases registrados para este expediente.</div>
+                  )
+                ) : (
+                  <TablaAudiencias
+                    audiencias={audiencias}
+                    onNueva={handleNuevaAudiencia}
+                    onEditar={handleEditarAudiencia}
+                    onEliminar={handleEliminarAudiencia}
+                    personasInvolucradas={expediente.denuncia?.personas || []}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -223,6 +280,16 @@ export default function DetalleExpediente() {
           </div>
         </div>
       </div>
+      {/* Modal para crear/editar audiencia */}
+      <ModalAudiencia
+        show={modalAudiencia.show}
+        modo={modalAudiencia.modo}
+        audiencia={modalAudiencia.audiencia}
+        onGuardar={handleGuardarAudiencia}
+        onClose={handleCerrarModal}
+        expedienteId={expediente.id} // id real del expediente, no nro_exp
+        personasInvolucradas={expediente.denuncia?.personas || []}
+      />
     </div>
   );
 }
