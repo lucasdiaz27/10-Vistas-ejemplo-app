@@ -16,6 +16,11 @@ export default function DetalleExpediente() {
   const [expediente, setExpediente] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
+  const [tab, setTab] = useState("pases");
+  const [modalAudiencia, setModalAudiencia] = useState({ show: false, modo: null, audiencia: null });
+  const [audiencias, setAudiencias] = useState([]);
+  const [mensaje, setMensaje] = useState("");
+  const [mostrarPDF, setMostrarPDF] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -99,9 +104,42 @@ export default function DetalleExpediente() {
 
   return (
     <div className="container py-4">
-      <button className="btn btn-outline-secondary mb-3" onClick={() => navigate(-1)}>
-        <i className="bi bi-arrow-left"></i> Volver
-      </button>
+      <div className="mb-3 d-flex gap-2">
+        {mensaje && (
+        <div className="alert alert-success alert-dismissible fade show" role="alert">
+          {mensaje}
+          <button type="button" className="btn-close" onClick={() => setMensaje("")}></button>
+        </div>
+      )}
+      <button className="btn btn-outline-secondary" onClick={() => navigate(-1)}>
+          <i className="bi bi-arrow-left"></i> Volver
+        </button>
+        <button className="btn btn-success" onClick={() => setMostrarPDF(true)}>
+          <i className="bi bi-file-earmark-pdf"></i> Generar PDF
+        </button>
+        <PDFDownloadLink
+          document={<ExpedientePDF expediente={expediente} />}
+          fileName={`expediente_${expediente.id}.pdf`}
+          className="btn btn-primary"
+        >
+          Descargar PDF
+        </PDFDownloadLink>
+      </div>
+
+      {mostrarPDF && (
+        <div className="mb-4">
+          <h5>Previsualización del PDF:</h5>
+          <PDFViewer width="100%" height={500}>
+            <ExpedientePDF expediente={expediente} />
+          </PDFViewer>
+          <div className="mt-2">
+            <button className="btn btn-secondary" onClick={() => setMostrarPDF(false)}>
+              Cerrar previsualización
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="row g-4">
         <div className="col-lg-8">
           <div className="card mb-4">
