@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { traerExpedientePorId } from "../../apis/expedientesApi";
+import { traerPasesPorExp, crearPase, editarPase, eliminarPase } from "../../apis/pasesApi";
 import FormularioPaseModal from "./modales/FormularioPaseModal";
 
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
@@ -20,6 +21,7 @@ import { ArchivosDenuncia } from "../detalle-denuncia/ArchivosDenuncia";
 import { ModalPDF } from "../detalle-denuncia/ModalPDF";
 import { traerDocDenuncia } from "../../apis/apiDenuncia";
 import { traerArchivoPDF } from "../../apis/apiDocumento";
+import TablaPases from "./TablaPases";
 
 export default function DetalleExpediente() {
   const { id } = useParams();
@@ -39,6 +41,8 @@ export default function DetalleExpediente() {
   const [archivos, setArchivos] = useState([]);
   const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [pases, setPases] = useState([]);
+  const [modalPase, setModalPase] = useState({ show: false, modo: null, pase: null });
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -60,10 +64,7 @@ export default function DetalleExpediente() {
     const token = localStorage.getItem("token");
     if (expediente?.id) {
       traerAudienciasPorExpediente(expediente.id, token)
-        .then((auds) => {
-          console.log("Audiencias cargadas:", auds);
-          setAudiencias(auds);
-        })
+        .then(auds => setAudiencias(auds))
         .catch(() => setAudiencias([]));
     }
   }, [expediente]);
@@ -73,7 +74,10 @@ export default function DetalleExpediente() {
         traerDocDenuncia(expediente.id_denuncia, token)
           .then((data) => setArchivos(data))
           .catch(() => setArchivos([]));
-      }
+        traerPasesPorExp(expediente.id, token)
+        .then(ps => setPases(ps))
+        .catch(() => setPases([]));
+    }
     }, [expediente]);
 
     const handleVerArchivo = async (archivo) => {
@@ -143,9 +147,90 @@ export default function DetalleExpediente() {
     }
   };
 
+  // --- PASES ---
+  const handleNuevoPase = () => {
+    setModalPase({ show: true, modo: "crear", pase: null });
+  };
+
+  const handleEditarPase = (pase) => {
+    setModalPase({ show: true, modo: "editar", pase });
+  };
+
+  const handleEliminarPase = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!window.confirm("¿Seguro que desea eliminar este pase?")) return;
+    try {
+      await eliminarPase(id, token);
+      const nuevosPases = await traerPasesPorExp(expediente.id, token);
+      setPases(nuevosPases);
+      setMensaje("Pase eliminado correctamente");
+    } catch (err) {
+      alert("Error al eliminar el pase");
+    }
+  };
+
+  const handleGuardarPase = async (paseData) => {
+    const token = localStorage.getItem("token");
+    try {
+      if (modalPase.modo === "crear") {
+        await crearPase(paseData, token);
+        setMensaje("Pase creado correctamente");
+      } else {
+        await editarPase(modalPase.pase.id, paseData, token);
+        setMensaje("Pase editado correctamente");
+      }
+      const nuevosPases = await traerPasesPorExp(expediente.id, token);
+      setPases(nuevosPases);
+    } catch (err) {
+      alert("Error al guardar el pase");
+    }
+    setModalPase({ show: false, modo: null, pase: null });
+  };
+
+  // --- PASES ---
+  const handleNuevoPase = () => {
+    setModalPase({ show: true, modo: "crear", pase: null });
+  };
+
+  const handleEditarPase = (pase) => {
+    setModalPase({ show: true, modo: "editar", pase });
+  };
+
+  const handleEliminarPase = async (id) => {
+    const token = localStorage.getItem("token");
+    if (!window.confirm("¿Seguro que desea eliminar este pase?")) return;
+    try {
+      await eliminarPase(id, token);
+      const nuevosPases = await traerPasesPorExp(expediente.id, token);
+      setPases(nuevosPases);
+      setMensaje("Pase eliminado correctamente");
+    } catch (err) {
+      alert("Error al eliminar el pase");
+    }
+  };
+
+  const handleGuardarPase = async (paseData) => {
+    const token = localStorage.getItem("token");
+    try {
+      if (modalPase.modo === "crear") {
+        await crearPase(paseData, token);
+        setMensaje("Pase creado correctamente");
+      } else {
+        await editarPase(modalPase.pase.id, paseData, token);
+        setMensaje("Pase editado correctamente");
+      }
+      const nuevosPases = await traerPasesPorExp(expediente.id, token);
+      setPases(nuevosPases);
+    } catch (err) {
+      alert("Error al guardar el pase");
+    }
+    setModalPase({ show: false, modo: null, pase: null });
+  };
+
   if (cargando)
     return <div className="container mt-4">Cargando expediente...</div>;
   if (error) return <div className="alert alert-danger mt-4">{error}</div>;
+  if (!expediente) return <div className="alert alert-warning mt-4">No se encontró el expediente.</div>;
 
   const denunciante = expediente.denuncia?.personas?.find(
     (p) => (p.rol || "").toLowerCase() === "denunciante"
@@ -348,46 +433,12 @@ export default function DetalleExpediente() {
               </div>
               <div>
                 {tab === "pases" ? (
-                  Array.isArray(expediente.pases) &&
-                  expediente.pases.length > 0 ? (
-                    <div
-                      className="table-responsive"
-                      style={{ paddingBottom: "2rem" }}
-                    >
-                      <table
-                        className="table table-sm table-bordered mb-0 align-middle"
-                        style={{ borderRadius: "0.5rem", overflow: "hidden" }}
-                      >
-                        <thead className="table-light">
-                          <tr>
-                            <th>Fecha</th>
-                            <th>Origen</th>
-                            <th>Destino</th>
-                            <th>Estado</th>
-                            <th>Asunto</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {expediente.pases.map((pase, idx) => (
-                            <tr key={idx}>
-                              <td>{pase.fecha || "-"}</td>
-                              <td>{pase.origen || "-"}</td>
-                              <td>{pase.destino || "-"}</td>
-                              <td>{pase.estado || "-"}</td>
-                              <td>{pase.asunto || "-"}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <div
-                      className="text-muted"
-                      style={{ paddingBottom: "2rem" }}
-                    >
-                      No hay pases registrados para este expediente.
-                    </div>
-                  )
+                  <TablaPases
+                    pases={pases}
+                    onEditar={handleEditarPase}
+                    onEliminar={handleEliminarPase}
+                    onNuevo={handleNuevoPase}
+                  />
                 ) : (
                   <TablaAudiencias
                     audiencias={audiencias}
@@ -444,6 +495,16 @@ export default function DetalleExpediente() {
         onClose={handleCerrarModal}
         expedienteId={expediente.id} // id real del expediente, no nro_exp
         personasInvolucradas={expediente.denuncia?.personas || []}
+      />
+      {/* Modal para crear/editar pase */}
+      <FormularioPaseModal
+        show={modalPase.show}
+        handleClose={() => setModalPase({ show: false, modo: null, pase: null })}
+        expedienteId={expediente.id}
+        usuarioId={localStorage.getItem("token") ? JSON.parse(atob(localStorage.getItem("token").split(".")[1])).jti : null}
+        modo={modalPase.modo}
+        pase={modalPase.pase}
+        onGuardar={handleGuardarPase}
       />
     </div>
   );
