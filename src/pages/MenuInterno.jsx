@@ -10,6 +10,7 @@ import {
   actualizarExpediente,
   traerExpedientes,
 } from "../apis/expedientesApi";
+import Expedientes from "../components/expedientes/Expedientes";
 // import VistaAjustes from "../components/ajustes/VistaAjustes";
 
 const MenuInterno = () => {
