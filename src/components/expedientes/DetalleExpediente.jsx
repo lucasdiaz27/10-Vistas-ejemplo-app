@@ -96,6 +96,15 @@ export default function DetalleExpediente() {
               <p><strong>Fecha de finalización:</strong> {expediente.fecha_finalizacion ?? "-"}</p>
               <p><strong>HV:</strong> {expediente.hipervulnerable ?? "-"}</p>
               <p><strong>Delegación:</strong> {expediente.delegacion ?? "-"}</p>
+              <div className='d-flex'>
+                <strong>Usuarios:</strong>
+                <span className="ms-2">
+                  {expediente.usuRespuesta
+                    .map(usu => usu.nombreUsuario)
+                    .join(' - ')
+                  }
+                </span>
+              </div>
               {/* Motivo en chips celestes, título arriba y chips debajo */}
               <div className="mb-2">
                 <div style={{ fontWeight: 500, fontSize: '1em', marginBottom: 2 }}><strong>Motivo:</strong></div>
