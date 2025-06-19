@@ -147,45 +147,6 @@ export default function DetalleExpediente() {
     }
   };
 
-  // --- PASES ---
-  const handleNuevoPase = () => {
-    setModalPase({ show: true, modo: "crear", pase: null });
-  };
-
-  const handleEditarPase = (pase) => {
-    setModalPase({ show: true, modo: "editar", pase });
-  };
-
-  const handleEliminarPase = async (id) => {
-    const token = localStorage.getItem("token");
-    if (!window.confirm("¿Seguro que desea eliminar este pase?")) return;
-    try {
-      await eliminarPase(id, token);
-      const nuevosPases = await traerPasesPorExp(expediente.id, token);
-      setPases(nuevosPases);
-      setMensaje("Pase eliminado correctamente");
-    } catch (err) {
-      alert("Error al eliminar el pase");
-    }
-  };
-
-  const handleGuardarPase = async (paseData) => {
-    const token = localStorage.getItem("token");
-    try {
-      if (modalPase.modo === "crear") {
-        await crearPase(paseData, token);
-        setMensaje("Pase creado correctamente");
-      } else {
-        await editarPase(modalPase.pase.id, paseData, token);
-        setMensaje("Pase editado correctamente");
-      }
-      const nuevosPases = await traerPasesPorExp(expediente.id, token);
-      setPases(nuevosPases);
-    } catch (err) {
-      alert("Error al guardar el pase");
-    }
-    setModalPase({ show: false, modo: null, pase: null });
-  };
 
   // --- PASES ---
   const handleNuevoPase = () => {
