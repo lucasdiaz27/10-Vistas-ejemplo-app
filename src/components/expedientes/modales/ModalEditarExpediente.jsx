@@ -51,30 +51,29 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
       };
 
       await editarExpediente(expediente.id, expedienteUpdateDTO, token);
-      alert('Expediente actualizado');
+      Swal.fire({
+        icon: 'success',
+        title: 'Editar expediente',
+        text: 'Expediente actualizado',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#00bcd4',
+        background: '#f8fafc',
+        customClass: {
+          title: 'swal2-title-modern',
+          popup: 'swal2-popup-modern',
+        },
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
       onClose();
     } catch (error) {
       console.error('Error al actualizar expediente:', error);
       alert('Ocurrió un error al actualizar el expediente');
     }
-    Swal.fire({
-      icon: 'info',
-      title: 'Funcionalidad pendiente',
-      text: 'Expediente actualizado (funcionalidad pendiente)',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: '#00bcd4',
-      background: '#f8fafc',
-      customClass: {
-        title: 'swal2-title-modern',
-        popup: 'swal2-popup-modern',
-      },
-      showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-      },
-      hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-      }
-    });
     onClose();
   };
 

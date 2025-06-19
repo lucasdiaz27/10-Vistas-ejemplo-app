@@ -9,8 +9,6 @@ import ModalEditarExpediente from "./modales/ModalEditarExpediente";
 import { traerPasesPorExp, crearPase, editarPase, eliminarPase } from "../../apis/pasesApi";
 import FormularioPaseModal from "./modales/FormularioPaseModal";
 
-import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
-import ExpedientePDF from "./ExpedientePDF";
 
 import {
   traerAudienciasPorExpediente,
