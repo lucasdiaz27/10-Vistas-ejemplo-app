@@ -1,21 +1,31 @@
 import { useState, useEffect } from 'react';
 
-function ModalUsuario({ tipo, usuario, onClose, onGuardar }) {
-  const [form, setForm] = useState({ nombre: '', email: '', rol: 'Empleado', activo: true });
+function ModalUsuario({ tipo, usuario, onClose, onGuardar, roles = [] }) {
+  const [form, setForm] = useState({ nombre: '', email: '', password: '', rol: roles[0]?.nombre || roles[0] || '' });
 
   useEffect(() => {
     if (tipo === 'editar' && usuario) {
-      setForm(usuario);
+      // Si el rol viene como objeto, usar su nombre. Si es string, usarlo directo.
+      let rolValue = usuario.rol;
+      if (rolValue && typeof rolValue === 'object' && rolValue.nombre) {
+        rolValue = rolValue.nombre;
+      }
+      setForm({
+        nombre: usuario.nombre || usuario.nombreUsuario || '',
+        email: usuario.email || '',
+        password: '',
+        rol: rolValue || roles[0]?.nombre || roles[0] || ''
+      });
     } else if (tipo === 'nuevo') {
-      setForm({ nombre: '', email: '', rol: 'Empleado', activo: true });
+      setForm({ nombre: '', email: '', password: '', rol: roles[0]?.nombre || roles[0] || '' });
     }
-  }, [tipo, usuario]);
+  }, [tipo, usuario, roles]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value,
     }));
   };
 
@@ -45,6 +55,18 @@ function ModalUsuario({ tipo, usuario, onClose, onGuardar }) {
                   value={form.nombre}
                   onChange={handleChange}
                   className="form-control"
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Contraseña</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="form-control"
+                  required
                 />
               </div>
               <div className="mb-3">
@@ -55,6 +77,7 @@ function ModalUsuario({ tipo, usuario, onClose, onGuardar }) {
                   value={form.email}
                   onChange={handleChange}
                   className="form-control"
+                  required
                 />
               </div>
               <div className="mb-3">
@@ -64,24 +87,12 @@ function ModalUsuario({ tipo, usuario, onClose, onGuardar }) {
                   value={form.rol}
                   onChange={handleChange}
                   className="form-select"
+                  required
                 >
-                  <option value="Administrador">Administrador</option>
-                  <option value="Empleado">Empleado</option>
-                  <option value="Inspector">Inspector</option>
+                  {roles.map((rol) => (
+                    <option key={rol.id || rol} value={rol.nombre || rol}>{rol.nombre || rol}</option>
+                  ))}
                 </select>
-              </div>
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  name="activo"
-                  checked={form.activo}
-                  onChange={handleChange}
-                  id="activoCheck"
-                />
-                <label className="form-check-label" htmlFor="activoCheck">
-                  Usuario activo
-                </label>
               </div>
             </div>
             <div className="modal-footer">

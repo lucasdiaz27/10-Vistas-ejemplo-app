@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import TablaUsuarios from './TablaUsuarios';
 import ModalUsuario from './modales/ModalUsuario';
+import { crearUsuario, traerUsuarios, eliminarUsuario } from '../../apis/apiUsuarios';
+import { traerRoles } from '../../apis/apiRoles';
 
 export default function VistaUsuarios2() {
   const [usuarios, setUsuarios] = useState([]);
@@ -10,15 +12,34 @@ export default function VistaUsuarios2() {
   const [rolFiltro, setRolFiltro] = useState('');
   const [modal, setModal] = useState(null); // 'nuevo' | 'editar'
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
+  const [roles, setRoles] = useState([]);
 
   useEffect(() => {
-    // Simular carga de datos inicial
-    setUsuarios([
-      { id: 1, nombre: 'Ana Martínez', email: 'ana.martinez@empresa.com', rol: 'Administrador', activo: true },
-      { id: 2, nombre: 'Carlos López', email: 'carlos.lopez@empresa.com', rol: 'Empleado', activo: true },
-      { id: 3, nombre: 'María González', email: 'maria.gonzalez@empresa.com', rol: 'Inspector', activo: true },
-      { id: 4, nombre: 'Juan Rodríguez', email: 'juan.rodriguez@empresa.com', rol: 'Empleado', activo: false },
-    ]);
+    const fetchUsuarios = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const data = await traerUsuarios(token);
+        setUsuarios(data.map(u => ({
+          id: u.id,
+          nombre: u.nombreUsuario || u.nombre,
+          email: u.email,
+          rol: (u.rol && typeof u.rol === 'object' && u.rol.nombre) ? u.rol.nombre : (typeof u.rol === 'string' ? u.rol : ''),
+        })));
+      } catch (error) {
+        alert('Error al traer usuarios: ' + error.message);
+      }
+    };
+    const fetchRoles = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const data = await traerRoles(token);
+        setRoles(data);
+      } catch (error) {
+        alert('Error al traer roles: ' + error.message);
+      }
+    };
+    fetchUsuarios();
+    fetchRoles();
   }, []);
 
   const abrirModal = (tipo, usuario = null) => {
@@ -40,12 +61,48 @@ export default function VistaUsuarios2() {
   };
 
   // Agrega un nuevo usuario
-  const handleCrearUsuario = (nuevoUsuario) => {
-    setUsuarios((prev) => [
-      ...prev,
-      { ...nuevoUsuario, id: prev.length ? Math.max(...prev.map(u => u.id)) + 1 : 1 }
-    ]);
-    cerrarModal();
+  const handleCrearUsuario = async (nuevoUsuario) => {
+    try {
+      const token = localStorage.getItem('token');
+      const usuarioCreado = await crearUsuario({
+        email: nuevoUsuario.email,
+        password: nuevoUsuario.password,
+        nombre: nuevoUsuario.nombre,
+        rol: nuevoUsuario.rol,
+      }, token);
+      setUsuarios((prev) => [
+        ...prev,
+        {
+          id: usuarioCreado.id || prev.length + 1,
+          nombre: usuarioCreado.nombre || usuarioCreado.name || nuevoUsuario.nombre || '',
+          email: usuarioCreado.email || nuevoUsuario.email || '',
+          rol: usuarioCreado.rol || (usuarioCreado.rol && usuarioCreado.rol.nombre) || nuevoUsuario.rol || ''
+        },
+      ]);
+      cerrarModal();
+    } catch (error) {
+      alert('Error al crear usuario: ' + error.message);
+    }
+  };
+
+  // Elimina un usuario
+  const handleEliminarUsuario = async (id) => {
+    if (window.confirm('¿Seguro que deseas eliminar este usuario?')) {
+      try {
+        const token = localStorage.getItem('token');
+        console.log('Token para eliminar usuario:', token);
+        await eliminarUsuario(id, token);
+        setUsuarios(usuarios.filter((u) => u.id !== id));
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          alert('No tienes permisos para eliminar usuarios. Inicia sesión como ADMIN.');
+        } else if (error.response && error.response.status === 401) {
+          alert('Sesión expirada o no autorizada. Por favor, vuelve a iniciar sesión.');
+        } else {
+          alert('Error al eliminar usuario: ' + (error.response?.data?.message || error.message));
+        }
+      }
+    }
   };
 
   const usuariosFiltrados = usuarios.filter(u => {
@@ -85,15 +142,17 @@ export default function VistaUsuarios2() {
               onChange={(e) => setRolFiltro(e.target.value)}
             >
               <option value="">Todos los roles</option>
-              <option value="Administrador">Administrador</option>
-              <option value="Empleado">Empleado</option>
-              <option value="Inspector">Inspector</option>
+              {roles && roles.length > 0 && roles.map((rol) => (
+                <option key={rol.id || rol.nombre || rol} value={rol.nombre || rol}>
+                  {rol.nombre || rol}
+                </option>
+              ))}
             </select>
           </div>
         </div>
       </div>
       <div style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: '0.5rem', borderBottomRightRadius: '0.5rem', overflow: 'hidden' }}>
-        <TablaUsuarios usuarios={usuariosFiltrados} onEditar={(u) => abrirModal('editar', u)} />
+        <TablaUsuarios usuarios={usuariosFiltrados} onEditar={(u) => abrirModal('editar', u)} onEliminar={handleEliminarUsuario} />
       </div>
       {modal && (
         <ModalUsuario
@@ -101,6 +160,7 @@ export default function VistaUsuarios2() {
           usuario={usuarioSeleccionado}
           onClose={cerrarModal}
           onGuardar={modal === 'editar' ? handleGuardarUsuario : handleCrearUsuario}
+          roles={roles}
         />
       )}
     </div>

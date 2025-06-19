@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
 import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
@@ -54,6 +54,10 @@ const MenuInterno = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const vistaParam = params.get("vista");
+    if (!vistaParam) {
+      navigate("/menu-interno?vista=mesa-entrada", { replace: true });
+      return;
+    }
     setVista(vistaParam);
     if (vistaParam === "mesa-entrada") {
       setDenuncias([]);
@@ -95,7 +99,7 @@ const MenuInterno = () => {
           console.error("Error al traer denuncias del backend:", err);
         });
     }
-  }, [location]);
+  }, [location, navigate]);
 
   // Ejemplo local de denuncias para visualizar la tabla si el backend no responde
   useEffect(() => {

@@ -13,7 +13,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@react-pdf/renderer": "^4.3.0",
     "axios": "^1.9.0",
-    "bootstrap": "^5.3.6",
+    "bootstrap": "^5.3.7",
     "jwt-decode": "^4.0.0",
     "pdfjs-dist": "^4.8.69",
     "react": "^19.0.0",
