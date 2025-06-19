@@ -1,17 +1,62 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { editarExpediente, traerUsuarios } from "../../../apis/expedientesApi";
 import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
 
 export default function ModalEditarExpediente({ onClose, expediente }) {
   const [form, setForm] = useState({ ...expediente });
+  const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
+
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const usuarios = await traerUsuarios(token);
+        setUsuariosDisponibles(usuarios);
+      } catch (err) {
+        console.error("Error al traer usuarios:", err);
+      }
+    };
+
+    fetchUsuarios();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "usuario1" || name === "usuario2") {
+      const idSeleccionado = parseInt(value);
+      const nuevosUsuarios = [...(form.usuarios ?? [])];
+      const index = name === "usuario1" ? 0 : 1;
+      nuevosUsuarios[index] = idSeleccionado;
+      setForm((prev) => ({ ...prev, usuarios: nuevosUsuarios }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+
+      const expedienteUpdateDTO = {
+        nroExp: form.nro_exp,
+        cant_folios: form.cant_folios,
+        fecha_inicio: form.fecha_inicio,
+        fecha_finalizacion: form.fecha_finalizacion,
+        hipervulnerable: form.hipervulnerable,
+        delegacion: form.delegacion,
+        usuarios: form.usuarios ?? [],
+      };
+
+      await editarExpediente(expediente.id, expedienteUpdateDTO, token);
+      alert('Expediente actualizado');
+      onClose();
+    } catch (error) {
+      console.error('Error al actualizar expediente:', error);
+      alert('Ocurrió un error al actualizar el expediente');
+    }
     Swal.fire({
       icon: 'info',
       title: 'Funcionalidad pendiente',
@@ -33,6 +78,8 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
     onClose();
   };
 
+  const usuarioPrincipal = usuariosDisponibles.find(u => u.id === form.usuarios?.[0]);
+
   return (
     <div className="modal fade show d-block" tabIndex="-1" role="dialog">
       <div className="modal-dialog modal-lg" role="document">
@@ -43,51 +90,96 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
               <button type="button" className="btn-close" onClick={onClose}></button>
             </div>
             <div className="modal-body">
+
+              {/* <div className="mb-3"> ... nro_exp ... </div> */}
+
               <div className="mb-3">
-                <label className="form-label">Nombre</label>
+                <label className="form-label">Cantidad de Folios</label>
                 <input
-                  type="text"
+                  type="number"
                   className="form-control"
-                  name="nombre"
-                  value={form.nombre}
+                  name="cant_folios"
+                  value={form.cant_folios ?? ''}
                   onChange={handleChange}
                 />
               </div>
+
+              {/* <div className="mb-3"> ... fecha_inicio ... </div> */}
+
               <div className="mb-3">
-                <label className="form-label">DNI</label>
+                <label className="form-label">Fecha de Finalización</label>
                 <input
-                  type="text"
+                  type="date"
                   className="form-control"
-                  name="dni"
-                  value={form.dni}
+                  name="fecha_finalizacion"
+                  value={form.fecha_finalizacion ?? ''}
                   onChange={handleChange}
                 />
               </div>
+
               <div className="mb-3">
-                <label className="form-label">Tipo</label>
+                <label className="form-label">HV</label>
                 <select
                   className="form-select"
-                  name="tipo"
-                  value={form.tipo}
+                  name="hipervulnerable"
+                  value={form.hipervulnerable ?? ''}
                   onChange={handleChange}
                 >
-                  <option>Reclamo</option>
-                  <option>Denuncia</option>
+                  <option value="">Seleccionar...</option>
+                  <option value="sí">Sí</option>
+                  <option value="no">No</option>
                 </select>
               </div>
+
               <div className="mb-3">
-                <label className="form-label">Estado</label>
+                <label className="form-label">Delegación</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="delegacion"
+                  value={form.delegacion ?? ''}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="mb-3">
+                <strong>Usuario: </strong>{usuarioPrincipal?.nombreUsuario ?? 'No seleccionado'}
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Usuario 1</label>
                 <select
                   className="form-select"
-                  name="estado"
-                  value={form.estado}
+                  name="usuario1"
+                  value={form.usuarios?.[0] ?? ''}
                   onChange={handleChange}
                 >
-                  <option>Pendiente</option>
-                  <option>En proceso</option>
-                  <option>Finalizado</option>
+                  <option value="">Seleccionar...</option>
+                  {usuariosDisponibles.map(usuario => (
+                    <option key={usuario.id} value={usuario.id}>
+                      {usuario.nombreUsuario}
+                    </option>
+                  ))}
                 </select>
               </div>
+
+              <div className="mb-3">
+                <label className="form-label">Usuario 2</label>
+                <select
+                  className="form-select"
+                  name="usuario2"
+                  value={form.usuarios?.[1] ?? ''}
+                  onChange={handleChange}
+                >
+                  <option value="">Seleccionar...</option>
+                  {usuariosDisponibles.map(usuario => (
+                    <option key={usuario.id} value={usuario.id}>
+                      {usuario.nombreUsuario}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>

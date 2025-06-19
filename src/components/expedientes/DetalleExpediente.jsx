@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { traerExpedientePorId } from "../../apis/expedientesApi";
+import { PDFViewer, PDFDownloadLink } from '@react-pdf/renderer';
+import ExpedientePDF from './ExpedientePDF';
+import ModalEditarExpediente from "./modales/ModalEditarExpediente";
 import { traerPasesPorExp, crearPase, editarPase, eliminarPase } from "../../apis/pasesApi";
 import FormularioPaseModal from "./modales/FormularioPaseModal";
 
@@ -43,6 +46,7 @@ export default function DetalleExpediente() {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [pases, setPases] = useState([]);
   const [modalPase, setModalPase] = useState({ show: false, modo: null, pase: null });
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -251,40 +255,39 @@ export default function DetalleExpediente() {
       <div className="row g-4">
         <div className="col-lg-8">
           <div className="card mb-4">
-            <div className="card-body">
-              <h5 className="card-title mb-3">
-                <i className="bi bi-info-circle me-2"></i>Información General
-              </h5>
-              <p>
-                <strong>Número de Expediente:</strong>{" "}
-                {expediente.nro_exp ?? "-"}
-              </p>
-              <p>
-                <strong>Número de Orden:</strong> {expediente.id}
-              </p>
-              <p>
-                <strong>Cant. folios:</strong> {expediente.cant_folios ?? "-"}
-              </p>
-              <p>
-                <strong>Fecha de ingreso:</strong>{" "}
-                {expediente.fecha_inicio ?? "-"}
-              </p>
-              <p>
-                <strong>Fecha de finalización:</strong>{" "}
-                {expediente.fecha_finalizacion ?? "-"}
-              </p>
-              <p>
-                <strong>HV:</strong> {expediente.hipervulnerable ?? "-"}
-              </p>
-              <p>
-                <strong>Delegación:</strong> {expediente.delegacion ?? "-"}
-              </p>
-              <div className="mb-2">
-                <div
-                  style={{ fontWeight: 500, fontSize: "1em", marginBottom: 2 }}
+            <div className="card-body position-relative">
+              <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
+                <span>
+                  <i className="bi bi-info-circle me-2"></i>Información General
+                </span>
+                <button
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => setMostrarModalEditar(true)}
+                  title="Editar expediente"
                 >
-                  <strong>Motivo:</strong>
-                </div>
+                  <i className="bi bi-pencil"></i>
+                </button>
+              </h5>
+
+              <p><strong>Número de Expediente:</strong> {expediente.nro_exp ?? '-'}</p>
+              <p><strong>Número de Orden:</strong> {expediente.id}</p>
+              <p><strong>Cant. folios:</strong> {expediente.cant_folios ?? "-"}</p>
+              <p><strong>Fecha de ingreso:</strong> {expediente.fecha_inicio ?? "-"}</p>
+              <p><strong>Fecha de finalización:</strong> {expediente.fecha_finalizacion ?? "-"}</p>
+              <p><strong>HV:</strong> {expediente.hipervulnerable ?? "-"}</p>
+              <p><strong>Delegación:</strong> {expediente.delegacion ?? "-"}</p>
+              <div className='d-flex'>
+                <strong>Usuarios:</strong>
+                <span className="ms-2">
+                  {expediente.usuRespuesta
+                    .map(usu => usu.nombreUsuario)
+                    .join(' - ')
+                  }
+                </span>
+              </div>
+              {/* Motivo en chips celestes, título arriba y chips debajo */}
+              <div className="mb-2">
+                <div style={{ fontWeight: 500, fontSize: '1em', marginBottom: 2 }}><strong>Motivo:</strong></div>
                 <div>
                   {Array.isArray(expediente.denuncia?.motivo) &&
                   expediente.denuncia.motivo.length > 0 ? (
@@ -311,11 +314,7 @@ export default function DetalleExpediente() {
                 </div>
               </div>
               <div className="mb-2">
-                <div
-                  style={{ fontWeight: 500, fontSize: "1em", marginBottom: 2 }}
-                >
-                  <strong>Estado:</strong>
-                </div>
+                <div style={{ fontWeight: 500, fontSize: '1em', marginBottom: 2 }}><strong>Estado:</strong></div>
                 <div>
                   {(() => {
                     const estado = (
@@ -467,6 +466,13 @@ export default function DetalleExpediente() {
         pase={modalPase.pase}
         onGuardar={handleGuardarPase}
       />
+      {mostrarModalEditar && (
+  <ModalEditarExpediente
+    expediente={expediente}
+    onClose={() => setMostrarModalEditar(false)}
+    actualizarExpediente={setExpediente} // si lo necesitás para refrescar luego de editar
+  />
+)}
     </div>
   );
 }

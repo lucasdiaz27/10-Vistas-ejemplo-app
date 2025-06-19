@@ -35,12 +35,14 @@ export default function Expedientes() {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold">Gestión de Expedientes</h2>
         <div>
-          <button className="btn btn-danger me-2" onClick={eliminarDuplicados}>
-            <i className="bi bi-trash me-2"></i>Eliminar duplicados
-          </button>
-          <button className="btn btn-primary">
-            <i className="bi bi-plus-lg me-2"></i> Nuevo Expediente
-          </button>
+          {/* 
+    <button className="btn btn-danger me-2" onClick={eliminarDuplicados}>
+      <i className="bi bi-trash me-2"></i>Eliminar duplicados
+    </button>
+    <button className="btn btn-primary">
+      <i className="bi bi-plus-lg me-2"></i> Nuevo Expediente
+    </button>
+    */}
         </div>
       </div>
       <div className="bg-light border p-3 mb-0" style={{ borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
