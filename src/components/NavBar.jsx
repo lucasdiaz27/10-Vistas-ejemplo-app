@@ -38,11 +38,11 @@ export const NavBar = () => {
                   Inicio
                 </Link>
               </li>
-              <li className="nav-item me-5">
+              {/* <li className="nav-item me-5">
                 <Link className="nav-link text-white fw-semibold" to="/consulta">
                   Consultas
                 </Link>
-              </li>
+              </li> */}
               <li className="nav-item ">
                 <Link className="nav-link text-white fw-semibold" to="/formulario">
                   Formulario
