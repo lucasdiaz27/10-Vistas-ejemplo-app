@@ -17,9 +17,9 @@ import ScrollToTop from "./components/ScrollToTop";
 import SideBar from "./components/SideBar";
 import { useState } from "react";
 import PrivateRoute from "./routes/PrivateRoute";
-
 function SiteApp() {
   const [sidebarAbierta, setSidebarAbierta] = useState(false);
+
   return (
     <Router>
       <ScrollToTop />
