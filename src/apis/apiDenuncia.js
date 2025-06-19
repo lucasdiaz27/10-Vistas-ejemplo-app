@@ -64,3 +64,12 @@ export const traerDocDenuncia = async (id, token) => {
   });
   return res.data;
 }
+
+export const mandarCorreo = async (id, observacion, token) => {
+  return axios.post(`http://localhost:8080/denuncia/mandarCorreo/${id}`, 
+    observacion, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}

@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   traerDenunciaPorId,
   actualizarEstadoDenuncia,
+  mandarCorreo,
 } from "../apis/apiDenuncia";
 import { DescDetalle } from "../components/detalle-denuncia/DescDetalle";
 import { PersonaDetalle } from "../components/detalle-denuncia/PersonaDetalle";
@@ -24,21 +25,21 @@ export const DetalleDenuncia = () => {
   const [showMotivo, setShowMotivo] = useState(false);
   const [tab, setTab] = useState("Denunciante");
   const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
-
-    const [pdfUrl, setPdfUrl] = useState(null);
-
-
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [showCorreoModal, setShowCorreoModal] = useState(false);
+  const [observacionCorreo, setObservacionCorreo] = useState("");
 
   useEffect(() => {
     const obtenerDenuncia = async () => {
       try {
-        const token = localStorage.getItem("token");  if (token) {
-        // Decodifica el token
-        const decoded = jwtDecode(token)
-        // Accede al rol (ajusta el nombre según tu backend, puede ser 'role', 'rol', 'authorities', etc.)
-        const rol = decoded.rol;
-        console.log("Rol del usuario:", rol);
-      }
+        const token = localStorage.getItem("token");
+        if (token) {
+          // Decodifica el token
+          const decoded = jwtDecode(token);
+          // Accede al rol (ajusta el nombre según tu backend, puede ser 'role', 'rol', 'authorities', etc.)
+          const rol = decoded.rol;
+          console.log("Rol del usuario:", rol);
+        }
         const data = await traerDenunciaPorId(id, token);
         setDenuncia(data);
       } catch (error) {
@@ -66,8 +67,13 @@ export const DetalleDenuncia = () => {
   const handleEnviarMotivo = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log(token)
-      await actualizarEstadoDenuncia(denuncia.id, estadoNuevo, motivoCambio, token);
+      console.log(token);
+      await actualizarEstadoDenuncia(
+        denuncia.id,
+        estadoNuevo,
+        motivoCambio,
+        token
+      );
       setDenuncia({ ...denuncia, estado: estadoNuevo });
       setShowMotivo(false);
       setMotivoCambio("");
@@ -76,24 +82,58 @@ export const DetalleDenuncia = () => {
       );
     } catch {
       Swal.fire({
-        icon: 'error',
-        title: 'Error al actualizar',
-        text: 'No se pudo actualizar el estado. Intenta nuevamente.',
-        confirmButtonText: 'Aceptar',
-        confirmButtonColor: '#e53935',
-        background: '#f8fafc',
+        icon: "error",
+        title: "Error al actualizar",
+        text: "No se pudo actualizar el estado. Intenta nuevamente.",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#e53935",
+        background: "#f8fafc",
         customClass: {
-          title: 'swal2-title-modern',
-          popup: 'swal2-popup-modern',
+          title: "swal2-title-modern",
+          popup: "swal2-popup-modern",
         },
         showClass: {
-          popup: 'animate__animated animate__shakeX'
+          popup: "animate__animated animate__shakeX",
         },
         hideClass: {
-          popup: 'animate__animated animate__fadeOutUp'
-        }
+          popup: "animate__animated animate__fadeOutUp",
+        },
       });
     }
+  };
+
+  const handleAbrirCorreoModal = () => {
+    setObservacionCorreo("");
+    setShowCorreoModal(true);
+  };
+
+  const handleCerrarCorreoModal = () => {
+    setShowCorreoModal(false);
+  };
+
+  const handleEnviarCorreo = async () => {
+    // Aquí deberías llamar a tu endpoint para enviar el correo
+    const token = localStorage.getItem("token");
+    await mandarCorreo(id, observacionCorreo, token)
+    setShowCorreoModal(false);
+    Swal.fire({
+      icon: "success",
+      title: "Correo enviado",
+      text: "El correo fue enviado correctamente.",
+      confirmButtonText: "Aceptar",
+      confirmButtonColor: "#3085d6",
+      background: "#f8fafc",
+      customClass: {
+        title: "swal2-title-modern",
+        popup: "swal2-popup-modern",
+      },
+      showClass: {
+        popup: "animate__animated animate__fadeInDown",
+      },
+      hideClass: {
+        popup: "animate__animated animate__fadeOutUp",
+      },
+    });
   };
 
   if (!denuncia)
@@ -115,22 +155,27 @@ export const DetalleDenuncia = () => {
         <div className="col-lg-8">
           <DescDetalle denuncia={denuncia} />
           {/* Personas involucradas */}
-          <PersonaDetalle denuncia={denuncia} personas={personas} tab={tab} setTab={setTab} />
+          <PersonaDetalle
+            denuncia={denuncia}
+            personas={personas}
+            tab={tab}
+            setTab={setTab}
+          />
           {/* Archivos adjuntos */}
           <div className="card mb-4">
             <div className="card-body">
               <ArchivosDenuncia id={id} onVerArchivo={handleVerArchivo} />
             </div>
-            {
-              archivoSeleccionado && pdfUrl && (
-              <ModalPDF 
-                archivo={archivoSeleccionado} 
-                pdfUrl={pdfUrl} 
-                onClose={() => {setArchivoSeleccionado(null)
-                setPdfUrl(null)
-              }} />
-              )
-            }
+            {archivoSeleccionado && pdfUrl && (
+              <ModalPDF
+                archivo={archivoSeleccionado}
+                pdfUrl={pdfUrl}
+                onClose={() => {
+                  setArchivoSeleccionado(null);
+                  setPdfUrl(null);
+                }}
+              />
+            )}
           </div>
         </div>
         {/* Estado y info adicional */}
@@ -154,6 +199,14 @@ export const DetalleDenuncia = () => {
                     </option>
                   ))}
                 </select>
+                {/* Botón para mandar correo */}
+                <button
+                  className="btn btn-outline-secondary mt-2"
+                  onClick={handleAbrirCorreoModal}
+                  type="button"
+                >
+                  Mandar correo
+                </button>
               </div>
               {showMotivo && (
                 <div className="mb-2">
@@ -193,6 +246,57 @@ export const DetalleDenuncia = () => {
           </div>
         </div>
       </div>
+      {/* Modal para enviar correo */}
+      {showCorreoModal && (
+        <div
+          className="modal fade show"
+          style={{
+            display: "block",
+            background: "rgba(0,0,0,0.3)",
+          }}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Mandar correo</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={handleCerrarCorreoModal}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-2">
+                  <label className="form-label">Observación</label>
+                  <textarea
+                    className="form-control"
+                    rows={3}
+                    value={observacionCorreo}
+                    onChange={(e) => setObservacionCorreo(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleCerrarCorreoModal}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleEnviarCorreo}
+                  disabled={!observacionCorreo}
+                >
+                  Enviar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
