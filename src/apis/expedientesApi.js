@@ -75,6 +75,16 @@ export const editarExpediente = async (id, expedienteUpdateDTO, token) => {
   return res.data;
 };
 
+export const traerUsuarios = async (token) => {
+  const res = await axios.get("http://localhost:8080/usuarios/traerUsuarios", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
+
 
 
 // despues agregar funciones como eliminarExpediente(id, token), etc.

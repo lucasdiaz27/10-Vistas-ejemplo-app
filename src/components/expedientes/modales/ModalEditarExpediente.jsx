@@ -1,15 +1,33 @@
-import { useState } from 'react';
-import { editarExpediente } from "../../../apis/expedientesApi";
+import { useEffect, useState } from 'react';
+import { editarExpediente, traerUsuarios } from "../../../apis/expedientesApi";
 
 export default function ModalEditarExpediente({ onClose, expediente }) {
   const [form, setForm] = useState({ ...expediente });
+  const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
+
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const usuarios = await traerUsuarios(token);
+        setUsuariosDisponibles(usuarios);
+      } catch (err) {
+        console.error("Error al traer usuarios:", err);
+      }
+    };
+
+    fetchUsuarios();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "usuarios") {
-      const arrayDeIds = value.split(",").map(id => Number(id.trim()));
-      setForm((prev) => ({ ...prev, usuarios: arrayDeIds }));
+    if (name === "usuario1" || name === "usuario2") {
+      const idSeleccionado = parseInt(value);
+      const nuevosUsuarios = [...(form.usuarios ?? [])];
+      const index = name === "usuario1" ? 0 : 1;
+      nuevosUsuarios[index] = idSeleccionado;
+      setForm((prev) => ({ ...prev, usuarios: nuevosUsuarios }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
@@ -20,7 +38,6 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
     try {
       const token = localStorage.getItem('token');
 
-      // Convertimos lo que hay en form al formato que espera el backend
       const expedienteUpdateDTO = {
         nroExp: form.nro_exp,
         cant_folios: form.cant_folios,
@@ -40,6 +57,8 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
     }
   };
 
+  const usuarioPrincipal = usuariosDisponibles.find(u => u.id === form.usuarios?.[0]);
+
   return (
     <div className="modal fade show d-block" tabIndex="-1" role="dialog">
       <div className="modal-dialog modal-lg" role="document">
@@ -50,16 +69,9 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
               <button type="button" className="btn-close" onClick={onClose}></button>
             </div>
             <div className="modal-body">
-              {/*<div className="mb-3">
-                <label className="form-label">Número de Expediente</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="nro_exp"
-                  value={form.nro_exp ?? ''}
-                  onChange={handleChange}
-                />
-              </div>*/}
+
+              {/* <div className="mb-3"> ... nro_exp ... </div> */}
+
               <div className="mb-3">
                 <label className="form-label">Cantidad de Folios</label>
                 <input
@@ -70,16 +82,9 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
                   onChange={handleChange}
                 />
               </div>
-              {/*<div className="mb-3">
-                <label className="form-label">Fecha de Inicio</label>
-                <input
-                  type="date"
-                  className="form-control"
-                  name="fecha_inicio"
-                  value={form.fecha_inicio ?? ''}
-                  onChange={handleChange}
-                />
-              </div>*/}
+
+              {/* <div className="mb-3"> ... fecha_inicio ... </div> */}
+
               <div className="mb-3">
                 <label className="form-label">Fecha de Finalización</label>
                 <input
@@ -90,6 +95,7 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
                   onChange={handleChange}
                 />
               </div>
+
               <div className="mb-3">
                 <label className="form-label">HV</label>
                 <select
@@ -114,16 +120,45 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
                   onChange={handleChange}
                 />
               </div>
+
               <div className="mb-3">
-                <label className="form-label">Usuarios (IDs separados por coma)</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="usuarios"
-                  value={Array.isArray(form.usuarios) ? form.usuarios.join(", ") : ""}
-                  onChange={handleChange}
-                />
+                <strong>Usuario: </strong>{usuarioPrincipal?.nombreUsuario ?? 'No seleccionado'}
               </div>
+
+              <div className="mb-3">
+                <label className="form-label">Usuario 1</label>
+                <select
+                  className="form-select"
+                  name="usuario1"
+                  value={form.usuarios?.[0] ?? ''}
+                  onChange={handleChange}
+                >
+                  <option value="">Seleccionar...</option>
+                  {usuariosDisponibles.map(usuario => (
+                    <option key={usuario.id} value={usuario.id}>
+                      {usuario.nombreUsuario}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label">Usuario 2</label>
+                <select
+                  className="form-select"
+                  name="usuario2"
+                  value={form.usuarios?.[1] ?? ''}
+                  onChange={handleChange}
+                >
+                  <option value="">Seleccionar...</option>
+                  {usuariosDisponibles.map(usuario => (
+                    <option key={usuario.id} value={usuario.id}>
+                      {usuario.nombreUsuario}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>
