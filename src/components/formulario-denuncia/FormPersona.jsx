@@ -7,7 +7,7 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
     <>
       <div className="mb-4">
         <div className="bg-white p-4 rounded shadow">
-          <h5>Datos de la {tipoPersona}:</h5>
+          <h5>Datos del {tipoPersona}:</h5>
 
           <div className="mb-3">
             <label htmlFor="nombre" className="form-label">

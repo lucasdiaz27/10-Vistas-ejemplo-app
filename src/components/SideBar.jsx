@@ -82,12 +82,12 @@ export const SideBar = ({ abierto, setAbierto }) => {
                     {/* Solo mostrar el resto si NO es MESA_ENTRADA */}
                     {rol !== "MESA_ENTRADA" && (
                         <>
-                            <li>
+                            {/* <li>
                                 <Link to="/menu-interno?vista=pases" className={`nav-link text-white  ${vistaActual === "pases" ? "active" : ""}`}>
                                     <i className="bi bi-speedometer2 me-2"></i>
                                     Pases
                                 </Link>
-                            </li>
+                            </li> */}
                             <li>
                                 <Link to="/menu-interno?vista=expedientes" className={`nav-link text-white ${vistaActual === "expedientes" ? "active" : ""}`}>
                                     <i className="bi bi-table me-2"></i>
@@ -121,7 +121,7 @@ export const SideBar = ({ abierto, setAbierto }) => {
                 <div className="dropdown">
                     <a
                         href="#"
-                        className="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                        className="d-flex align-items-center text-white text-decoration-none "
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                     >

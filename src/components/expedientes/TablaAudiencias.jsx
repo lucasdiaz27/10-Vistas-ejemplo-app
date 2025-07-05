@@ -29,7 +29,10 @@ export default function TablaAudiencias({ audiencias, onNueva, onEditar, onElimi
             <tbody>
               {audiencias.map((a, idx) => (
                 <tr key={a.id || idx}>
-                  <td>{a.fecha || "-"}</td>
+                  <td>
+  {a.fecha
+    ? new Date(a.fecha).toLocaleDateString("es-AR", { year: "numeric", month: "2-digit", day: "2-digit" })
+    : "-"}</td>
                   <td>{a.hora || "-"}</td>
                   <td>{a.lugar || "-"}</td>
                   <td>

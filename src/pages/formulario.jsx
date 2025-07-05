@@ -26,9 +26,9 @@ export const Formulario = () => {
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm(/*{
+  } = useForm({
     resolver: zodResolver(denunciaSchema), // Aquí le pasas el schema del cual se va a basar para resolver los errores (o eso entendí yo). Si pones el clic sobre resolver y denunciaSchema vas a ver
-  }*/);
+  });
   console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
 
   const onSubmit = (data) => {
@@ -110,7 +110,7 @@ export const Formulario = () => {
             <div className="row">
               <div className="col-6">
                 <label className="form-label">
-                  Multiple files input example
+                  Envía tus archivos aquí
                 </label>
                 <input
                   className="form-control"
