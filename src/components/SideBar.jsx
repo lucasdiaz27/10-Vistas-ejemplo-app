@@ -100,6 +100,13 @@ export const SideBar = ({ abierto, setAbierto }) => {
                                     Usuarios
                                 </Link>
                             </li>
+                            {/* NUEVO: Acceso temporal para probar el generador de PDF */}
+                            <li>
+                                <Link to="/menu-interno?vista=prueba-pdf" className={`nav-link text-white ${vistaActual === "prueba-pdf" ? "active" : ""}`}>
+                                    <i className="bi bi-file-earmark-pdf me-2"></i>
+                                    Prueba PDF
+                                </Link>
+                            </li>
                             {/* <Link
                                 to="/ajustes" className={`nav-link text-white ${location.pathname === "/ajustes" ? "active" : ""}`}
                             >
