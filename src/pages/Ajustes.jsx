@@ -1,15 +1,14 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2";
+
 
 
 const Ajustes = () => {
   const [tab, setTab] = useState("personal");
   const [form, setForm] = useState({
     nombre: "Juan",
-    apellido: "Díaz",
     email: "juan.diaz@dgc.gob.ar",
-    telefono: "(011) 4567-8900",
-    cargo: "Analista",
-    departamento: "Sistemas",
+    rol: "Analista",
   });
   const [passwords, setPasswords] = useState({ actual: "", nueva: "", repetir: "" });
   const [notificaciones, setNotificaciones] = useState({ correo: true, sistema: true });
@@ -28,6 +27,36 @@ const Ajustes = () => {
   const handlePrivacidadChange = (e) => {
     setPrivacidad({ ...privacidad, [e.target.name]: e.target.checked });
   };
+
+  const handlePasswordSubmit = () => {
+    if (passwords.nueva !== passwords.repetir) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Las nuevas contraseñas no coinciden.",
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Deseas cambiar tu contraseña?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cambiar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Simulación del cambio de contraseña (cuando esté el backend se reemplaza esto)
+        Swal.fire({
+          icon: "success",
+          title: "Contraseña actualizada",
+          text: "Se cambió la contraseña correctamente.",
+        });
+      }
+    });
+  };
+
 
   return (
     <div className="container py-4">
@@ -49,35 +78,41 @@ const Ajustes = () => {
               <div className="card-body">
                 <h5 className="card-title mb-4">Información Personal</h5>
                 <div className="row g-3">
-                  <div className="col-md-6">
+                  <div className="col-12">
                     <label className="form-label">Nombre</label>
-                    <input className="form-control" name="nombre" value={form.nombre} onChange={handleFormChange} />
+                    <input
+                      className="form-control"
+                      name="nombre"
+                      value={form.nombre}
+                      onChange={handleFormChange}
+                    />
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Apellido</label>
-                    <input className="form-control" name="apellido" value={form.apellido} onChange={handleFormChange} />
+
+                  <div className="col-12">
+                    <label className="form-label">Email</label>
+                    <input
+                      className="form-control"
+                      name="email"
+                      value={form.email}
+                      readOnly
+                    />
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Correo electrónico</label>
-                    <input className="form-control" name="email" value={form.email} onChange={handleFormChange} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Teléfono</label>
-                    <input className="form-control" name="telefono" value={form.telefono} onChange={handleFormChange} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Cargo</label>
-                    <input className="form-control" name="cargo" value={form.cargo} onChange={handleFormChange} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Departamento</label>
-                    <input className="form-control" name="departamento" value={form.departamento} onChange={handleFormChange} />
+
+                  <div className="col-12">
+                    <label className="form-label">Área</label>
+                    <input
+                      className="form-control"
+                      name="rol"
+                      value={form.rol || ""}
+                      readOnly
+                    />
                   </div>
                 </div>
                 <button className="btn btn-primary mt-4">Guardar cambios</button>
               </div>
             </div>
           )}
+
           {tab === "password" && (
             <div className="card mb-4">
               <div className="card-body">
@@ -94,7 +129,9 @@ const Ajustes = () => {
                   <label className="form-label">Repetir nueva contraseña</label>
                   <input type="password" className="form-control" name="repetir" value={passwords.repetir} onChange={handlePasswordChange} />
                 </div>
-                <button className="btn btn-primary">Actualizar contraseña</button>
+                <button className="btn btn-primary" onClick={handlePasswordSubmit}>
+                  Actualizar contraseña
+                </button>
               </div>
             </div>
           )}
