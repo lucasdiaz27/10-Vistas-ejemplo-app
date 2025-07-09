@@ -102,6 +102,15 @@ export const traerUsuarios = async (token) => {
   return res.data;
 };
 
+export const traerPorUsuario = async (token) => {
+  const res = await axios.get("http://localhost:8080/expediente/traerPorUsuario", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};
+
 
 
 

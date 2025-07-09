@@ -2,7 +2,9 @@
 import { useState, useEffect } from 'react';
 
 import TablaExpedientes from './TablaExpedientes';
-import { traerExpedientes } from '../../apis/expedientesApi';
+import { traerExpedientes, traerPorUsuario } from '../../apis/expedientesApi';
+import { jwtDecode } from 'jwt-decode';
+import { data } from 'react-router-dom';
 
 export default function Expedientes() {
   const [busqueda, setBusqueda] = useState('');
@@ -10,8 +12,15 @@ export default function Expedientes() {
 
   useEffect(() => {
     const fetchExpedientes = async () => {
-      const token = localStorage.getItem("token");
-      const data = await traerExpedientes(token);
+        const token = localStorage.getItem("token");
+        const decoded = jwtDecode(token);
+        if (decoded.rol == "ADMIN") {
+          const data = await traerExpedientes(token);
+          setExpedientes(data);
+        } else {
+          const data = await traerPorUsuario(token);
+          setExpedientes(data);
+        }
       setExpedientes(data);
     };
     fetchExpedientes();
@@ -70,7 +79,7 @@ export default function Expedientes() {
         </div>
       </div>
 
-      <TablaExpedientes filtro={busqueda} expedientes={expedientes} setExpedientes={setExpedientes} />
+      <TablaExpedientes filtro={busqueda} data={expedientes} setExpedientes={setExpedientes} />
     </div>
   );
 }
