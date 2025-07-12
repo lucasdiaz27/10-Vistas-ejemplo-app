@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { obtenerPerfilUsuario, actualizarNombre, cambiarPassword } from "../api/usuarioAPI";
+import { obtenerPerfilUsuario, actualizarNombre, cambiarPassword } from "../apis/usuarioAPI";
 
 
 const Ajustes = () => {
