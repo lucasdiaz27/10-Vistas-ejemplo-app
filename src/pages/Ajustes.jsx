@@ -1,19 +1,105 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
-
-
 const Ajustes = () => {
+  const token = localStorage.getItem("token");
+
   const [tab, setTab] = useState("personal");
   const [form, setForm] = useState({
-    nombre: "Juan",
-    email: "juan.diaz@dgc.gob.ar",
-    rol: "Analista",
+    nombre: "",
+    email: "",
+    rol: "",
   });
   const [passwords, setPasswords] = useState({ actual: "", nueva: "", repetir: "" });
   const [notificaciones, setNotificaciones] = useState({ correo: true, sistema: true });
   const [tema, setTema] = useState("claro");
   const [privacidad, setPrivacidad] = useState({ mostrarEmail: true, mostrarTelefono: false });
+
+  // Cargar datos al iniciar
+  useEffect(() => {
+    fetch("http://localhost:8080/usuarios/perfilUsuario", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al obtener el perfil");
+        return res.json();
+      })
+      .then((data) => {
+        setForm({
+          nombre: data.nombre || "",
+          email: data.email || "",
+          rol: data.area || "",
+        });
+      })
+      .catch((err) => {
+        console.error("Error al obtener el perfil:", err);
+        Swal.fire("Error", "No se pudo cargar el perfil.", "error");
+      });
+  }, [token]);
+
+  const handleGuardarCambios = () => {
+    fetch("http://localhost:8080/usuarios/actualizarNombre", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ nombre: form.nombre }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al guardar cambios");
+        return res.text();
+      })
+      .then((msg) => {
+        Swal.fire("Éxito", msg, "success");
+      })
+      .catch(() => {
+        Swal.fire("Error", "No se pudo guardar el nombre", "error");
+      });
+  };
+
+  const handlePasswordSubmit = () => {
+    if (passwords.nueva !== passwords.repetir) {
+      Swal.fire("Error", "Las nuevas contraseñas no coinciden.", "error");
+      return;
+    }
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Deseas cambiar tu contraseña?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cambiar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("http://localhost:8080/usuarios/cambiarPassword", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(passwords),
+        })
+          .then((res) => res.text().then((text) => ({ ok: res.ok, text })))
+          .then(({ ok, text }) => {
+            if (ok) {
+              Swal.fire("Éxito", text, "success");
+              setPasswords({ actual: "", nueva: "", repetir: "" });
+            } else {
+              Swal.fire("Error", text, "error");
+            }
+          })
+          .catch(() => {
+            Swal.fire("Error", "No se pudo cambiar la contraseña", "error");
+          });
+      }
+    });
+  };
 
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,36 +113,6 @@ const Ajustes = () => {
   const handlePrivacidadChange = (e) => {
     setPrivacidad({ ...privacidad, [e.target.name]: e.target.checked });
   };
-
-  const handlePasswordSubmit = () => {
-    if (passwords.nueva !== passwords.repetir) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Las nuevas contraseñas no coinciden.",
-      });
-      return;
-    }
-
-    Swal.fire({
-      title: "¿Estás seguro?",
-      text: "¿Deseas cambiar tu contraseña?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Sí, cambiar",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        // Simulación del cambio de contraseña (cuando esté el backend se reemplaza esto)
-        Swal.fire({
-          icon: "success",
-          title: "Contraseña actualizada",
-          text: "Se cambió la contraseña correctamente.",
-        });
-      }
-    });
-  };
-
 
   return (
     <div className="container py-4">
@@ -80,39 +136,21 @@ const Ajustes = () => {
                 <div className="row g-3">
                   <div className="col-12">
                     <label className="form-label">Nombre</label>
-                    <input
-                      className="form-control"
-                      name="nombre"
-                      value={form.nombre}
-                      onChange={handleFormChange}
-                    />
+                    <input className="form-control" name="nombre" value={form.nombre} onChange={handleFormChange} />
                   </div>
-
                   <div className="col-12">
                     <label className="form-label">Email</label>
-                    <input
-                      className="form-control"
-                      name="email"
-                      value={form.email}
-                      readOnly
-                    />
+                    <input className="form-control" name="email" value={form.email} readOnly />
                   </div>
-
                   <div className="col-12">
                     <label className="form-label">Área</label>
-                    <input
-                      className="form-control"
-                      name="rol"
-                      value={form.rol || ""}
-                      readOnly
-                    />
+                    <input className="form-control" name="rol" value={form.rol || ""} readOnly />
                   </div>
                 </div>
-                <button className="btn btn-primary mt-4">Guardar cambios</button>
+                <button className="btn btn-primary mt-4" onClick={handleGuardarCambios}>Guardar cambios</button>
               </div>
             </div>
           )}
-
           {tab === "password" && (
             <div className="card mb-4">
               <div className="card-body">
@@ -129,9 +167,7 @@ const Ajustes = () => {
                   <label className="form-label">Repetir nueva contraseña</label>
                   <input type="password" className="form-control" name="repetir" value={passwords.repetir} onChange={handlePasswordChange} />
                 </div>
-                <button className="btn btn-primary" onClick={handlePasswordSubmit}>
-                  Actualizar contraseña
-                </button>
+                <button className="btn btn-primary" onClick={handlePasswordSubmit}>Actualizar contraseña</button>
               </div>
             </div>
           )}
