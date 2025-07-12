@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
+import { obtenerPerfilUsuario, actualizarNombre, cambiarPassword } from "../api/usuarioAPI";
+
 
 const Ajustes = () => {
   const token = localStorage.getItem("token");
@@ -15,19 +17,10 @@ const Ajustes = () => {
   const [tema, setTema] = useState("claro");
   const [privacidad, setPrivacidad] = useState({ mostrarEmail: true, mostrarTelefono: false });
 
-  // Cargar datos al iniciar
+
+  // Cargar perfil del usuario al iniciar
   useEffect(() => {
-    fetch("http://localhost:8080/usuarios/perfilUsuario", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Error al obtener el perfil");
-        return res.json();
-      })
+    obtenerPerfilUsuario()
       .then((data) => {
         setForm({
           nombre: data.nombre || "",
@@ -39,21 +32,11 @@ const Ajustes = () => {
         console.error("Error al obtener el perfil:", err);
         Swal.fire("Error", "No se pudo cargar el perfil.", "error");
       });
-  }, [token]);
+  }, []);
 
+  // Manejo de cambios en el formulario
   const handleGuardarCambios = () => {
-    fetch("http://localhost:8080/usuarios/actualizarNombre", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ nombre: form.nombre }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Error al guardar cambios");
-        return res.text();
-      })
+    actualizarNombre(form.nombre)
       .then((msg) => {
         Swal.fire("Éxito", msg, "success");
       })
@@ -62,6 +45,7 @@ const Ajustes = () => {
       });
   };
 
+// Manejo de cambio de contraseña
   const handlePasswordSubmit = () => {
     if (passwords.nueva !== passwords.repetir) {
       Swal.fire("Error", "Las nuevas contraseñas no coinciden.", "error");
@@ -77,29 +61,19 @@ const Ajustes = () => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch("http://localhost:8080/usuarios/cambiarPassword", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(passwords),
-        })
-          .then((res) => res.text().then((text) => ({ ok: res.ok, text })))
-          .then(({ ok, text }) => {
-            if (ok) {
-              Swal.fire("Éxito", text, "success");
-              setPasswords({ actual: "", nueva: "", repetir: "" });
-            } else {
-              Swal.fire("Error", text, "error");
-            }
+        cambiarPassword(passwords)
+          .then((msg) => {
+            Swal.fire("Éxito", msg, "success");
+            setPasswords({ actual: "", nueva: "", repetir: "" });
           })
-          .catch(() => {
-            Swal.fire("Error", "No se pudo cambiar la contraseña", "error");
+          .catch((err) => {
+            const msg = err.response?.data || "No se pudo cambiar la contraseña";
+            Swal.fire("Error", msg, "error");
           });
       }
     });
   };
+
 
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
