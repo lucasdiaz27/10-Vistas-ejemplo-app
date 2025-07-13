@@ -73,3 +73,12 @@ export const mandarCorreo = async (id, observacion, token) => {
     },
   });
 }
+
+export const traerHistorialDenuncia = async (nroExp, token) => {
+  const res = await axios.get(`http://localhost:8080/denuncia/historial/${nroExp}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

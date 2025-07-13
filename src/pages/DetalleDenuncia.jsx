@@ -5,6 +5,7 @@ import {
   traerDenunciaPorId,
   actualizarEstadoDenuncia,
   mandarCorreo,
+  traerHistorialDenuncia, // funcion para consultar el historial de estados
 } from "../apis/apiDenuncia";
 import { DescDetalle } from "../components/detalle-denuncia/DescDetalle";
 import { PersonaDetalle } from "../components/detalle-denuncia/PersonaDetalle";
@@ -13,6 +14,8 @@ import { jwtDecode } from "jwt-decode";
 import { ArchivosDenuncia } from "../components/detalle-denuncia/ArchivosDenuncia";
 import { ModalPDF } from "../components/detalle-denuncia/ModalPDF";
 import { traerArchivoPDF } from "../apis/apiDocumento";
+import { HistorialEstados } from "../components/detalle-denuncia/HistorialEstados";
+
 
 const ESTADOS = ["NO ADMITIDO", "RECHAZADO", "EN PROCESO", "PENDIENTE"];
 
@@ -28,6 +31,8 @@ export const DetalleDenuncia = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [showCorreoModal, setShowCorreoModal] = useState(false);
   const [observacionCorreo, setObservacionCorreo] = useState("");
+  const [historialEstados, setHistorialEstados] = useState([]);
+
 
   useEffect(() => {
     const obtenerDenuncia = async () => {
@@ -42,6 +47,10 @@ export const DetalleDenuncia = () => {
         }
         const data = await traerDenunciaPorId(id, token);
         setDenuncia(data);
+
+        // Traer el historial de estados de la denuncia
+        const historial = await traerHistorialDenuncia(id, token);
+        setHistorialEstados(historial);
       } catch (error) {
         console.error("Error al obtener denuncia:", error);
       }
@@ -49,9 +58,90 @@ export const DetalleDenuncia = () => {
     obtenerDenuncia();
   }, [id]);
 
-  const handleEstadoChange = (e) => {
-    setEstadoNuevo(e.target.value);
-    setShowMotivo(true);
+  const handleEstadoChange = async (e) => {
+    // obtenemos el nuevo estado seleccionado
+    const nuevoEstado = e.target.value;
+    // obtenemos el token del usuario
+    const token = localStorage.getItem("token");
+    // consultamos el historial de la denuncia
+    try {
+      const historial = await traerHistorialDenuncia(denuncia.id, token);
+      // validamos si el cambio de estado es permitido segun el historial
+      const cambioPermitido = validarCambioEstado(
+        historial,
+        denuncia.estado,
+        nuevoEstado
+      );
+      if (!cambioPermitido) {
+        // si el cambio no es permitido, mostramos un popup de error y no permitimos el cambio
+        Swal.fire({
+          icon: "error",
+          title: "cambio de estado no permitido",
+          text: "no se puede cambiar a ese estado segun el historial de la denuncia",
+          confirmButtonText: "aceptar",
+          confirmButtonColor: "#e53935",
+          background: "#f8fafc",
+          customClass: {
+            title: "swal2-title-modern",
+            popup: "swal2-popup-modern",
+          },
+          showClass: {
+            popup: "animate__animated animate__shakeX",
+          },
+          hideClass: {
+            popup: "animate__animated animate__fadeOutUp",
+          },
+        });
+        return;
+      }
+      // si el cambio es permitido, mostramos un popup de confirmacion antes de continuar
+      const confirm = await Swal.fire({
+        icon: "question",
+        title: "confirmar cambio de estado",
+        text: `estas seguro que quieres cambiar el estado a ${nuevoEstado}?`,
+        showCancelButton: true,
+        confirmButtonText: "si, cambiar",
+        cancelButtonText: "cancelar",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#e53935",
+        background: "#f8fafc",
+        customClass: {
+          title: "swal2-title-modern",
+          popup: "swal2-popup-modern",
+        },
+        showClass: {
+          popup: "animate__animated animate__fadeInDown",
+        },
+        hideClass: {
+          popup: "animate__animated animate__fadeOutUp",
+        },
+      });
+      if (confirm.isConfirmed) {
+        // si el usuario confirma, habilitamos el textarea de motivo y guardamos el estado nuevo
+        setEstadoNuevo(nuevoEstado);
+        setShowMotivo(true);
+      }
+    } catch (error) {
+      // si hay error al consultar el historial, mostramos un mensaje
+      Swal.fire({
+        icon: "error",
+        title: "error al consultar historial",
+        text: "no se pudo consultar el historial de la denuncia",
+        confirmButtonText: "aceptar",
+        confirmButtonColor: "#e53935",
+        background: "#f8fafc",
+        customClass: {
+          title: "swal2-title-modern",
+          popup: "swal2-popup-modern",
+        },
+        showClass: {
+          popup: "animate__animated animate__shakeX",
+        },
+        hideClass: {
+          popup: "animate__animated animate__fadeOutUp",
+        },
+      });
+    }
   };
 
   const handleVerArchivo = async (archivo) => {
@@ -77,6 +167,25 @@ export const DetalleDenuncia = () => {
       setDenuncia({ ...denuncia, estado: estadoNuevo });
       setShowMotivo(false);
       setMotivoCambio("");
+      // mostramos un popup de exito al cambiar el estado
+      Swal.fire({
+        icon: "success",
+        title: "estado actualizado",
+        text: `el estado se cambio correctamente a ${estadoNuevo}`,
+        confirmButtonText: "aceptar",
+        confirmButtonColor: "#3085d6",
+        background: "#f8fafc",
+        customClass: {
+          title: "swal2-title-modern",
+          popup: "swal2-popup-modern",
+        },
+        showClass: {
+          popup: "animate__animated animate__fadeInDown",
+        },
+        hideClass: {
+          popup: "animate__animated animate__fadeOutUp",
+        },
+      });
       navigate(
         `/menu-interno?vista=mesa-entrada&actualizarExpediente=1&id=${denuncia.id}&estado=${estadoNuevo}`
       );
@@ -114,7 +223,7 @@ export const DetalleDenuncia = () => {
   const handleEnviarCorreo = async () => {
     // Aquí deberías llamar a tu endpoint para enviar el correo
     const token = localStorage.getItem("token");
-    await mandarCorreo(id, observacionCorreo, token)
+    await mandarCorreo(id, observacionCorreo, token);
     setShowCorreoModal(false);
     Swal.fire({
       icon: "success",
@@ -208,6 +317,12 @@ export const DetalleDenuncia = () => {
                   Mandar correo
                 </button>
               </div>
+              
+              {/* Historial de estados */}
+              <div className="mt-3">
+                <HistorialEstados historial={historialEstados} />
+              </div>
+
               {showMotivo && (
                 <div className="mb-2">
                   <label className="form-label">
@@ -300,3 +415,32 @@ export const DetalleDenuncia = () => {
     </div>
   );
 };
+
+// funcion para validar si el cambio de estado es permitido segun el historial
+// se puede personalizar la logica segun las reglas de negocio
+function validarCambioEstado(historial, estadoActual, estadoNuevo) {
+  // ejemplo: solo se permite cambiar a un estado que no este en el historial
+  // y que sea distinto al actual
+  if (estadoActual === estadoNuevo) return false;
+  if (historial.some((h) => h.estado === estadoNuevo)) return false;
+
+  // ejemplo: permitir solo ciertos saltos de estado
+  // const transicionesPermitidas = {
+  //   'PENDIENTE': ['EN PROCESO', 'RECHAZADO'],
+  //   'EN PROCESO': ['RECHAZADO', 'NO ADMITIDO'],
+  //   // agregar mas reglas segun negocio
+  // };
+  // if (transicionesPermitidas[estadoActual] && !transicionesPermitidas[estadoActual].includes(estadoNuevo)) return false;
+
+  // ejemplo: bloquear retrocesos de estado
+  // si el ultimo estado en el historial es mas avanzado que el nuevo, no permitir
+  // const ordenEstados = ['PENDIENTE', 'EN PROCESO', 'RECHAZADO', 'NO ADMITIDO'];
+  // const ultimoEstado = historial.length > 0 ? historial[historial.length - 1].estado : estadoActual;
+  // if (ordenEstados.indexOf(estadoNuevo) < ordenEstados.indexOf(ultimoEstado)) return false;
+
+  // ejemplo: permitir cambios solo si el ultimo estado en el historial es 'PENDIENTE'
+  // if (historial.length > 0 && historial[historial.length - 1].estado !== 'PENDIENTE') return false;
+
+  // se pueden agregar mas reglas aqui
+  return true;
+}
