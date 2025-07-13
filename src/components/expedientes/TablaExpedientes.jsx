@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ModalEditarExpediente from './modales/ModalEditarExpediente';
-import { traerExpedientes } from '../../apis/expedientesApi';
+import { traerExpedientes, traerPorUsuario } from '../../apis/expedientesApi';
+import { jwtDecode } from 'jwt-decode';
 
 export default function TablaExpedientes({ filtro }) {
   const [expedientes, setExpedientes] = useState([]);
@@ -13,8 +14,14 @@ export default function TablaExpedientes({ filtro }) {
     const fetchExpedientes = async () => {
       try {
         const token = localStorage.getItem("token");
-        const data = await traerExpedientes(token);
-        setExpedientes(data);
+        const decoded = jwtDecode(token);
+        if (decoded.rol == "ADMIN") {
+          const data = await traerExpedientes(token);
+          setExpedientes(data);
+        } else {
+          const data = await traerPorUsuario(token);
+          setExpedientes(data);
+        }
       } catch (err) {
         console.error('Error al traer expedientes:', err);
       }
