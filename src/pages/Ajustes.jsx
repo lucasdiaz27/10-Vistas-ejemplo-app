@@ -4,7 +4,6 @@ import { obtenerPerfilUsuario, actualizarNombre, cambiarPassword } from "../apis
 
 
 const Ajustes = () => {
-  const token = localStorage.getItem("token");
 
   const [tab, setTab] = useState("personal");
   const [form, setForm] = useState({
@@ -20,7 +19,8 @@ const Ajustes = () => {
 
   // Cargar perfil del usuario al iniciar
   useEffect(() => {
-    obtenerPerfilUsuario()
+    const token = localStorage.getItem("token");
+    obtenerPerfilUsuario(token)
       .then((data) => {
         setForm({
           nombre: data.nombre || "",
@@ -36,7 +36,8 @@ const Ajustes = () => {
 
   // Manejo de cambios en el formulario
   const handleGuardarCambios = () => {
-    actualizarNombre(form.nombre)
+    const token = localStorage.getItem("token");
+    actualizarNombre(form.nombre, token)
       .then((msg) => {
         Swal.fire("Éxito", msg, "success");
       })
@@ -61,7 +62,8 @@ const Ajustes = () => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        cambiarPassword(passwords)
+        const token = localStorage.getItem("token");
+        cambiarPassword(passwords, token)
           .then((msg) => {
             Swal.fire("Éxito", msg, "success");
             setPasswords({ actual: "", nueva: "", repetir: "" });
