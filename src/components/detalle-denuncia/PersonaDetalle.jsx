@@ -32,7 +32,6 @@ export const PersonaDetalle = ({personas, denuncia, tab, setTab}) => {
                       <div>
                         <b>Email:</b> {p.email}
                       </div>
-                      {console.log(p)}
                       <div>
                         <b>Domicilio:</b> {p.domicilio}
                       </div>

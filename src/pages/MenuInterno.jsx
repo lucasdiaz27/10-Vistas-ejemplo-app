@@ -12,7 +12,7 @@ import {
 } from "../apis/expedientesApi";
 import Expedientes from "../components/expedientes/Expedientes";
 import Pases from "../components/pases/Pases";
-// import VistaAjustes from "../components/ajustes/VistaAjustes";
+import GeneradorPDF from "../components/pdf/GeneradorPDF"; // <-- Importa el nuevo componente
 
 const MenuInterno = () => {
   const location = useLocation();
@@ -363,6 +363,13 @@ const MenuInterno = () => {
       {vista === "formulario" && <p>Formulario interno</p>}
       {vista === "usuarios" && <VistaUsuarios2 />}
       {vista === "ajustes" && <p>Vista de ajustes (en construcción)</p>}
+      {/* NUEVO: Opción para probar el generador de PDF */}
+      {vista === "prueba-pdf" && (
+        <div className="my-4">
+          <h2>Prueba Generador de PDF</h2>
+          <GeneradorPDF />
+        </div>
+      )}
       {!vista && <p>Seleccioná una opción del menú superior.</p>}
     </div>
   );

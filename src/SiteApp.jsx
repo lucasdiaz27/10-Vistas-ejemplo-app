@@ -17,6 +17,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import SideBar from "./components/SideBar";
 import { useState } from "react";
 import PrivateRoute from "./routes/PrivateRoute";
+import GeneradorPDF from "./components/pdf/GeneradorPDF";
+
 function SiteApp() {
   const [sidebarAbierta, setSidebarAbierta] = useState(false);
 
@@ -132,6 +134,22 @@ function SiteApp() {
                 <Ajustes />
               </div>
             </div>
+          }
+        />
+
+        {/* NUEVO: Ruta protegida para probar el generador de PDF */}
+        <Route
+          path="/prueba-pdf"
+          element={
+            <PrivateRoute>
+              <>
+                <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
+                <div className={`contenido-principal ${sidebarAbierta ? "con-sidebar" : ""}`}>
+                  <h2>Prueba Generador de PDF</h2>
+                  <GeneradorPDF />
+                </div>
+              </>
+            </PrivateRoute>
           }
         />
       </Routes>
