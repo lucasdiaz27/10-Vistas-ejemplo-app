@@ -23,6 +23,7 @@ import { ModalPDF } from "../detalle-denuncia/ModalPDF";
 import { traerDocDenuncia } from "../../apis/apiDenuncia";
 import { traerArchivoPDF } from "../../apis/apiDocumento";
 import TablaPases from "./TablaPases";
+import OrdenesTabla from "./OrdenesTabla"; // Importa la tabla de órdenes
 
 export default function DetalleExpediente() {
   const { id } = useParams();
@@ -368,28 +369,29 @@ export default function DetalleExpediente() {
             <div className="card-body pb-0">
               <div className="d-flex align-items-center mb-3">
                 <button
-                  className={`btn btn-link px-3 py-2 ${
-                    tab === "pases" ? "fw-bold text-primary" : "text-secondary"
-                  }`}
+                  className={`btn btn-link px-3 py-2 ${tab === "pases" ? "fw-bold text-primary" : "text-secondary"}`}
                   style={{ textDecoration: "none" }}
                   onClick={() => setTab("pases")}
                 >
-                  <i className="bi bi-arrow-left-right me-2"></i>Historial de
-                  Pases
+                  <i className="bi bi-arrow-left-right me-2"></i>Historial de Pases
                 </button>
                 <button
-                  className={`btn btn-link px-3 py-2 ${
-                    tab === "audiencias"
-                      ? "fw-bold text-primary"
-                      : "text-secondary"
-                  }`}
+                  className={`btn btn-link px-3 py-2 ${tab === "audiencias" ? "fw-bold text-primary" : "text-secondary"}`}
                   style={{ textDecoration: "none" }}
                   onClick={() => setTab("audiencias")}
                 >
                   <i className="bi bi-calendar-event me-2"></i>Audiencias
                 </button>
+                {/* Nueva sección: Órdenes */}
+                <button
+                  className={`btn btn-link px-3 py-2 ${tab === "ordenes" ? "fw-bold text-primary" : "text-secondary"}`}
+                  style={{ textDecoration: "none" }}
+                  onClick={() => setTab("ordenes")}
+                >
+                  <i className="bi bi-file-earmark-text me-2"></i>Órdenes
+                </button>
               </div>
-              <div>
+              <div style={{ width: '100%' }}>
                 {tab === "pases" ? (
                   <TablaPases
                     pases={pases}
@@ -397,13 +399,21 @@ export default function DetalleExpediente() {
                     onEliminar={handleEliminarPase}
                     onNuevo={handleNuevoPase}
                   />
-                ) : (
+                ) : tab === "audiencias" ? (
                   <TablaAudiencias
                     audiencias={audiencias}
                     onNueva={handleNuevaAudiencia}
                     onEditar={handleEditarAudiencia}
                     onEliminar={handleEliminarAudiencia}
                     personasInvolucradas={expediente.denuncia?.personas || []}
+                  />
+                ) : (
+                  // Sección Órdenes: tabla ocupa todo el ancho
+                  <OrdenesTabla
+                    ordenes={expediente.ordenes || []}
+                    onDescargar={orden => {/* TODO: lógica para descargar */}}
+                    onVer={orden => {/* TODO: lógica para visualizar */}}
+                    onEliminar={id => {/* TODO: lógica para eliminar */}}
                   />
                 )}
               </div>
