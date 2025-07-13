@@ -1,20 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Swal from "sweetalert2";
+import { obtenerPerfilUsuario, actualizarNombre, cambiarPassword } from "../apis/usuarioAPI";
 
 
 const Ajustes = () => {
+
   const [tab, setTab] = useState("personal");
   const [form, setForm] = useState({
-    nombre: "Juan",
-    apellido: "Díaz",
-    email: "juan.diaz@dgc.gob.ar",
-    telefono: "(011) 4567-8900",
-    cargo: "Analista",
-    departamento: "Sistemas",
+    nombre: "",
+    email: "",
+    rol: "",
   });
   const [passwords, setPasswords] = useState({ actual: "", nueva: "", repetir: "" });
   const [notificaciones, setNotificaciones] = useState({ correo: true, sistema: true });
   const [tema, setTema] = useState("claro");
   const [privacidad, setPrivacidad] = useState({ mostrarEmail: true, mostrarTelefono: false });
+
+
+  // Cargar perfil del usuario al iniciar
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    obtenerPerfilUsuario(token)
+      .then((data) => {
+        setForm({
+          nombre: data.nombre || "",
+          email: data.email || "",
+          rol: data.area || "",
+        });
+      })
+      .catch((err) => {
+        console.error("Error al obtener el perfil:", err);
+        Swal.fire("Error", "No se pudo cargar el perfil.", "error");
+      });
+  }, []);
+
+  // Manejo de cambios en el formulario
+  const handleGuardarCambios = () => {
+    const token = localStorage.getItem("token");
+    actualizarNombre(form.nombre, token)
+      .then((msg) => {
+        Swal.fire("Éxito", msg, "success");
+      })
+      .catch(() => {
+        Swal.fire("Error", "No se pudo guardar el nombre", "error");
+      });
+  };
+
+// Manejo de cambio de contraseña
+  const handlePasswordSubmit = () => {
+    if (passwords.nueva !== passwords.repetir) {
+      Swal.fire("Error", "Las nuevas contraseñas no coinciden.", "error");
+      return;
+    }
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Deseas cambiar tu contraseña?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, cambiar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const token = localStorage.getItem("token");
+        cambiarPassword(passwords, token)
+          .then((msg) => {
+            Swal.fire("Éxito", msg, "success");
+            setPasswords({ actual: "", nueva: "", repetir: "" });
+          })
+          .catch((err) => {
+            const msg = err.response?.data || "No se pudo cambiar la contraseña";
+            Swal.fire("Error", msg, "error");
+          });
+      }
+    });
+  };
+
 
   const handleFormChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -49,32 +110,20 @@ const Ajustes = () => {
               <div className="card-body">
                 <h5 className="card-title mb-4">Información Personal</h5>
                 <div className="row g-3">
-                  <div className="col-md-6">
+                  <div className="col-12">
                     <label className="form-label">Nombre</label>
                     <input className="form-control" name="nombre" value={form.nombre} onChange={handleFormChange} />
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Apellido</label>
-                    <input className="form-control" name="apellido" value={form.apellido} onChange={handleFormChange} />
+                  <div className="col-12">
+                    <label className="form-label">Email</label>
+                    <input className="form-control" name="email" value={form.email} readOnly />
                   </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Correo electrónico</label>
-                    <input className="form-control" name="email" value={form.email} onChange={handleFormChange} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Teléfono</label>
-                    <input className="form-control" name="telefono" value={form.telefono} onChange={handleFormChange} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Cargo</label>
-                    <input className="form-control" name="cargo" value={form.cargo} onChange={handleFormChange} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Departamento</label>
-                    <input className="form-control" name="departamento" value={form.departamento} onChange={handleFormChange} />
+                  <div className="col-12">
+                    <label className="form-label">Área</label>
+                    <input className="form-control" name="rol" value={form.rol || ""} readOnly />
                   </div>
                 </div>
-                <button className="btn btn-primary mt-4">Guardar cambios</button>
+                <button className="btn btn-primary mt-4" onClick={handleGuardarCambios}>Guardar cambios</button>
               </div>
             </div>
           )}
@@ -94,7 +143,7 @@ const Ajustes = () => {
                   <label className="form-label">Repetir nueva contraseña</label>
                   <input type="password" className="form-control" name="repetir" value={passwords.repetir} onChange={handlePasswordChange} />
                 </div>
-                <button className="btn btn-primary">Actualizar contraseña</button>
+                <button className="btn btn-primary" onClick={handlePasswordSubmit}>Actualizar contraseña</button>
               </div>
             </div>
           )}
