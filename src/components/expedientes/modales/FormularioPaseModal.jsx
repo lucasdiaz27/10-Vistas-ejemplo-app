@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { obtenerAreasEnum } from '../../../apis/pasesApi';
-import { contarPaginasPDF } from 'c:/Users/matix/OneDrive/Documentos/SITE-FRONT/10-Vistas-ejemplo-app/src/utils/contarPaginasPDF.js';
+import { contarPaginasPDF } from '../../../utils/contarPaginasPDF';
 
 // Devuelve la fecha actual en formato ISO (YYYY-MM-DD)
 function getTodayISO() {
@@ -103,6 +103,7 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
             usuarioId: Number(usuarioId), // Asegura tipo Long
             tipoDocumento: formData.tipoDocumento // Debe coincidir con ENUM
         });
+        
         formDataToSend.append('pase', paseJson);
         // El archivo PDF va bajo la key "file"
         if (formData.file) formDataToSend.append('file', formData.file);
