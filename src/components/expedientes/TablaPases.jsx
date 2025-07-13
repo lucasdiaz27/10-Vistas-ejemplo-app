@@ -16,8 +16,8 @@ export default function TablaPases({ pases, onEditar, onEliminar, onNuevo }) {
             <th>Área Origen</th>
             <th>Área Destino</th>
             <th>Descripción</th>
-            <th>Tipo de Documento</th>
-            <th>Archivo PDF</th>
+            <th>Fecha Acción</th>
+            <th>Usuario</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -34,8 +34,8 @@ export default function TablaPases({ pases, onEditar, onEliminar, onNuevo }) {
                 <td>{pase.areaOrigen || '-'}</td>
                 <td>{pase.areaDestino || '-'}</td>
                 <td>{pase.descripcion || '-'}</td>
-                <td>{pase.tipoDocumento || '-'}</td>
-                <td>{pase.archivoNombre ? <a href={pase.archivoUrl} target="_blank" rel="noopener noreferrer">{pase.archivoNombre}</a> : '-'}</td>
+                <td>{pase.fechaAccion || '-'}</td>
+                <td>{pase.nombreUsuario || '-'}</td>
                 <td>
                   <button className="btn btn-sm btn-outline-primary me-2" onClick={() => onEditar(pase)}>
                     <i className="bi bi-pencil"></i>
