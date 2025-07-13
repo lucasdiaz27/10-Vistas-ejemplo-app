@@ -14,7 +14,10 @@ import { jwtDecode } from "jwt-decode";
 import { ArchivosDenuncia } from "../components/detalle-denuncia/ArchivosDenuncia";
 import { ModalPDF } from "../components/detalle-denuncia/ModalPDF";
 import { traerArchivoPDF } from "../apis/apiDocumento";
+
 import { HistorialEstados } from "../components/detalle-denuncia/HistorialEstados";
+import { ModalCorreo } from "../components/detalle-denuncia/ModalCorreo";
+import { EstadoDenuncia } from "../components/detalle-denuncia/EstadoDenuncia";
 
 
 const ESTADOS = ["NO ADMITIDO", "RECHAZADO", "EN PROCESO", "PENDIENTE"];
@@ -38,13 +41,6 @@ export const DetalleDenuncia = () => {
     const obtenerDenuncia = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (token) {
-          // Decodifica el token
-          const decoded = jwtDecode(token);
-          // Accede al rol (ajusta el nombre según tu backend, puede ser 'role', 'rol', 'authorities', etc.)
-          const rol = decoded.rol;
-          console.log("Rol del usuario:", rol);
-        }
         const data = await traerDenunciaPorId(id, token);
         setDenuncia(data);
 
@@ -258,7 +254,6 @@ export const DetalleDenuncia = () => {
   return (
     <div className="container py-4">
       <h3 className="mb-4">Detalle de Denuncia #{denuncia.id}</h3>
-      {console.log(personas)}
       <div className="row g-4">
         {/* Información General y Estado */}
         <div className="col-lg-8">
@@ -294,55 +289,21 @@ export const DetalleDenuncia = () => {
               <h5 className="card-title mb-3">
                 <i className="bi bi-check-circle me-2"></i>Estado de la Denuncia
               </h5>
-              <div className="mb-2">
-                <label className="form-label fw-bold">Estado actual</label>
-                <select
-                  className="form-select"
-                  value={estadoNuevo || denuncia.estado}
-                  onChange={handleEstadoChange}
-                >
-                  <option value="">{denuncia.estado}</option>
-                  {ESTADOS.map((estado) => (
-                    <option key={estado} value={estado}>
-                      {estado}
-                    </option>
-                  ))}
-                </select>
-                {/* Botón para mandar correo */}
-                <button
-                  className="btn btn-outline-secondary mt-2"
-                  onClick={handleAbrirCorreoModal}
-                  type="button"
-                >
-                  Mandar correo
-                </button>
-              </div>
-              
+              <EstadoDenuncia
+                estadoActual={denuncia.estado}
+                estadoNuevo={estadoNuevo}
+                onChange={handleEstadoChange}
+                ESTADOS={ESTADOS}
+                onCorreo={handleAbrirCorreoModal}
+                showMotivo={showMotivo}
+                motivoCambio={motivoCambio}
+                setMotivoCambio={setMotivoCambio}
+                onEnviarMotivo={handleEnviarMotivo}
+              />
               {/* Historial de estados */}
               <div className="mt-3">
                 <HistorialEstados historial={historialEstados} />
               </div>
-
-              {showMotivo && (
-                <div className="mb-2">
-                  <label className="form-label">
-                    Motivo del cambio de estado
-                  </label>
-                  <textarea
-                    className="form-control"
-                    rows={3}
-                    value={motivoCambio}
-                    onChange={(e) => setMotivoCambio(e.target.value)}
-                  />
-                  <button
-                    className="btn btn-primary mt-2"
-                    onClick={handleEnviarMotivo}
-                    disabled={!motivoCambio}
-                  >
-                    Enviar
-                  </button>
-                </div>
-              )}
             </div>
           </div>
           {/* Información adicional */}
@@ -362,56 +323,13 @@ export const DetalleDenuncia = () => {
         </div>
       </div>
       {/* Modal para enviar correo */}
-      {showCorreoModal && (
-        <div
-          className="modal fade show"
-          style={{
-            display: "block",
-            background: "rgba(0,0,0,0.3)",
-          }}
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Mandar correo</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={handleCerrarCorreoModal}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="mb-2">
-                  <label className="form-label">Observación</label>
-                  <textarea
-                    className="form-control"
-                    rows={3}
-                    value={observacionCorreo}
-                    onChange={(e) => setObservacionCorreo(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleCerrarCorreoModal}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleEnviarCorreo}
-                  disabled={!observacionCorreo}
-                >
-                  Enviar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ModalCorreo
+        show={showCorreoModal}
+        observacion={observacionCorreo}
+        setObservacion={setObservacionCorreo}
+        onClose={handleCerrarCorreoModal}
+        onSend={handleEnviarCorreo}
+      />
     </div>
   );
 };
@@ -422,8 +340,14 @@ function validarCambioEstado(historial, estadoActual, estadoNuevo) {
   // ejemplo: solo se permite cambiar a un estado que no este en el historial
   // y que sea distinto al actual
   if (estadoActual === estadoNuevo) return false;
-  if (historial.some((h) => h.estado === estadoNuevo)) return false;
-
+  const transicionesPermitidas = {
+    "PENDIENTE": ["EN PROCESO", "NO ADMITIDO"],
+    "EN PROCESO": ["FINALIZADO", "NO ADMITIDO"],
+    "NO ADMITIDO": [],
+    "FINALIZADO": [],
+  };
+  const transiciones = transicionesPermitidas[estadoActual] || [];
+  return transiciones.includes(estadoNuevo); // Chequea si ese estado nuevo está permitido según las transiciones definidas. Es decir, si el estado nuevo está en la lista de transiciones permitidas del estado actual, entonces es un cambio válido.
   // ejemplo: permitir solo ciertos saltos de estado
   // const transicionesPermitidas = {
   //   'PENDIENTE': ['EN PROCESO', 'RECHAZADO'],
@@ -442,5 +366,4 @@ function validarCambioEstado(historial, estadoActual, estadoNuevo) {
   // if (historial.length > 0 && historial[historial.length - 1].estado !== 'PENDIENTE') return false;
 
   // se pueden agregar mas reglas aqui
-  return true;
 }

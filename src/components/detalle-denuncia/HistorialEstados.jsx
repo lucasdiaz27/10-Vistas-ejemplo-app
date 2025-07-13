@@ -32,7 +32,8 @@ export const HistorialEstados = ({ historial }) => {
             ></span>
             <strong>{item.estado}</strong> -{" "}
             <span className="text-muted">
-              {new Date(item.fechaHora).toLocaleString("es-AR")}
+              {console.log(historialOrdenado.map(i => i.fecha))}
+              {new Date(item.fecha).toLocaleString("es-AR")}
             </span>
             <br />
             <small className="text-secondary">{item.descripcion}</small>
