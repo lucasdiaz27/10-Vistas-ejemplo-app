@@ -107,7 +107,7 @@ export const SideBar = ({ abierto, setAbierto }) => {
                                     Prueba PDF
                                 </Link>
                             </li>
-                            {/* <Link
+                            <Link
                                 to="/ajustes" className={`nav-link text-white ${location.pathname === "/ajustes" ? "active" : ""}`}
                             >
                                 <i className="bi bi-people me-2"></i>
