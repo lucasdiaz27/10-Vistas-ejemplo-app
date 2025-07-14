@@ -46,6 +46,7 @@ export default function DetalleExpediente() {
   const [pases, setPases] = useState([]);
   const [modalPase, setModalPase] = useState({ show: false, modo: null, pase: null });
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+  const [ordenes, setOrdenes] = useState([]); // Estado para las órdenes
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -69,29 +70,36 @@ export default function DetalleExpediente() {
       traerAudienciasPorExpediente(expediente.id, token)
         .then(auds => setAudiencias(auds))
         .catch(() => setAudiencias([]));
+      // Traer órdenes del backend
+      import("../../apis/ordenesApi").then(({ traerOrdenesPorExpediente }) => {
+        traerOrdenesPorExpediente(expediente.id, token)
+          .then(data => setOrdenes(data))
+          .catch(() => setOrdenes([]));
+      });
     }
   }, [expediente]);
-    useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (expediente && expediente.id_denuncia) {
-        traerDocDenuncia(expediente.id_denuncia, token)
-          .then((data) => setArchivos(data))
-          .catch(() => setArchivos([]));
-        traerPasesPorExp(expediente.id, token)
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (expediente && expediente.id_denuncia) {
+      traerDocDenuncia(expediente.id_denuncia, token)
+        .then((data) => setArchivos(data))
+        .catch(() => setArchivos([]));
+      traerPasesPorExp(expediente.id, token)
         .then(ps => setPases(ps))
         .catch(() => setPases([]));
     }
-    }, [expediente]);
+  }, [expediente]);
 
-    const handleVerArchivo = async (archivo) => {
-      const token = localStorage.getItem("token");
-      const blob = await traerArchivoPDF(archivo.id, token);
-      const url = URL.createObjectURL(blob);
-      setPdfUrl(url);
-      setArchivoSeleccionado(archivo);
-      //window.open(url);
-      //console.log(blob.size);
-    };
+  const handleVerArchivo = async (archivo) => {
+    const token = localStorage.getItem("token");
+    const blob = await traerArchivoPDF(archivo.id, token);
+    const url = URL.createObjectURL(blob);
+    setPdfUrl(url);
+    setArchivoSeleccionado(archivo);
+    //window.open(url);
+    //console.log(blob.size);
+  };
   const handleNuevaAudiencia = () => {
     setModalAudiencia({ show: true, modo: "crear", audiencia: null });
     console.log(expediente)
@@ -189,6 +197,58 @@ export default function DetalleExpediente() {
       alert("Error al guardar el pase");
     }
     setModalPase({ show: false, modo: null, pase: null });
+  };
+
+  // Acciones para la tabla de órdenes
+  const handleDescargarOrden = async (orden) => {
+    // Aquí deberías consumir el endpoint del backend que devuelve el archivo
+    // Por ejemplo: traerArchivoPDF(orden.orden, token)
+    try {
+      const token = localStorage.getItem("token");
+      const blob = await traerArchivoPDF(orden.orden, token); // Ajusta el método si es necesario
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = orden.nroDocumento || `documento_${orden.orden}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      alert("No se pudo descargar el documento");
+    }
+  };
+
+  const handleVerOrden = async (orden) => {
+    // Visualiza el PDF en un modal
+    try {
+      const token = localStorage.getItem("token");
+      const blob = await traerArchivoPDF(orden.orden, token); // Ajusta el método si es necesario
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+      setArchivoSeleccionado({ id: orden.orden, nombre: orden.nroDocumento });
+    } catch (err) {
+      alert("No se pudo visualizar el documento");
+    }
+  };
+
+  const handleEliminarOrden = async (id) => {
+    // Aquí deberías consumir el endpoint para eliminar la orden
+    // Por ejemplo: await eliminarOrden(id, token)
+    if (!window.confirm("¿Seguro que desea eliminar este documento?")) return;
+    try {
+      // TODO: implementar eliminarOrden en ordenesApi.js
+      // const token = localStorage.getItem("token");
+      // await eliminarOrden(id, token);
+      // Recargar órdenes
+      // import("../../apis/ordenesApi").then(({ traerOrdenesPorExpediente }) => {
+      //   traerOrdenesPorExpediente(expediente.id, token)
+      //     .then(data => setOrdenes(data))
+      //     .catch(() => setOrdenes([]));
+      // });
+      alert("Funcionalidad de eliminar documento pendiente de implementación.");
+    } catch (err) {
+      alert("No se pudo eliminar el documento");
+    }
   };
 
   if (cargando)
@@ -410,10 +470,10 @@ export default function DetalleExpediente() {
                 ) : (
                   // Sección Órdenes: tabla ocupa todo el ancho
                   <OrdenesTabla
-                    ordenes={expediente.ordenes || []}
-                    onDescargar={orden => {/* TODO: lógica para descargar */}}
-                    onVer={orden => {/* TODO: lógica para visualizar */}}
-                    onEliminar={id => {/* TODO: lógica para eliminar */}}
+                    ordenes={ordenes}
+                    onDescargar={handleDescargarOrden}
+                    onVer={handleVerOrden}
+                    onEliminar={handleEliminarOrden}
                   />
                 )}
               </div>

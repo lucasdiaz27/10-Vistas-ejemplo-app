@@ -4,7 +4,7 @@
 // El diseño sigue el estilo general del sistema y ocupa todo el ancho disponible
 import React from "react";
 
-export default function OrdenesTabla({ ordenes, onDescargar, onVer, onEliminar }) {
+export default function OrdenesTabla({ ordenes, onDescargar, onVer }) {
   return (
     <div className="table-responsive" style={{ width: '100%' }}>
       {/* Tabla de órdenes, estructura y diseño similar a la imagen proporcionada */}
@@ -26,30 +26,26 @@ export default function OrdenesTabla({ ordenes, onDescargar, onVer, onEliminar }
             </tr>
           ) : (
             ordenes.map((orden, idx) => (
-              <tr key={orden.id || idx}>
+              <tr key={orden.orden || idx}>
                 {/* Id de la orden */}
-                <td>{orden.id || '-'}</td>
+                <td>{orden.orden || '-'}</td>
                 {/* Tipo de documento (ENUM o string) */}
                 <td>{orden.tipoDocumento || '-'}</td>
-                {/* Nombre del documento */}
-                <td>{orden.numeroDocumento || '-'}</td>
+                {/* Número de documento */}
+                <td>{orden.nroDocumento || '-'}</td>
                 {/* Referencia asociada */}
                 <td>{orden.referencia || '-'}</td>
                 {/* Fecha de asociación, formateada si es necesario */}
-                <td>{orden.fechaAsociacion ? new Date(orden.fechaAsociacion).toLocaleString() : '-'}</td>
-                {/* Acciones: descargar, ver, eliminar */}
+                <td>{orden.fechaCreacion ? new Date(orden.fechaCreacion).toLocaleString() : '-'}</td>
+                {/* Acciones: descargar, ver */}
                 <td>
                   {/* Descargar documento */}
                   <button className="btn btn-sm btn-outline-success me-2" title="Descargar" onClick={() => onDescargar(orden)}>
                     <i className="bi bi-download"></i>
                   </button>
                   {/* Visualizar documento */}
-                  <button className="btn btn-sm btn-outline-info me-2" title="Visualizar" onClick={() => onVer(orden)}>
+                  <button className="btn btn-sm btn-outline-info" title="Visualizar" onClick={() => onVer(orden)}>
                     <i className="bi bi-eye"></i>
-                  </button>
-                  {/* Eliminar documento */}
-                  <button className="btn btn-sm btn-outline-danger" title="Eliminar" onClick={() => onEliminar(orden.id)}>
-                    <i className="bi bi-trash"></i>
                   </button>
                 </td>
               </tr>
