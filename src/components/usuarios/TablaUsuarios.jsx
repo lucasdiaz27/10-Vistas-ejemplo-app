@@ -27,8 +27,8 @@ function TablaUsuarios({ usuarios, onEditar, onEliminar }) {
           </tr>
         </thead>
         <tbody>
-          {usuarios.map((u) => (
-            <tr key={u.id}>
+          {usuarios.map((u, idx) => (
+            <tr key={u.id ?? idx}>
               <td>{u.nombre}</td>
               <td>{u.email}</td>
               <td>{typeof u.rol === 'object' && u.rol !== null ? u.rol.nombre : u.rol}</td>
