@@ -6,6 +6,11 @@ export default defineConfig({
   plugins: [react()],
   assetsInclude: ['**/*.worker.js'],
   optimizeDeps: {
-    include: ['pdfjs-dist/build/pdf.worker.entry']
+    include: ['pdfjs-dist']
+  },
+  build: {
+    rollupOptions: {
+      external: ['pdfjs-dist/build/pdf.worker.entry']
+    }
   }
 })
