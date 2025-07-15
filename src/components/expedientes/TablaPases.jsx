@@ -11,27 +11,31 @@ export default function TablaPases({ pases, onEditar, onEliminar, onNuevo }) {
       <table className="table table-sm table-bordered mb-0 align-middle" style={{ borderRadius: '0.5rem', overflow: 'hidden' }}>
         <thead className="table-light">
           <tr>
-            <th>Acción</th>
-            <th>Fecha</th>
-            <th>Área</th>
-            <th>Tipo de Trámite</th>
+            <th>Asunto</th>
+            <th>Cant. Folios</th>
+            <th>Área Origen</th>
+            <th>Área Destino</th>
             <th>Descripción</th>
+            <th>Fecha Acción</th>
+            <th>Usuario</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {pases.length === 0 ? (
             <tr>
-              <td colSpan={6} className="text-center text-muted">No hay pases registrados para este expediente.</td>
+              <td colSpan={8} className="text-center text-muted">No hay pases registrados para este expediente.</td>
             </tr>
           ) : (
             pases.map((pase, idx) => (
               <tr key={pase.id || idx}>
-                <td>{pase.accion || '-'}</td>
-                <td>{pase.fechaAccion || '-'}</td>
-                <td>{pase.areaAccion || '-'}</td>
-                <td>{pase.tipoTramite || '-'}</td>
+                <td>{pase.asunto || '-'}</td>
+                <td>{pase.cantFolios || '-'}</td>
+                <td>{pase.areaOrigen || '-'}</td>
+                <td>{pase.areaDestino || '-'}</td>
                 <td>{pase.descripcion || '-'}</td>
+                <td>{pase.fechaAccion || '-'}</td>
+                <td>{pase.nombreUsuario || '-'}</td>
                 <td>
                   <button className="btn btn-sm btn-outline-primary me-2" onClick={() => onEditar(pase)}>
                     <i className="bi bi-pencil"></i>
