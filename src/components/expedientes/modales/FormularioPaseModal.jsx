@@ -4,14 +4,19 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { obtenerAreasEnum } from '../../../apis/pasesApi';
 import { contarPaginasPDF } from '../../../utils/contarPaginasPDF';
+import { jwtDecode } from 'jwt-decode';
 
 // Devuelve la fecha actual en formato ISO (YYYY-MM-DD)
+
 function getTodayISO() {
     const today = new Date();
     return today.toISOString().split('T')[0];
 }
 
 export default function FormularioPaseModal({ show, handleClose, expedienteId, usuarioId, modo = "crear", pase = null, onGuardar }) {
+
+    const [usuarioActual, setUsuarioActual] = useState(''); // Usuario actual decodificado del token
+
     // Estado del formulario, incluye todos los campos requeridos
     const [formData, setFormData] = useState({
         iniciador: '',
@@ -25,6 +30,12 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
     });
     const [areas, setAreas] = useState([]); // Áreas dinámicas desde backend
 
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const tokenData = jwtDecode(token);
+        const usuarioActual = tokenData ? tokenData.name : 'Usuario Desconocido';
+        setUsuarioActual(usuarioActual);
+    })
     // Cargar áreas desde backend al abrir el modal
     useEffect(() => {
         const fetchAreas = async () => {
@@ -127,7 +138,7 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
                     {/* Campo Iniciador */}
                     <Form.Group className="mb-3">
                         <Form.Label>Iniciador</Form.Label>
-                        <Form.Control type="text" name="iniciador" value={formData.iniciador} onChange={handleChange} required />
+                        <Form.Control type="text" name="iniciador" value={usuarioActual} disabled onChange={handleChange} required />
                     </Form.Group>
                     {/* Campo Asunto */}
                     <Form.Group className="mb-3">
