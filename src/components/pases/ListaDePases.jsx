@@ -1,10 +1,27 @@
 const estadoConfig = {
-  pendiente: { label: "Pendiente", color: "warning" },
-  aprobada: { label: "Aprobada", color: "success" },
-  "en proceso": { label: "En Proceso", color: "primary" },
-  "no admitido": { label: "No Admitido", color: "secondary" },
-  rechazada: { label: "Rechazada", color: "danger" },
-  completado: { label: "Completado", color: "success" },
+  "ADMITIDO": { label: "ADMITIDO", color: "success" },
+  "RECHAZADO": { label: "RECHAZADO", color: "danger" },
+  "AS. LEGAL": { label: "ASESORÍA LEGAL", color: "info" },
+  "EN PROCESO": { label: "EN PROCESO", color: "info" },
+  "EN INSPECCIÓN": { label: "EN INSPECCIÓN", color: "warning" },
+  "EN SUBDIR": { label: "EN SUBDIRECCIÓN", color: "primary" },
+  "EN DIR": { label: "EN DIRECCIÓN", color: "primary" },
+  "FINALIZADO": { label: "FINALIZADO", color: "success" },
+  // Estados en minúsculas para compatibilidad con datos existentes
+  "admitido": { label: "ADMITIDO", color: "success" },
+  "rechazado": { label: "RECHAZADO", color: "danger" },
+  "as. legal": { label: "ASESORÍA LEGAL", color: "info" },
+  "en proceso": { label: "EN PROCESO", color: "info" },
+  "en inspección": { label: "EN INSPECCIÓN", color: "warning" },
+  "en subdir": { label: "EN SUBDIRECCIÓN", color: "primary" },
+  "en dir": { label: "EN DIRECCIÓN", color: "primary" },
+  "finalizado": { label: "FINALIZADO", color: "success" },
+  // Estados anteriores para compatibilidad
+  "pendiente": { label: "PENDIENTE", color: "warning" },
+  "aprobada": { label: "APROBADA", color: "success" },
+  "no admitido": { label: "NO ADMITIDO", color: "secondary" },
+  "rechazada": { label: "RECHAZADA", color: "danger" },
+  "completado": { label: "COMPLETADO", color: "success" },
 };
 
 export default function ListaDePases({ abrirModal }) {

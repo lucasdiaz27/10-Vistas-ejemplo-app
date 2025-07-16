@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import Swal from "sweetalert2";
 import { traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
 import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
@@ -145,11 +146,28 @@ const MenuInterno = () => {
 
   // Mapeo de estados a colores y etiquetas más estéticas
   const ESTADO_CONFIG = {
-    pendiente: { label: "Pendiente", color: "warning" },
-    aprobada: { label: "Aprobada", color: "success" },
-    "en proceso": { label: "En Proceso", color: "info" },
-    "no admitido": { label: "No Admitido", color: "secondary" },
-    rechazada: { label: "Rechazada", color: "danger" },
+    "ADMITIDO": { label: "ADMITIDO", color: "success" },
+    "RECHAZADO": { label: "RECHAZADO", color: "danger" },
+    "AS. LEGAL": { label: "ASESORÍA LEGAL", color: "info" },
+    "EN PROCESO": { label: "EN PROCESO", color: "info" },
+    "EN INSPECCIÓN": { label: "EN INSPECCIÓN", color: "warning" },
+    "EN SUBDIR": { label: "EN SUBDIRECCIÓN", color: "primary" },
+    "EN DIR": { label: "EN DIRECCIÓN", color: "primary" },
+    "FINALIZADO": { label: "FINALIZADO", color: "success" },
+    // Estados en minúsculas para compatibilidad con datos existentes
+    "admitido": { label: "ADMITIDO", color: "success" },
+    "rechazado": { label: "RECHAZADO", color: "danger" },
+    "as. legal": { label: "ASESORÍA LEGAL", color: "info" },
+    "en proceso": { label: "EN PROCESO", color: "info" },
+    "en inspección": { label: "EN INSPECCIÓN", color: "warning" },
+    "en subdir": { label: "EN SUBDIRECCIÓN", color: "primary" },
+    "en dir": { label: "EN DIRECCIÓN", color: "primary" },
+    "finalizado": { label: "FINALIZADO", color: "success" },
+    // Estados anteriores para compatibilidad
+    "pendiente": { label: "PENDIENTE", color: "warning" },
+    "aprobada": { label: "APROBADA", color: "success" },
+    "no admitido": { label: "NO ADMITIDO", color: "secondary" },
+    "rechazada": { label: "RECHAZADA", color: "danger" },
   };
 
   //  Cambia estado de un expediente
@@ -249,22 +267,22 @@ const MenuInterno = () => {
   //   }
   // };
 
-  // Filtrado y búsqueda de denuncias
-  const denunciasFiltradas = denuncias.filter((d) => {
-    const texto = busquedaDenuncia.toLowerCase();
-    // Normalizar estado para evitar problemas de mayúsculas/minúsculas y espacios
-    const estadoDenuncia = (d.estado || "").toLowerCase().trim();
-    const estadoFiltro = (filtroEstado || "").toLowerCase().trim();
-    return (
-      (!filtroEstado || estadoDenuncia === estadoFiltro) &&
-      (d.id?.toString().includes(texto) ||
-        (d.solicitante || "").toLowerCase().includes(texto) ||
-        (d.objeto || "").toLowerCase().includes(texto) ||
-        (d.motivo || "").toLowerCase().includes(texto) ||
-        (d.descripcion || "").toLowerCase().includes(texto) ||
-        (d.fechaIngreso || "").toLowerCase().includes(texto))
-    );
-  });
+  // Filtrado y búsqueda de denuncias - Ahora se maneja en MesaEntradaTabla
+  // const denunciasFiltradas = denuncias.filter((d) => {
+  //   const texto = busquedaDenuncia.toLowerCase();
+  //   // Normalizar estado para evitar problemas de mayúsculas/minúsculas y espacios
+  //   const estadoDenuncia = (d.estado || "").toLowerCase().trim();
+  //   const estadoFiltro = (filtroEstado || "").toLowerCase().trim();
+  //   return (
+  //     (!filtroEstado || estadoDenuncia === estadoFiltro) &&
+  //     (d.id?.toString().includes(texto) ||
+  //       (d.solicitante || "").toLowerCase().includes(texto) ||
+  //       (d.objeto || "").toLowerCase().includes(texto) ||
+  //       (d.motivo || "").toLowerCase().includes(texto) ||
+  //       (d.descripcion || "").toLowerCase().includes(texto) ||
+  //       (d.fechaIngreso || "").toLowerCase().includes(texto))
+  //   );
+  // });
 
   // Acciones
   const abrirDetalle = (denuncia) => navigate(`/denuncia/${denuncia.id}`);
@@ -346,7 +364,7 @@ const MenuInterno = () => {
       {vista === "mesa-entrada" && (
         <>
           <MesaEntradaTabla
-            denuncias={denunciasFiltradas}
+            denuncias={denuncias}
             filtroEstado={filtroEstado}
             setFiltroEstado={setFiltroEstado}
             busquedaDenuncia={busquedaDenuncia}

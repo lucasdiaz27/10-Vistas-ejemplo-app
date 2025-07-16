@@ -12,11 +12,25 @@ export const HistorialEstados = ({ historial }) => {
   );
 
   const estadoColor = {
+    "ADMITIDO": "success",
+    "RECHAZADO": "danger", 
+    "AS. LEGAL": "info",
+    "EN INSPECCIÓN": "warning",
+    "EN SUBDIR": "primary",
+    "EN DIR": "primary",
+    "FINALIZADO": "success",
+    // Estados en minúsculas para compatibilidad
+    "admitido": "success",
+    "rechazado": "danger", 
+    "as. legal": "info",
+    "en inspección": "warning",
+    "en subdir": "primary",
+    "en dir": "primary",
+    "finalizado": "success",
+    // Estados anteriores para compatibilidad
     "NO ADMITIDO": "danger",
-    "RECHAZADO": "danger",
     "PENDIENTE": "warning",
     "EN PROCESO": "primary",
-    "ADMITIDO": "success",
     "EN REVISIÓN": "warning",
   };
 

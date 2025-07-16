@@ -1,6 +1,6 @@
 // VistaUsuarios.jsx
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import TablaUsuarios from './TablaUsuarios';
 import ModalUsuario from './modales/ModalUsuario';
 import { crearUsuario, traerUsuarios, eliminarUsuario } from '../../apis/apiUsuarios';
@@ -13,6 +13,9 @@ export default function VistaUsuarios2() {
   const [modal, setModal] = useState(null); // 'nuevo' | 'editar'
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [roles, setRoles] = useState([]);
+  // Estados para la paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [elementosPorPagina, setElementosPorPagina] = useState(10);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -105,13 +108,54 @@ export default function VistaUsuarios2() {
     }
   };
 
-  const usuariosFiltrados = usuarios.filter(u => {
-    const coincideTexto = u.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
-                          u.email.toLowerCase().includes(filtro.toLowerCase()) ||
-                          u.rol.toLowerCase().includes(filtro.toLowerCase());
-    const coincideRol = rolFiltro === '' || u.rol === rolFiltro;
-    return coincideTexto && coincideRol;
-  });
+  const usuariosFiltrados = useMemo(() => {
+    return usuarios.filter(u => {
+      const coincideTexto = u.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
+                            u.email.toLowerCase().includes(filtro.toLowerCase()) ||
+                            u.rol.toLowerCase().includes(filtro.toLowerCase());
+      const coincideRol = rolFiltro === '' || u.rol === rolFiltro;
+      return coincideTexto && coincideRol;
+    });
+  }, [usuarios, filtro, rolFiltro]);
+
+  // Calcular datos de paginación
+  const totalPaginas = Math.ceil(usuariosFiltrados.length / elementosPorPagina);
+  const indiceInicio = (paginaActual - 1) * elementosPorPagina;
+  const indiceFin = indiceInicio + elementosPorPagina;
+  const usuariosPaginados = usuariosFiltrados.slice(indiceInicio, indiceFin);
+
+  // Funciones de paginación
+  const irAPagina = (pagina) => {
+    setPaginaActual(Math.max(1, Math.min(pagina, totalPaginas)));
+  };
+
+  const cambiarElementosPorPagina = (cantidad) => {
+    setElementosPorPagina(cantidad);
+    setPaginaActual(1); // Resetear a la primera página
+  };
+
+  // Generar números de página para mostrar
+  const generarNumerosPagina = () => {
+    const numeros = [];
+    const rango = 2; // Mostrar 2 páginas antes y después de la actual
+    
+    let inicio = Math.max(1, paginaActual - rango);
+    let fin = Math.min(totalPaginas, paginaActual + rango);
+    
+    // Ajustar el rango si estamos cerca del inicio o final
+    if (paginaActual <= rango) {
+      fin = Math.min(totalPaginas, 2 * rango + 1);
+    }
+    if (paginaActual > totalPaginas - rango) {
+      inicio = Math.max(1, totalPaginas - 2 * rango);
+    }
+    
+    for (let i = inicio; i <= fin; i++) {
+      numeros.push(i);
+    }
+    
+    return numeros;
+  };
 
   return (
     <div className="p-4 bg-white rounded shadow-sm">
@@ -123,7 +167,7 @@ export default function VistaUsuarios2() {
       </div>
       <div className="bg-light border p-3 mb-0" style={{ borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
         <div className="row g-2 align-items-center">
-          <div className="col-md-9 col-12 mb-2 mb-md-0">
+          <div className="col-md-6 col-12 mb-2 mb-md-0">
             <div className="position-relative">
               <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
               <input
@@ -149,10 +193,87 @@ export default function VistaUsuarios2() {
               ))}
             </select>
           </div>
+          <div className="col-md-3 col-12">
+            <select
+              className="form-select"
+              value={elementosPorPagina}
+              onChange={e => cambiarElementosPorPagina(Number(e.target.value))}
+            >
+              <option value={5}>5 por página</option>
+              <option value={10}>10 por página</option>
+              <option value={25}>25 por página</option>
+              <option value={50}>50 por página</option>
+            </select>
+          </div>
         </div>
       </div>
       <div style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: '0.5rem', borderBottomRightRadius: '0.5rem', overflow: 'hidden' }}>
-        <TablaUsuarios usuarios={usuariosFiltrados} onEditar={(u) => abrirModal('editar', u)} onEliminar={handleEliminarUsuario} />
+        <TablaUsuarios usuarios={usuariosPaginados} onEditar={(u) => abrirModal('editar', u)} onEliminar={handleEliminarUsuario} />
+        
+        {/* Controles de paginación */}
+        {usuariosFiltrados.length > 0 && (
+          <div className="bg-light border-top p-3">
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="text-muted">
+                Mostrando {indiceInicio + 1} a {Math.min(indiceFin, usuariosFiltrados.length)} de {usuariosFiltrados.length} usuarios
+              </div>
+              {totalPaginas > 1 && (
+                <nav>
+                  <ul className="pagination pagination-sm mb-0">
+                    <li className={`page-item ${paginaActual === 1 ? 'disabled' : ''}`}>
+                      <button 
+                        className="page-link" 
+                        onClick={() => irAPagina(1)}
+                        disabled={paginaActual === 1}
+                      >
+                        <i className="bi bi-chevron-double-left"></i>
+                      </button>
+                    </li>
+                    <li className={`page-item ${paginaActual === 1 ? 'disabled' : ''}`}>
+                      <button 
+                        className="page-link" 
+                        onClick={() => irAPagina(paginaActual - 1)}
+                        disabled={paginaActual === 1}
+                      >
+                        <i className="bi bi-chevron-left"></i>
+                      </button>
+                    </li>
+                    
+                    {generarNumerosPagina().map(numero => (
+                      <li key={numero} className={`page-item ${numero === paginaActual ? 'active' : ''}`}>
+                        <button 
+                          className="page-link" 
+                          onClick={() => irAPagina(numero)}
+                        >
+                          {numero}
+                        </button>
+                      </li>
+                    ))}
+                    
+                    <li className={`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`}>
+                      <button 
+                        className="page-link" 
+                        onClick={() => irAPagina(paginaActual + 1)}
+                        disabled={paginaActual === totalPaginas}
+                      >
+                        <i className="bi bi-chevron-right"></i>
+                      </button>
+                    </li>
+                    <li className={`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`}>
+                      <button 
+                        className="page-link" 
+                        onClick={() => irAPagina(totalPaginas)}
+                        disabled={paginaActual === totalPaginas}
+                      >
+                        <i className="bi bi-chevron-double-right"></i>
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              )}
+            </div>
+          </div>
+        )}
       </div>
       {modal && (
         <ModalUsuario
