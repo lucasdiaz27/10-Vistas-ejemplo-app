@@ -112,7 +112,6 @@ export default function DetalleExpediente() {
   };
   const handleNuevaAudiencia = () => {
     setModalAudiencia({ show: true, modo: "crear", audiencia: null });
-    console.log(expediente);
   };
 
   const handleEditarAudiencia = (audiencia) => {
@@ -337,7 +336,7 @@ export default function DetalleExpediente() {
         >
           <i className="bi bi-arrow-left"></i> Volver
         </button>
-        <button className="btn btn-success" onClick={() => setMostrarPDF(true)}>
+        {/* <button className="btn btn-success" onClick={() => setMostrarPDF(true)}>
           <i className="bi bi-file-earmark-pdf"></i> Generar PDF
         </button>
         <PDFDownloadLink
@@ -346,7 +345,7 @@ export default function DetalleExpediente() {
           className="btn btn-primary"
         >
           Descargar PDF
-        </PDFDownloadLink>
+        </PDFDownloadLink> */}
       </div>
 
       {mostrarPDF && (

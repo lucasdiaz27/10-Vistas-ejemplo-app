@@ -82,3 +82,12 @@ export const traerHistorialDenuncia = async (nroExp, token) => {
   });
   return res.data;
 };
+
+export const traerDenunciaPorUsuario = async (token) => {
+  const res = await axios.get(`http://localhost:8080/denuncia/traerDenunciasPorUsuario`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+  });
+  return res.data
+}

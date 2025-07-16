@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer/Footer";
 import { Formulario } from "./pages/formulario";
@@ -18,127 +23,40 @@ import SideBar from "./components/SideBar";
 import { useState } from "react";
 import PrivateRoute from "./routes/PrivateRoute";
 import GeneradorPDF from "./components/pdf/GeneradorPDF";
+import { Navbar } from "react-bootstrap";
+import { InternalLayout } from "./routes/InternalLayout";
 
 function SiteApp() {
-  const [sidebarAbierta, setSidebarAbierta] = useState(false);
-
   return (
     <Router>
       <ScrollToTop />
       <Routes>
-        {/* Páginas normales con NavBar y Footer */}
+        {/* Layout público con NavBar y Footer */}
         <Route
-          path="/"
           element={
             <>
-              <NavBar />
-              <Inicio />
-              <Footer />
+              <NavBar /> <Outlet /> <Footer />
             </>
           }
-        />
-        <Route
-          path="/formulario"
-          element={
-            <>
-              <NavBar />
-              <Formulario />
-              <Footer />
-            </>
-          }
-        />
-        <Route
-          path="/formularioPersona"
-          element={
-            <>
-              <NavBar />
-              <FormPersona />
-              <Footer />
-            </>
-          }
-        />
-        <Route
-          path="/consulta"
-          element={
-            <>
-              <NavBar />
-              <Consulta />
-              <Footer />
-            </>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <>
-              <NavBar />
-              <Login />
-              <Footer />
-            </>
-          }
-        />
+        >
+          <Route path="/" element={<Inicio />} />
+          <Route path="/formulario" element={<Formulario />} />
+          <Route path="/formularioPersona" element={<FormPersona />} />
+          <Route path="/consulta" element={<Consulta />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
 
         {/* Paginas Internos con NavBarInterno */}
-        <Route
-          path="/menu-interno"
-          element={
-            <PrivateRoute>
-              <>
-                <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
-                <MenuInterno />
-              </>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/prueba"
-          element={
-            <>
-              <Prueba />
-              {/* Aqui podria ir otro footer */}
-            </>
-          }
-        />
-        <Route
-          path="/lista-denuncias"
-          element={
-            <>
-              <SideBar />
-              <ListaDenuncias />
-              {/* Aqui podria ir otro footer pero me da paja hacerlo*/}
-            </>
-          }
-        />
-        <Route
-          path="/denuncia/:id"
-          element={
-            <>
-              <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
-              <div className={`contenido-principal ${sidebarAbierta ? "con-sidebar" : ""}`}>
-              <DetalleDenunciaPage />
-              </div>
-            </>
-          }
-        />
-        <Route
-          path="/expedientes/:id"
-          element={<DetalleExpediente />}
-        />
-        <Route
-          path="/ajustes"
-          element={
-            <div className="d-flex">
-              <SideBar abierto={sidebarAbierta} setAbierto={setSidebarAbierta} />
-              <div className={`contenido-principal ${sidebarAbierta ? "con-sidebar" : ""}`}>
-                <Ajustes />
-              </div>
-            </div>
-          }
-        />
+        <Route element={<PrivateRoute> <InternalLayout/> </PrivateRoute>}>
+          <Route path="/menu-interno" element={<MenuInterno />} />
+          <Route path="/lista-denuncias" element={<><ListaDenuncias /></>}/>
+          <Route path="/denuncia/:id" element={<><DetalleDenunciaPage /></>}/>
+          <Route path="/expedientes/:id" element={<DetalleExpediente />} />
+          <Route path="/ajustes" element={<Ajustes />} />
+        </Route>
 
         {/* NUEVO: Ruta protegida para probar el generador de PDF */}
-        <Route
+        {/* <Route
           path="/prueba-pdf"
           element={
             <PrivateRoute>
@@ -151,11 +69,10 @@ function SiteApp() {
               </>
             </PrivateRoute>
           }
-        />
+        /> */}
       </Routes>
     </Router>
   );
 }
-
 
 export default SiteApp;

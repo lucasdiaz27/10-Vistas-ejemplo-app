@@ -4,9 +4,9 @@ export const NavBar = () => {
   return (
     <>
       <nav
-        className="navbar sticky-top navbar-expand-lg bg-primary"
+        className="navbar navbar-expand-lg bg-primary"
         data-bs-theme="dark"
-        style={{ height: "60px" }}
+        style={{ position: "relative" }}
       >
         <div className="container-fluid">
           <Link
@@ -31,25 +31,25 @@ export const NavBar = () => {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav mx-auto">
-              <li className="nav-item me-5">
-                <Link className="nav-link text-white fw-semibold" to="/">
+          <div className="collapse navbar-collapse bg-primary p-3" id="navbarNav">
+            <ul className="navbar-nav ms-auto">
+              <li className="nav-item me-5" style={{fontSize: "1.2rem"}}>
+                <Link className="nav-link text-white fw-semibold w-100" to="/">
                   Inicio
                 </Link>
               </li>
               {/* <li className="nav-item me-5">
-                <Link className="nav-link text-white fw-semibold" to="/consulta">
+                <Link className="nav-link text-white fw-semibold w-100" to="/consulta">
                   Consultas
                 </Link>
               </li> */}
-              <li className="nav-item ">
-                <Link className="nav-link text-white fw-semibold" to="/formulario">
+              <li className="nav-item " style={{fontSize: "1.2rem"}}>
+                <Link className="nav-link text-white fw-semibold w-100" to="/formulario">
                   Formulario
                 </Link>
               </li>
             </ul>
-            </div>
+          </div>
         </div>
       </nav>
     </>

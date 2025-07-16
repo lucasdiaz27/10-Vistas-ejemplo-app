@@ -20,7 +20,7 @@ import { ModalCorreo } from "../components/detalle-denuncia/ModalCorreo";
 import { EstadoDenuncia } from "../components/detalle-denuncia/EstadoDenuncia";
 
 
-const ESTADOS = ["ADMITIDO", "RECHAZADO", "ASESORÍA LEGAL", "EN INSPECCIÓN", "EN SUBDIRECCIÓN", "EN DIRECCIÓN", "FINALIZADO"];
+const ESTADOS = ["EN ESPERA", "ADMITIDO", "RECHAZADO", "ASESORÍA LEGAL", "EN INSPECCIÓN", "EN SUBDIRECCIÓN", "EN DIRECCIÓN", "FINALIZADO"];
 
 export const DetalleDenuncia = () => {
   const { id } = useParams();
@@ -45,8 +45,12 @@ export const DetalleDenuncia = () => {
         setDenuncia(data);
 
         // Traer el historial de estados de la denuncia
-        const historial = await traerHistorialDenuncia(id, token);
-        setHistorialEstados(historial);
+        try {
+          const historial = await traerHistorialDenuncia(id, token);
+          setHistorialEstados(historial || []);
+        } catch (error) {
+          setHistorialEstados([]);
+        }
       } catch (error) {
         console.error("Error al obtener denuncia:", error);
       }
@@ -59,70 +63,25 @@ export const DetalleDenuncia = () => {
     const nuevoEstado = e.target.value;
     // obtenemos el token del usuario
     const token = localStorage.getItem("token");
-    // consultamos el historial de la denuncia
+    let historial = [];
     try {
-      const historial = await traerHistorialDenuncia(denuncia.id, token);
-      // validamos si el cambio de estado es permitido segun el historial
-      const cambioPermitido = validarCambioEstado(
-        historial,
-        denuncia.estado,
-        nuevoEstado
-      );
-      if (!cambioPermitido) {
-        // si el cambio no es permitido, mostramos un popup de error y no permitimos el cambio
-        Swal.fire({
-          icon: "error",
-          title: "cambio de estado no permitido",
-          text: "no se puede cambiar a ese estado segun el historial de la denuncia",
-          confirmButtonText: "aceptar",
-          confirmButtonColor: "#e53935",
-          background: "#f8fafc",
-          customClass: {
-            title: "swal2-title-modern",
-            popup: "swal2-popup-modern",
-          },
-          showClass: {
-            popup: "animate__animated animate__shakeX",
-          },
-          hideClass: {
-            popup: "animate__animated animate__fadeOutUp",
-          },
-        });
-        return;
-      }
-      // si el cambio es permitido, mostramos un popup de confirmacion antes de continuar
-      const confirm = await Swal.fire({
-        icon: "question",
-        title: "confirmar cambio de estado",
-        text: `estas seguro que quieres cambiar el estado a ${nuevoEstado}?`,
-        showCancelButton: true,
-        confirmButtonText: "si, cambiar",
-        cancelButtonText: "cancelar",
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#e53935",
-        background: "#f8fafc",
-        customClass: {
-          title: "swal2-title-modern",
-          popup: "swal2-popup-modern",
-        },
-        showClass: {
-          popup: "animate__animated animate__fadeInDown",
-        },
-        hideClass: {
-          popup: "animate__animated animate__fadeOutUp",
-        },
-      });
-      if (confirm.isConfirmed) {
-        // si el usuario confirma, habilitamos el textarea de motivo y guardamos el estado nuevo
-        setEstadoNuevo(nuevoEstado);
-        setShowMotivo(true);
-      }
+      historial = await traerHistorialDenuncia(denuncia.id, token);
     } catch (error) {
-      // si hay error al consultar el historial, mostramos un mensaje
+      // Si hay error, asumimos historial vacío (por ejemplo, 400 o 404)
+      historial = [];
+    }
+    // validamos si el cambio de estado es permitido segun el historial
+    const cambioPermitido = validarCambioEstado(
+      historial,
+      denuncia.estado,
+      nuevoEstado
+    );
+    if (!cambioPermitido) {
+      // si el cambio no es permitido, mostramos un popup de error y no permitimos el cambio
       Swal.fire({
         icon: "error",
-        title: "error al consultar historial",
-        text: "no se pudo consultar el historial de la denuncia",
+        title: "cambio de estado no permitido",
+        text: "no se puede cambiar a ese estado segun el historial de la denuncia",
         confirmButtonText: "aceptar",
         confirmButtonColor: "#e53935",
         background: "#f8fafc",
@@ -137,6 +96,34 @@ export const DetalleDenuncia = () => {
           popup: "animate__animated animate__fadeOutUp",
         },
       });
+      return;
+    }
+    // si el cambio es permitido, mostramos un popup de confirmacion antes de continuar
+    const confirm = await Swal.fire({
+      icon: "question",
+      title: "confirmar cambio de estado",
+      text: `estas seguro que quieres cambiar el estado a ${nuevoEstado}?`,
+      showCancelButton: true,
+      confirmButtonText: "si, cambiar",
+      cancelButtonText: "cancelar",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#e53935",
+      background: "#f8fafc",
+      customClass: {
+        title: "swal2-title-modern",
+        popup: "swal2-popup-modern",
+      },
+      showClass: {
+        popup: "animate__animated animate__fadeInDown",
+      },
+      hideClass: {
+        popup: "animate__animated animate__fadeOutUp",
+      },
+    });
+    if (confirm.isConfirmed) {
+      // si el usuario confirma, habilitamos el textarea de motivo y guardamos el estado nuevo
+      setEstadoNuevo(nuevoEstado);
+      setShowMotivo(true);
     }
   };
 
@@ -153,7 +140,6 @@ export const DetalleDenuncia = () => {
   const handleEnviarMotivo = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log(token);
       await actualizarEstadoDenuncia(
         denuncia.id,
         estadoNuevo,
@@ -163,6 +149,7 @@ export const DetalleDenuncia = () => {
       setDenuncia({ ...denuncia, estado: estadoNuevo });
       setShowMotivo(false);
       setMotivoCambio("");
+      setEstadoNuevo(""); // Resetea el estadoNuevo para permitir nuevos cambios
       // mostramos un popup de exito al cambiar el estado
       Swal.fire({
         icon: "success",
@@ -307,7 +294,7 @@ export const DetalleDenuncia = () => {
             </div>
           </div>
           {/* Información adicional */}
-          <div className="card">
+          {/* <div className="card">
             <div className="card-body">
               <h5 className="card-title mb-3">
                 <i className="bi bi-info-square me-2"></i>Información Adicional
@@ -319,7 +306,7 @@ export const DetalleDenuncia = () => {
                 <b>Última actualización:</b> {denuncia.ultimaActualizacion}
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       {/* Modal para enviar correo */}
@@ -341,12 +328,12 @@ function validarCambioEstado(historial, estadoActual, estadoNuevo) {
   // y que sea distinto al actual
   if (estadoActual === estadoNuevo) return false;
   const transicionesPermitidas = {
-    "ADMITIDO": ["ASESORÍA LEGAL", "EN PROCESO", "EN INSPECCIÓN", "RECHAZADO"],
-    "ASESORÍA LEGAL": ["EN PROCESO", "EN INSPECCIÓN", "EN SUBDIRECCIÓN", "RECHAZADO"],
-    "EN PROCESO": ["EN INSPECCIÓN", "EN SUBDIRECCIÓN", "RECHAZADO"],
-    "EN INSPECCIÓN": ["EN SUBDIRECCIÓN", "EN DIRECCIÓN", "RECHAZADO"],
-    "EN SUBDIRECCIÓN": ["EN DIRECCIÓN", "FINALIZADO", "RECHAZADO"],
-    "EN DIRECCIÓN": ["FINALIZADO", "RECHAZADO"],
+    "EN ESPERA": ["ADMITIDO", "RECHAZADO"],
+    "ADMITIDO": ["ASESORÍA LEGAL", "EN DIRECCIÓN", "EN INSPECCIÓN", "EN SUBDIRECCIÓN", "FINALIZADO"],
+    "ASESORÍA LEGAL": ["EN INSPECCIÓN", "EN SUBDIRECCIÓN", "EN DIRECCIÓN", "FINALIZADO"],
+    "EN INSPECCIÓN": ["EN SUBDIRECCIÓN", "EN DIRECCIÓN", "ASESORÍA LEGAL"],
+    "EN SUBDIRECCIÓN": ["EN DIRECCIÓN", "FINALIZADO", "EN INSPECCIÓN", "ASESORÍA LEGAL"],
+    "EN DIRECCIÓN": ["FINALIZADO", "EN SUBDIRECCIÓN", "EN INSPECCIÓN", "ASESORÍA LEGAL"],
     "RECHAZADO": [],
     "FINALIZADO": [],
   };

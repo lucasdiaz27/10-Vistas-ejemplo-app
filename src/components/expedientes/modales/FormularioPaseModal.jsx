@@ -118,13 +118,11 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
         formDataToSend.append('pase', paseJson);
         // El archivo PDF va bajo la key "file"
         if (formData.file) formDataToSend.append('file', formData.file);
-        // LOG para depuración
-        console.log('JSON enviado:', paseJson);
-        if (formData.file) {
-            console.log('Archivo PDF:', formData.file.name, formData.file.size, formData.file.type);
-        } else {
-            console.log('Sin archivo PDF');
-        }
+        // if (formData.file) {
+        //     console.log('Archivo PDF:', formData.file.name, formData.file.size, formData.file.type);
+        // } else {
+        //     console.log('Sin archivo PDF');
+        // }
         onGuardar(formDataToSend);
     };
 

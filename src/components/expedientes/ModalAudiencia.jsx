@@ -56,7 +56,6 @@ export default function ModalAudiencia({ show, modo, audiencia, onGuardar, onClo
       expedienteId: expedienteId, // id real del expediente
       personasIds: form.personasIds
     };
-    console.log('JSON enviado al backend:', data); // DEBUG
     onGuardar(data);
   };
 

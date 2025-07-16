@@ -14,18 +14,18 @@ export const HistorialEstados = ({ historial }) => {
   const estadoColor = {
     "ADMITIDO": "success",
     "RECHAZADO": "danger", 
-    "AS. LEGAL": "info",
+    "ASESORÍA. LEGAL": "info",
     "EN INSPECCIÓN": "warning",
-    "EN SUBDIR": "primary",
-    "EN DIR": "primary",
+    "EN SUBDIRECCIÓN": "primary",
+    "EN DIRECCIÓN": "primary",
     "FINALIZADO": "success",
     // Estados en minúsculas para compatibilidad
     "admitido": "success",
     "rechazado": "danger", 
-    "as. legal": "info",
+    "asesoría legal": "info",
     "en inspección": "warning",
-    "en subdir": "primary",
-    "en dir": "primary",
+    "en subdireccion": "primary",
+    "en dirección": "primary",
     "finalizado": "success",
     // Estados anteriores para compatibilidad
     "NO ADMITIDO": "danger",
@@ -46,7 +46,6 @@ export const HistorialEstados = ({ historial }) => {
             ></span>
             <strong>{item.estado}</strong> -{" "}
             <span className="text-muted">
-              {console.log(historialOrdenado.map(i => i.fecha))}
               {new Date(item.fecha).toLocaleString("es-AR")}
             </span>
             <br />

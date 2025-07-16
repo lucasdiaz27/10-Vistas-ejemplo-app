@@ -29,7 +29,7 @@ export const Formulario = () => {
   } = useForm({
     resolver: zodResolver(denunciaSchema), // Aquí le pasas el schema del cual se va a basar para resolver los errores (o eso entendí yo). Si pones el clic sobre resolver y denunciaSchema vas a ver
   });
-  console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
+  //console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
 
   const onSubmit = (data) => {
     try {
@@ -65,7 +65,7 @@ export const Formulario = () => {
           </p>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="row">
-              <div className="col-6">
+              <div className="col-12 col-md-6">
                 <FormPersona
                   register={register}
                   errors={errors}
@@ -74,7 +74,7 @@ export const Formulario = () => {
                 />
                 {/* Pasa el valor errors para el FormPersona así pilla de ahí los errores */}
               </div>
-              <div className={"col-6"}>
+              <div className={"col-12 col-md-6"}>
                 <FormPersona
                   register={register}
                   errors={errors}
@@ -85,7 +85,7 @@ export const Formulario = () => {
             </div>
 
             <div className="row">
-              <div className={"col-6"}>
+              <div className={"col-12 col-md-6"}>
                 <FormPersona
                   register={register}
                   errors={errors}
@@ -93,14 +93,14 @@ export const Formulario = () => {
                   index={2}
                 />
               </div>
-              <div className={"col-6"}>
+              <div className={"col-12 col-md-6"}>
                 <FormObjeto errors={errors} register={register} />
 
                 <label className="form-label" htmlFor="">
                   Descripción
                 </label>
                 <textarea
-                  className="form-control col-6"
+                  className="form-control col-12 col-md-6"
                   {...register("descripcion")}
                   rows={5}
                   placeholder="Descripción de la denuncia"
@@ -108,7 +108,7 @@ export const Formulario = () => {
               </div>
             </div>
             <div className="row">
-              <div className="col-6">
+              <div className="col-12 col-md-6">
                 <label className="form-label">
                   Envía tus archivos aquí
                 </label>
@@ -120,7 +120,7 @@ export const Formulario = () => {
                   ref={fileInputRef}
                 />
               </div>
-              <div className="text-center col-6">
+              <div className="text-center col-12 col-md-6">
                 <button type="submit" className="btn btn-success mt-4">
                   Enviar formulario
                 </button>

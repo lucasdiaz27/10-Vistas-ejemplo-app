@@ -8,7 +8,6 @@ export const ConsultaTuExpediente = () => {
 
   const handleBuscarExp = () => {
     setExpedienteBuscado(nroExp); // Solo busca cuando se hace clic
-    console.log(expedienteBuscado)
   };
 
   return (
@@ -17,7 +16,7 @@ export const ConsultaTuExpediente = () => {
 
       <div className="row justify-content-center">
         {/* Columna izquierda: búsqueda */}
-        <div className="col-md-5 mb-4">
+        <div className="col-12 col-md-6 mb-4">
           <div className="d-flex mb-3">
             <input
               type="text"
@@ -39,7 +38,7 @@ export const ConsultaTuExpediente = () => {
         </div>
 
         {/* Columna derecha: acordeón // Esto puede ser un componente a futuro*/}
-        <div className="col-md-5">
+        <div className="col-12 col-md-6">
           <div
             className="accordion p-3 border rounded"
             id="accordionExample"

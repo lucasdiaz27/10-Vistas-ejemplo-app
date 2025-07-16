@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { data, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { traerDenuncias } from "../apis/apiDenuncia";
+import { traerDenunciaPorUsuario, traerDenuncias } from "../apis/apiDenuncia";
 import MesaEntradaTabla from "../components/MesaEntradaTabla";
 import VistaUsuarios2 from "../components/usuarios/VistaUsuarios2";
 import {
@@ -14,6 +14,7 @@ import {
 import Expedientes from "../components/expedientes/Expedientes";
 import Pases from "../components/pases/Pases";
 import GeneradorPDF from "../components/pdf/GeneradorPDF"; // <-- Importa el nuevo componente
+import { jwtDecode } from "jwt-decode";
 
 const MenuInterno = () => {
   const location = useLocation();
@@ -65,8 +66,15 @@ const MenuInterno = () => {
     if (vistaParam === "mesa-entrada") {
       setDenuncias([]);
       const token = localStorage.getItem("token"); // <-- Obtén el token aquí
-      console.log(token)
-      traerDenuncias(token)
+      const decode = jwtDecode(token);
+      const getDenunciaPorRol = () => {
+        if (decode.rol === "ADMIN" || decode.rol === "MESA_ENTRADA") {
+          return traerDenuncias(token);
+        } else {
+          return traerDenunciaPorUsuario(token);
+        }
+      }
+      getDenunciaPorRol()
         .then((data) => {
           if (Array.isArray(data) && data.length > 0) {
             setDenuncias(
@@ -231,58 +239,6 @@ const MenuInterno = () => {
       return nuevos;
     });
   };
-
-  // const handleActualizarExpediente = async (
-  //   denunciaId,
-  //   nuevoEstado,
-  //   dataParaActualizarOCrear
-  // ) => {
-  //   const expedientes = await traerExpedientes();
-  //   // Buscá el expediente relacionado a la denuncia
-  //   const expediente = expedientes.find(
-  //     (exp) => exp.denuncia && String(exp.denuncia.id) === String(denunciaId)
-  //   );
-
-  //   if (nuevoEstado.toLowerCase() === "en proceso") {
-  //     if (expediente) {
-  //       // Si ya existe, solo actualizá el estado
-  //       await actualizarExpediente(expediente.id, {
-  //         ...expediente,
-  //         estado: "En proceso",
-  //       });
-  //     } else {
-  //       // Si no existe, creá el expediente
-  //       await crearExpedienteDesdeDenuncia(denunciaId);
-  //     }
-  //   } else {
-  //     // Para otros estados, actualizá el expediente si existe
-  //     if (expediente) {
-  //       await actualizarExpediente(expediente.id, {
-  //         ...expediente,
-  //         estado: nuevoEstado,
-  //       });
-  //     } else {
-  //       alert("No existe expediente para esta denuncia.");
-  //     }
-  //   }
-  // };
-
-  // Filtrado y búsqueda de denuncias - Ahora se maneja en MesaEntradaTabla
-  // const denunciasFiltradas = denuncias.filter((d) => {
-  //   const texto = busquedaDenuncia.toLowerCase();
-  //   // Normalizar estado para evitar problemas de mayúsculas/minúsculas y espacios
-  //   const estadoDenuncia = (d.estado || "").toLowerCase().trim();
-  //   const estadoFiltro = (filtroEstado || "").toLowerCase().trim();
-  //   return (
-  //     (!filtroEstado || estadoDenuncia === estadoFiltro) &&
-  //     (d.id?.toString().includes(texto) ||
-  //       (d.solicitante || "").toLowerCase().includes(texto) ||
-  //       (d.objeto || "").toLowerCase().includes(texto) ||
-  //       (d.motivo || "").toLowerCase().includes(texto) ||
-  //       (d.descripcion || "").toLowerCase().includes(texto) ||
-  //       (d.fechaIngreso || "").toLowerCase().includes(texto))
-  //   );
-  // });
 
   // Acciones
   const abrirDetalle = (denuncia) => navigate(`/denuncia/${denuncia.id}`);

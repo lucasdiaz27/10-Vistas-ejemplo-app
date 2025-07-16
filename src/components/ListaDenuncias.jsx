@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { traerDenuncias, eliminarDenuncia } from "../apis/apiDenuncia";
+import { traerDenuncias, eliminarDenuncia, traerDenunciaPorUsuario } from "../apis/apiDenuncia";
 
 const ListaDenuncias = () => {
   const [denuncias, setDenuncias] = useState([]);
@@ -7,7 +7,14 @@ const ListaDenuncias = () => {
   const cargarDenuncias = async () => {
     try {
       const token = localStorage.getItem("token");
-      const data = await traerDenuncias(token);
+      const decoded = jwtDecode(token);
+      if (decoded.rol == "ADMIN") {
+        const data = await traerDenuncias(token);
+        setDenuncias(data);
+      } else {
+        const data = await traerDenunciaPorUsuario(token);
+        setDenuncias(data);
+      }
       setDenuncias(data);
     } catch (error) {
       console.error("Error al cargar denuncias:", error);
@@ -34,7 +41,9 @@ const ListaDenuncias = () => {
         {denuncias.map((denuncia) => (
           <li key={denuncia.id}>
             {denuncia.nombre} - {denuncia.descripcion}
-            <button onClick={() => handleEliminar(denuncia.id)}>Eliminar</button>
+            <button onClick={() => handleEliminar(denuncia.id)}>
+              Eliminar
+            </button>
           </li>
         ))}
       </ul>

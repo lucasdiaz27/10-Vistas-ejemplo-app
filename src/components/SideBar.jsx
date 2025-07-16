@@ -101,12 +101,12 @@ export const SideBar = ({ abierto, setAbierto }) => {
                                 </Link>
                             </li>
                             {/* NUEVO: Acceso temporal para probar el generador de PDF */}
-                            <li>
+                            {/* <li>
                                 <Link to="/menu-interno?vista=prueba-pdf" className={`nav-link text-white ${vistaActual === "prueba-pdf" ? "active" : ""}`}>
                                     <i className="bi bi-file-earmark-pdf me-2"></i>
                                     Prueba PDF
                                 </Link>
-                            </li>
+                            </li> */}
                             <Link
                                 to="/ajustes" className={`nav-link text-white ${location.pathname === "/ajustes" ? "active" : ""}`}
                             >
@@ -119,7 +119,7 @@ export const SideBar = ({ abierto, setAbierto }) => {
                         <Link to="/login" className={`nav-link text-white ${vistaActual === "cerrarsesion  " ? "active" : ""}`}
                             onClick={handleLogout}
                             style={{cursor: "pointer"}}>
-                            <i className="bi bi-grid me-2"></i>
+                            <i className="bi bi-box-arrow-left me-2"></i>
                             Cerrar Sesión
                         </Link>
                     </li>
@@ -132,21 +132,15 @@ export const SideBar = ({ abierto, setAbierto }) => {
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                     >
-                        <img
-                            src="https://github.com/mdo.png"
-                            alt=""
-                            width="32"
-                            height="32"
-                            className="rounded-circle me-2"
-                        />
+                        <i className="bi bi-person-circle me-2"></i>
                         <strong>{userName || "Usuario"}</strong>
                     </a>
-                    <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
+                    {/* <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
                         <li><a className="dropdown-item" href="#">Settings</a></li>
                         <li><a className="dropdown-item" href="#">Profile</a></li>
                         <li><hr className="dropdown-divider" /></li>
                         <li><a className="dropdown-item" href="#">Sign out</a></li>
-                    </ul>
+                    </ul> */}
                 </div>
             </div>
         </>
