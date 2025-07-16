@@ -20,7 +20,7 @@ import { ModalCorreo } from "../components/detalle-denuncia/ModalCorreo";
 import { EstadoDenuncia } from "../components/detalle-denuncia/EstadoDenuncia";
 
 
-const ESTADOS = ["ADMITIDO", "RECHAZADO", "ASESORÍA LEGAL", "EN PROCESO", "EN INSPECCIÓN", "EN SUBDIRECCIÓN", "EN DIRECCIÓN", "FINALIZADO"];
+const ESTADOS = ["ADMITIDO", "RECHAZADO", "ASESORÍA LEGAL", "EN INSPECCIÓN", "EN SUBDIRECCIÓN", "EN DIRECCIÓN", "FINALIZADO"];
 
 export const DetalleDenuncia = () => {
   const { id } = useParams();
