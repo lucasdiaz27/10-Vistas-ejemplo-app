@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { editarExpediente, traerUsuarios } from "../../../apis/expedientesApi";
+import { editarExpediente, traerExpedientePorId, traerUsuarios } from "../../../apis/expedientesApi";
 import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
 
-export default function ModalEditarExpediente({ onClose, expediente }) {
+export default function ModalEditarExpediente({ onClose, expediente, actualizarExpediente }) {
   const [form, setForm] = useState({ ...expediente });
   const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
 
@@ -46,11 +46,14 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
         fecha_inicio: form.fecha_inicio,
         fecha_finalizacion: form.fecha_finalizacion,
         hipervulnerable: form.hipervulnerable,
-        delegacion: form.delegacion,
+        delegacion: 'DGC',
         usuarios: form.usuarios ?? [],
       };
 
       await editarExpediente(expediente.id, expedienteUpdateDTO, token);
+        
+      const data = await traerExpedientePorId(expediente.id, token);
+      actualizarExpediente(data);
       Swal.fire({
         icon: 'success',
         title: 'Editar expediente',
@@ -121,7 +124,7 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
                 <select
                   className="form-select"
                   name="hipervulnerable"
-                  value={form.hipervulnerable ?? ''}
+                  value={form.hipervulnerable === true ? "Sí" : form.hipervulnerable === false ? "No" : (form.hipervulnerable ?? "")}
                   onChange={handleChange}
                 >
                   <option value="">Seleccionar...</option>
@@ -136,7 +139,8 @@ export default function ModalEditarExpediente({ onClose, expediente }) {
                   type="text"
                   className="form-control"
                   name="delegacion"
-                  value={form.delegacion ?? ''}
+                  value={'DGC'}
+                  disabled
                   onChange={handleChange}
                 />
               </div>

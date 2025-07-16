@@ -86,6 +86,7 @@ export default function DetalleExpediente() {
         .then((data) => setOrdenes(data))
         .catch(() => setOrdenes([]));
     }
+    
   }, [expediente]);
 
   useEffect(() => {
