@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/pases";
+const BASE_URL = "https://site-backend-f8xg.onrender.com/pases";
 
 // Traer pases por expediente
 export const traerPasesPorExp = async (expedienteId, token) => {
@@ -43,7 +43,7 @@ export const eliminarPase = async (id, token) => {
 // Devuelve un array de strings con los valores del ENUM Area
 export const obtenerAreasEnum = async (token) => {
   // Ahora apunta al endpoint correcto del backend para el ENUM Area
-  const res = await axios.get("http://localhost:8080/api/areas", {
+  const res = await axios.get("https://site-backend-f8xg.onrender.com/api/areas", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data; // Se espera un array tipo ["MESA_DE_ENTRADA", "ABOGADOS", ...]

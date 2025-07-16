@@ -1,7 +1,7 @@
 import axios from "axios";
 import Swal from 'sweetalert2';
 
-const BASE_URL = "http://localhost:8080/expediente";
+const BASE_URL = "https://site-backend-f8xg.onrender.com/expediente";
 
 export const traerExpedientes = async (token) => {
   const res = await axios.get(`${BASE_URL}/traerExpedientes`, {
@@ -12,7 +12,7 @@ export const traerExpedientes = async (token) => {
   return res.data;
 };
 export const traerExpedientePorId = async (id, token) => {
-  const res = await axios.get(`http://localhost:8080/expediente/traerExpedientePorId/${id}`, {
+  const res = await axios.get(`https://site-backend-f8xg.onrender.com/expediente/traerExpedientePorId/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -82,7 +82,7 @@ export const existeExpedienteParaDenuncia = async (denunciaId, token) => {
 
 export const editarExpediente = async (id, expedienteUpdateDTO, token) => {
   const res = await axios.put(
-    `http://localhost:8080/expediente/editarExpediente/${id}`,
+    `https://site-backend-f8xg.onrender.com/expediente/editarExpediente/${id}`,
     expedienteUpdateDTO,
     {
       headers: {
@@ -94,7 +94,7 @@ export const editarExpediente = async (id, expedienteUpdateDTO, token) => {
 };
 
 export const traerUsuarios = async (token) => {
-  const res = await axios.get("http://localhost:8080/usuarios/traerUsuarios", {
+  const res = await axios.get("https://site-backend-f8xg.onrender.com/usuarios/traerUsuarios", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -103,7 +103,7 @@ export const traerUsuarios = async (token) => {
 };
 
 export const traerPorUsuario = async (token) => {
-  const res = await axios.get("http://localhost:8080/expediente/traerPorUsuario", {
+  const res = await axios.get("https://site-backend-f8xg.onrender.com/expediente/traerPorUsuario", {
     headers: {
       Authorization: `Bearer ${token}`,
     },

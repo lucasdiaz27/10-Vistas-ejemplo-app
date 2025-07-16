@@ -179,7 +179,6 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
           {tipoPersona == "Denunciante" ? <InputsDelegado register={register} index={index} errors={errors} /> : null}
           <input
             type="hidden"
-            disabled
             value={tipoPersona
               .toLowerCase()
               .normalize("NFD")

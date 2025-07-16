@@ -27,14 +27,27 @@ export const Formulario = () => {
     formState: { errors },
     watch,
   } = useForm({
-    resolver: zodResolver(denunciaSchema), // Aquí le pasas el schema del cual se va a basar para resolver los errores (o eso entendí yo). Si pones el clic sobre resolver y denunciaSchema vas a ver
+    resolver: zodResolver(denunciaSchema),
   });
+  // Mostrar en consola los datos en tiempo real
+  console.log("Datos en tiempo real:", watch());
   //console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
 
   const onSubmit = (data) => {
     try {
+      // Normaliza los campos de personas para que todos tengan los campos requeridos
+      // Si el campo rol sigue llegando vacío, lo forzamos según el índice
+      const rolesPorIndice = ["denunciante", "denunciado", "tecnico"];
+      const personasNormalizadas = (data.personas || []).map((p, idx) => ({
+        ...p,
+        nombreDelegado: p.nombreDelegado ?? "",
+        apellidoDelegado: p.apellidoDelegado ?? "",
+        dniDelegado: p.dniDelegado ?? "",
+        rol: p.rol && p.rol !== "" ? p.rol : rolesPorIndice[idx] || "", // Si no viene, lo forzamos
+      }));
+      const dataFinal = { ...data, personas: personasNormalizadas };
       const files = fileInputRef.current?.files;
-      enviarDenuncia(data, files);
+      enviarDenuncia(dataFinal, files);
       setToast({
         show: true,
         success: true,

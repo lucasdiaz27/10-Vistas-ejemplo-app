@@ -1,4 +1,25 @@
 import React, { useEffect, useState } from 'react';
+// Componente reutilizable para seleccionar usuario
+function UsuarioSelect({ label, name, value, onChange, usuariosDisponibles }) {
+  return (
+    <div className="mb-3">
+      <label className="form-label">{label}</label>
+      <select
+        className="form-select"
+        name={name}
+        value={value ?? ''}
+        onChange={onChange}
+      >
+        <option value="">Seleccionar...</option>
+        {usuariosDisponibles.map(usuario => (
+          <option key={usuario.id} value={usuario.id}>
+            {usuario.nombreUsuario}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 import { editarExpediente, traerExpedientePorId, traerUsuarios } from "../../../apis/expedientesApi";
 import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
@@ -23,11 +44,11 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "usuario1" || name === "usuario2") {
+    // name será usuario0, usuario1, usuario2, usuario3
+    if (name.startsWith("usuario")) {
       const idSeleccionado = parseInt(value);
+      const index = parseInt(name.replace("usuario", ""));
       const nuevosUsuarios = [...(form.usuarios ?? [])];
-      const index = name === "usuario1" ? 0 : 1;
       nuevosUsuarios[index] = idSeleccionado;
       setForm((prev) => ({ ...prev, usuarios: nuevosUsuarios }));
     } else {
@@ -149,39 +170,34 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
                 <strong>Usuario: </strong>{usuarioPrincipal?.nombreUsuario ?? 'No seleccionado'}
               </div>
 
-              <div className="mb-3">
-                <label className="form-label">Usuario 1</label>
-                <select
-                  className="form-select"
-                  name="usuario1"
-                  value={form.usuarios?.[0] ?? ''}
-                  onChange={handleChange}
-                >
-                  <option value="">Seleccionar...</option>
-                  {usuariosDisponibles.map(usuario => (
-                    <option key={usuario.id} value={usuario.id}>
-                      {usuario.nombreUsuario}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Usuario 2</label>
-                <select
-                  className="form-select"
-                  name="usuario2"
-                  value={form.usuarios?.[1] ?? ''}
-                  onChange={handleChange}
-                >
-                  <option value="">Seleccionar...</option>
-                  {usuariosDisponibles.map(usuario => (
-                    <option key={usuario.id} value={usuario.id}>
-                      {usuario.nombreUsuario}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <UsuarioSelect
+                label="Usuario 1"
+                name="usuario0"
+                value={form.usuarios?.[0] ?? ''}
+                onChange={handleChange}
+                usuariosDisponibles={usuariosDisponibles}
+              />
+              <UsuarioSelect
+                label="Usuario 2"
+                name="usuario1"
+                value={form.usuarios?.[1] ?? ''}
+                onChange={handleChange}
+                usuariosDisponibles={usuariosDisponibles}
+              />
+              <UsuarioSelect
+                label="Usuario 3"
+                name="usuario2"
+                value={form.usuarios?.[2] ?? ''}
+                onChange={handleChange}
+                usuariosDisponibles={usuariosDisponibles}
+              />
+              <UsuarioSelect
+                label="Usuario 4"
+                name="usuario3"
+                value={form.usuarios?.[3] ?? ''}
+                onChange={handleChange}
+                usuariosDisponibles={usuariosDisponibles}
+              />
 
             </div>
             <div className="modal-footer">

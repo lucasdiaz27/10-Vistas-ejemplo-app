@@ -2,7 +2,7 @@
 // API para consumir las órdenes de un expediente desde el backend
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/doc";
+const BASE_URL = "https://site-backend-f8xg.onrender.com/doc";
 
 // Trae las órdenes por expediente
 export const traerOrdenesPorExpediente = async (expedienteId, token) => {

@@ -99,9 +99,6 @@ const Ajustes = () => {
           <div className="list-group">
             <button className={`list-group-item list-group-item-action${tab === "personal" ? " active" : ""}`} onClick={() => setTab("personal")}> <i className="bi bi-person me-2"></i>Información Personal</button>
             <button className={`list-group-item list-group-item-action${tab === "password" ? " active" : ""}`} onClick={() => setTab("password")}> <i className="bi bi-lock me-2"></i>Contraseña</button>
-            <button className={`list-group-item list-group-item-action${tab === "notificaciones" ? " active" : ""}`} onClick={() => setTab("notificaciones")}> <i className="bi bi-bell me-2"></i>Notificaciones</button>
-            <button className={`list-group-item list-group-item-action${tab === "tema" ? " active" : ""}`} onClick={() => setTab("tema")}> <i className="bi bi-palette me-2"></i>Tema</button>
-            <button className={`list-group-item list-group-item-action${tab === "privacidad" ? " active" : ""}`} onClick={() => setTab("privacidad")}> <i className="bi bi-shield-lock me-2"></i>Privacidad</button>
           </div>
         </div>
         <div className="col-md-9">

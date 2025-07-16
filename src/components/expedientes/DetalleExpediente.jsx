@@ -579,7 +579,10 @@ export default function DetalleExpediente() {
               {expediente.denuncia?.personas?.map((persona) => (
                 <div key={persona.id} className="mb-2">
                   <strong>
-                    {persona.rol.charAt(0).toUpperCase() + persona.rol.slice(1)}
+                    {persona.rol
+                      ? persona.rol.charAt(0).toUpperCase() + persona.rol.slice(1)
+                      : "Sin rol"}
+                      
                     :
                   </strong>{" "}
                   {persona.nombre} {persona.apellido} - DNI: {persona.documento}

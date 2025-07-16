@@ -8,7 +8,7 @@ export const enviarDenuncia = async (data, files) => {
     }
   }
   formData.append("denuncia", JSON.stringify(data));
-  return axios.post("http://localhost:8080/denuncia/subirDenuncia", formData, {
+  return axios.post("https://site-backend-f8xg.onrender.com/denuncia/subirDenuncia", formData, {
     headers: {
       "Content-Type": "multipart/form-data"
     },
@@ -16,7 +16,7 @@ export const enviarDenuncia = async (data, files) => {
 };
 
 export const traerDenuncias = async (token) => {
-  const res = await axios.get("http://localhost:8080/denuncia/traerDenuncia", {
+  const res = await axios.get("https://site-backend-f8xg.onrender.com/denuncia/traerDenuncia", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -25,7 +25,7 @@ export const traerDenuncias = async (token) => {
 };
 
 export const traerDenunciaPorId = async (id, token) => {
-  const res = await axios.get(`http://localhost:8080/denuncia/traerDenunciaPorId/${id}`, {
+  const res = await axios.get(`https://site-backend-f8xg.onrender.com/denuncia/traerDenunciaPorId/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -34,7 +34,7 @@ export const traerDenunciaPorId = async (id, token) => {
 };
 
 export const eliminarDenuncia = async (id, token) => {
-  return axios.delete(`http://localhost:8080/denuncia/eliminar/${id}`, {
+  return axios.delete(`https://site-backend-f8xg.onrender.com/denuncia/eliminar/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -43,7 +43,7 @@ export const eliminarDenuncia = async (id, token) => {
 
 export const actualizarEstadoDenuncia = async (id, nuevoEstado, motivoEstado, token) => {
   return axios.put(
-    `http://localhost:8080/denuncia/actualizarEstado/${id}`,
+    `https://site-backend-f8xg.onrender.com/denuncia/actualizarEstado/${id}`,
     { estado: nuevoEstado, motivo: motivoEstado },
     {
       headers: {
@@ -57,7 +57,7 @@ export const actualizarEstadoDenuncia = async (id, nuevoEstado, motivoEstado, to
 // ale
 
 export const traerDocDenuncia = async (id, token) => {
-  const res = await axios.get(`http://localhost:8080/doc/traerPorDenuncia/${id}`, {
+  const res = await axios.get(`https://site-backend-f8xg.onrender.com/doc/traerPorDenuncia/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -66,7 +66,7 @@ export const traerDocDenuncia = async (id, token) => {
 }
 
 export const mandarCorreo = async (id, observacion, token) => {
-  return axios.post(`http://localhost:8080/denuncia/mandarCorreo/${id}`, 
+  return axios.post(`https://site-backend-f8xg.onrender.com/denuncia/mandarCorreo/${id}`, 
     observacion, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -75,7 +75,7 @@ export const mandarCorreo = async (id, observacion, token) => {
 }
 
 export const traerHistorialDenuncia = async (nroExp, token) => {
-  const res = await axios.get(`http://localhost:8080/denuncia/historial/${nroExp}`, {
+  const res = await axios.get(`https://site-backend-f8xg.onrender.com/denuncia/historial/${nroExp}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -84,7 +84,7 @@ export const traerHistorialDenuncia = async (nroExp, token) => {
 };
 
 export const traerDenunciaPorUsuario = async (token) => {
-  const res = await axios.get(`http://localhost:8080/denuncia/traerDenunciasPorUsuario`, {
+  const res = await axios.get(`https://site-backend-f8xg.onrender.com/denuncia/traerDenunciasPorUsuario`, {
     headers: {
       Authorization: `Bearer ${token}`
     },
