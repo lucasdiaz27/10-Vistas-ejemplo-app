@@ -20,7 +20,7 @@ import { ModalCorreo } from "../components/detalle-denuncia/ModalCorreo";
 import { EstadoDenuncia } from "../components/detalle-denuncia/EstadoDenuncia";
 
 
-const ESTADOS = ["NO ADMITIDO", "RECHAZADO", "EN PROCESO", "PENDIENTE"];
+const ESTADOS = ["ADMITIDO", "RECHAZADO", "ASESORÍA LEGAL", "EN PROCESO", "EN INSPECCIÓN", "EN SUBDIRECCIÓN", "EN DIRECCIÓN", "FINALIZADO"];
 
 export const DetalleDenuncia = () => {
   const { id } = useParams();
@@ -341,9 +341,13 @@ function validarCambioEstado(historial, estadoActual, estadoNuevo) {
   // y que sea distinto al actual
   if (estadoActual === estadoNuevo) return false;
   const transicionesPermitidas = {
-    "PENDIENTE": ["EN PROCESO", "NO ADMITIDO"],
-    "EN PROCESO": ["FINALIZADO", "NO ADMITIDO"],
-    "NO ADMITIDO": [],
+    "ADMITIDO": ["ASESORÍA LEGAL", "EN PROCESO", "EN INSPECCIÓN", "RECHAZADO"],
+    "ASESORÍA LEGAL": ["EN PROCESO", "EN INSPECCIÓN", "EN SUBDIRECCIÓN", "RECHAZADO"],
+    "EN PROCESO": ["EN INSPECCIÓN", "EN SUBDIRECCIÓN", "RECHAZADO"],
+    "EN INSPECCIÓN": ["EN SUBDIRECCIÓN", "EN DIRECCIÓN", "RECHAZADO"],
+    "EN SUBDIRECCIÓN": ["EN DIRECCIÓN", "FINALIZADO", "RECHAZADO"],
+    "EN DIRECCIÓN": ["FINALIZADO", "RECHAZADO"],
+    "RECHAZADO": [],
     "FINALIZADO": [],
   };
   const transiciones = transicionesPermitidas[estadoActual] || [];

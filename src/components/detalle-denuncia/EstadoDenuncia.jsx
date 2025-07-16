@@ -21,7 +21,7 @@ export function EstadoDenuncia({
           onChange={onChange}
         >
           <option value="">{estadoActual}</option>
-          {ESTADOS.map((estado) => (
+          {ESTADOS.filter(estado => estado !== estadoActual).map((estado) => (
             <option key={estado} value={estado}>
               {estado}
             </option>
