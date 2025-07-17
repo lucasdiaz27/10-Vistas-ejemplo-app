@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import "./SideBar.css";
 import { useState } from "react";
@@ -9,6 +9,7 @@ export const SideBar = ({ abierto, setAbierto }) => {
     setAbierto(!abierto);
   };
 
+  const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
