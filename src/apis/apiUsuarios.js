@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://site-backend-f8xg.onrender.com/auth"; // Cambia el puerto si tu backend usa otro
-const USUARIOS_URL = "https://site-backend-f8xg.onrender.com/usuarios";
+const API_URL = "http://localhost:8080/auth"; // Cambia el puerto si tu backend usa otro
+const USUARIOS_URL = "http://localhost:8080/usuarios";
 
 export async function crearUsuario({ email, password, nombre, rol }, token) {
   const res = await axios.post(

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://site-backend-f8xg.onrender.com/usuarios";
+const API_URL = "http://localhost:8080/usuarios";
 
 export const obtenerPerfilUsuario = async (token) => {
     const response = await axios.get(`${API_URL}/perfilUsuario`, {

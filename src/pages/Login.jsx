@@ -24,7 +24,7 @@ const Login = () => {
                 password: data.contraseña,
             };
 
-            const response = await axios.post("https://site-backend-f8xg.onrender.com/auth/login", payload);
+            const response = await axios.post("http://localhost:8080/auth/login", payload);
 
             localStorage.setItem("token", response.data.access_token);
             navigate("/menu-interno?vista=mesa-entrada");

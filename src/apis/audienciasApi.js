@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://site-backend-f8xg.onrender.com/audiencias";
+const BASE_URL = "http://localhost:8080/audiencias";
 
 // Traer audiencias por expediente
 export const traerAudienciasPorExpediente = async (expedienteId, token) => {

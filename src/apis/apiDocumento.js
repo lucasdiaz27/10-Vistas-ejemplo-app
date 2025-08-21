@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const BASE_URL = "http://localhost:8080/doc";
+
 export const traerArchivoPDF = async (id, token) => {
-  const res = await axios.get(`https://site-backend-f8xg.onrender.com/doc/traerPorId/${id}`, {
+  const res = await axios.get(`${BASE_URL}/traerPorId/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
     responseType: "blob", // <-- importante
   });

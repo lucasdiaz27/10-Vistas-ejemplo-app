@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const API_URL = "https://site-backend-f8xg.onrender.com/rol/traerRol";
+const API_URL = "http://localhost:8080/rol";
 
 export async function traerRoles(token) {
-  const res = await axios.get(API_URL, {
+  const res = await axios.get(`${API_URL}/traerRol`, {
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),
     },

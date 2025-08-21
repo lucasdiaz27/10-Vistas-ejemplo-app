@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const BASE_URL = "http://localhost:8080/denuncia"
+
 export const enviarDenuncia = async (data, files) => {
   const formData = new FormData();
   if (files && files.length > 0) {
@@ -8,7 +10,7 @@ export const enviarDenuncia = async (data, files) => {
     }
   }
   formData.append("denuncia", JSON.stringify(data));
-  return axios.post("https://site-backend-f8xg.onrender.com/denuncia/subirDenuncia", formData, {
+  return axios.post(`${BASE_URL}/subirDenuncia`, formData, {
     headers: {
       "Content-Type": "multipart/form-data"
     },
@@ -16,7 +18,7 @@ export const enviarDenuncia = async (data, files) => {
 };
 
 export const traerDenuncias = async (token) => {
-  const res = await axios.get("https://site-backend-f8xg.onrender.com/denuncia/traerDenuncia", {
+  const res = await axios.get(`${BASE_URL}/traerDenuncia`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -25,7 +27,7 @@ export const traerDenuncias = async (token) => {
 };
 
 export const traerDenunciaPorId = async (id, token) => {
-  const res = await axios.get(`https://site-backend-f8xg.onrender.com/denuncia/traerDenunciaPorId/${id}`, {
+  const res = await axios.get(`${BASE_URL}/traerDenunciaPorId/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -34,7 +36,7 @@ export const traerDenunciaPorId = async (id, token) => {
 };
 
 export const eliminarDenuncia = async (id, token) => {
-  return axios.delete(`https://site-backend-f8xg.onrender.com/denuncia/eliminar/${id}`, {
+  return axios.delete(`${BASE_URL}/eliminar/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -43,7 +45,7 @@ export const eliminarDenuncia = async (id, token) => {
 
 export const actualizarEstadoDenuncia = async (id, nuevoEstado, motivoEstado, token) => {
   return axios.put(
-    `https://site-backend-f8xg.onrender.com/denuncia/actualizarEstado/${id}`,
+    `${BASE_URL}/actualizarEstado/${id}`,
     { estado: nuevoEstado, motivo: motivoEstado },
     {
       headers: {
