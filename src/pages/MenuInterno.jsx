@@ -68,7 +68,7 @@ const MenuInterno = () => {
       const token = localStorage.getItem("token"); // <-- Obtén el token aquí
       const decode = jwtDecode(token);
       const getDenunciaPorRol = () => {
-        if (decode.rol === "ADMIN" || decode.rol === "MESA_ENTRADA") {
+        if (decode.rol === "DIRECCION" || decode.rol === "MESA_DE_ENTRADA") {
           return traerDenuncias(token);
         } else {
           return traerDenunciaPorUsuario(token);

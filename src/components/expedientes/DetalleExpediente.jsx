@@ -2,25 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { traerExpedientePorId } from "../../apis/expedientesApi";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
 import ExpedientePDF from "./ExpedientePDF";
 import ModalEditarExpediente from "./modales/ModalEditarExpediente";
-import {
-  traerPasesPorExp,
-  crearPase,
-  editarPase,
-  eliminarPase,
-} from "../../apis/pasesApi";
 import FormularioPaseModal from "./modales/FormularioPaseModal";
-import { agregarOrden, eliminarOrden, traerOrdenesPorExpediente } from "../../apis/ordenesApi";
-
-import {
-  traerAudienciasPorExpediente,
-  crearAudiencia,
-  eliminarAudiencia,
-  editarAudiencia,
-} from "../../apis/audienciasApi";
 import TablaAudiencias from "./TablaAudiencias";
 import ModalAudiencia from "./ModalAudiencia";
 import { ArchivosDenuncia } from "../detalle-denuncia/ArchivosDenuncia";
@@ -30,63 +15,39 @@ import { traerArchivoPDF } from "../../apis/apiDocumento";
 import TablaPases from "./TablaPases";
 import OrdenesTabla from "./OrdenesTabla"; // Importa la tabla de órdenes
 import ModalSubirOrden from "./modales/ModalSubirOrden";
+import { useExpediente } from "../../hooks/useExpediente";
+import { useAudiencias } from "../../hooks/useAudiencias";
+import { usePases } from "../../hooks/usePases";
+import { useOrdenes } from "../../hooks/useOrdenes";
+import { useDocumentos } from "../../hooks/useDocumentos";
 
 export default function DetalleExpediente() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [expediente, setExpediente] = useState(null);
-  const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState(null);
   const [tab, setTab] = useState("pases");
-  const [modalAudiencia, setModalAudiencia] = useState({
-    show: false,
-    modo: null,
-    audiencia: null,
-  });
-  const [audiencias, setAudiencias] = useState([]);
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [modalAudiencia, setModalAudiencia] = useState({show: false, modo: null, audiencia: null});
   const [mensaje, setMensaje] = useState("");
   const [mostrarPDF, setMostrarPDF] = useState(false);
   const [archivos, setArchivos] = useState([]);
-  const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [pases, setPases] = useState([]);
-  const [modalPase, setModalPase] = useState({
-    show: false,
-    modo: null,
-    pase: null,
-  });
+  const [modalPase, setModalPase] = useState({show: false, modo: null, pase: null});
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
-  const [ordenes, setOrdenes] = useState([]); // Estado para las órdenes
   const [mostrarModalOrden, setMostrarModalOrden] = useState(false);
 
-  useEffect(() => {
-    const fetchExpediente = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const data = await traerExpedientePorId(id, token);
-        setExpediente(data);
-      } catch (err) {
-        setError("Error al cargar el expediente");
-      } finally {
-        setCargando(false);
-      }
-    };
-
-    fetchExpediente();
-  }, [id]);
+  // Llama al hook de Expedientes
+  const { expediente, cargando, error } = useExpediente(id);
+  const { audiencias, guardarAudiencia, borrarAudiencia} =
+    useAudiencias(id, setMensaje);
+    const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes } = useOrdenes(id, setMensaje);
+    const { pases, guardarPase, borrarPase } = usePases(id, setMensaje, fetchOrdenes);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (expediente?.id) {
-      traerAudienciasPorExpediente(expediente.id, token)
-        .then((auds) => setAudiencias(auds))
-        .catch(() => setAudiencias([]));
       // Traer órdenes del backend
-      traerOrdenesPorExpediente(expediente.id, token)
-        .then((data) => setOrdenes(data))
-        .catch(() => setOrdenes([]));
+      console.log("Ordenes en el useEffect");
     }
-    
   }, [expediente]);
 
   useEffect(() => {
@@ -95,9 +56,6 @@ export default function DetalleExpediente() {
       traerDocDenuncia(expediente.id_denuncia, token)
         .then((data) => setArchivos(data))
         .catch(() => setArchivos([]));
-      traerPasesPorExp(expediente.id, token)
-        .then((ps) => setPases(ps))
-        .catch(() => setPases([]));
     }
   }, [expediente]);
 
@@ -110,160 +68,60 @@ export default function DetalleExpediente() {
     //window.open(url);
     //console.log(blob.size);
   };
+
+  // Abren los modales según lo que sea --- Para cerrar también
   const handleNuevaAudiencia = () => {
     setModalAudiencia({ show: true, modo: "crear", audiencia: null });
   };
-
   const handleEditarAudiencia = (audiencia) => {
     setModalAudiencia({ show: true, modo: "editar", audiencia });
   };
-
-  const handleGuardarAudiencia = async (audiencia) => {
-    const token = localStorage.getItem("token");
-    if (modalAudiencia.modo === "crear") {
-      try {
-        await crearAudiencia(audiencia, token);
-        const nuevasAudiencias = await traerAudienciasPorExpediente(
-          expediente.id,
-          token
-        );
-        setAudiencias(nuevasAudiencias);
-        setMensaje("Audiencia creada correctamente");
-      } catch (err) {
-        alert("Error al crear la audiencia");
-      }
-    } else if (modalAudiencia.modo === "editar") {
-      try {
-        await editarAudiencia(modalAudiencia.audiencia.id, audiencia, token);
-        const nuevasAudiencias = await traerAudienciasPorExpediente(
-          expediente.id,
-          token
-        );
-        setAudiencias(nuevasAudiencias);
-        setMensaje("Audiencia editada correctamente");
-      } catch (err) {
-        alert("Error al editar la audiencia");
-      }
-    }
-    setModalAudiencia({ show: false, modo: null, audiencia: null });
-  };
-
   const handleCerrarModal = () => {
     setModalAudiencia({ show: false, modo: null, audiencia: null });
   };
-
+  const handleGuardarAudiencia = async (audiencia) => {
+    await guardarAudiencia(
+      audiencia,
+      modalAudiencia.modo,
+      modalAudiencia.audiencia?.id
+    );
+    setModalAudiencia({ show: false, modo: null, audiencia: null });
+  };
   const handleEliminarAudiencia = async (id) => {
-    const token = localStorage.getItem("token");
-    try {
-      await eliminarAudiencia(id, token);
-      const nuevasAudiencias = await traerAudienciasPorExpediente(
-        expediente.id,
-        token
-      );
-      setAudiencias(nuevasAudiencias);
-      setMensaje("Audiencia eliminada correctamente");
-    } catch (err) {
-      alert("Error al eliminar la audiencia");
-    }
+    await borrarAudiencia(id);
   };
 
-  // --- PASES ---
+  // --- Handlers para los pases, después la lógica de negocio se maneja en el hook ---
   const handleNuevoPase = () => {
     setModalPase({ show: true, modo: "crear", pase: null });
   };
-
   const handleEditarPase = (pase) => {
     setModalPase({ show: true, modo: "editar", pase });
   };
-
   const handleEliminarPase = async (id) => {
     const token = localStorage.getItem("token");
     if (!window.confirm("¿Seguro que desea eliminar este pase?")) return;
-    try {
-      await eliminarPase(id, token);
-      const nuevosPases = await traerPasesPorExp(expediente.id, token);
-      setPases(nuevosPases);
-      setMensaje("Pase eliminado correctamente");
-      // ACTUALIZA ORDENES DESPUÉS DE GUARDAR EL PASE
-      const nuevasOrdenes = await traerOrdenesPorExpediente(
-        expediente.id,
-        token
-      );
-      setOrdenes(nuevasOrdenes);
-    } catch (err) {
-      alert("Error al eliminar el pase");
-    }
+    await borrarPase(id, token);
   };
-
   const handleGuardarPase = async (paseData) => {
-    const token = localStorage.getItem("token");
-    try {
-      if (modalPase.modo === "crear") {
-        await crearPase(paseData, token);
-        setMensaje("Pase creado correctamente");
-      } else {
-        await editarPase(modalPase.pase.id, paseData, token);
-        setMensaje("Pase editado correctamente");
-      }
-      const nuevosPases = await traerPasesPorExp(expediente.id, token);
-      setPases(nuevosPases);
-      // ACTUALIZA ORDENES DESPUÉS DE GUARDAR EL PASE
-      const nuevasOrdenes = await traerOrdenesPorExpediente(
-        expediente.id,
-        token
-      );
-      setOrdenes(nuevasOrdenes);
-    } catch (err) {
-      alert("Error al guardar el pase");
-    }
     setModalPase({ show: false, modo: null, pase: null });
+    await guardarPase(paseData, modalPase);
   };
 
-  // Acciones para la tabla de órdenes
-
-  const onSubmitOrden = async (ordenData) => {
-    const token = localStorage.getItem("token");
-    try {
-      await agregarOrden(ordenData, token);
-      setMostrarModalOrden(false);
-      setMensaje("Orden agregada correctamente");
-      //Recargar órdenes
-      const nuevasOrdenes = await traerOrdenesPorExpediente(
-        expediente.id,
-        token
-      );
-      setOrdenes(nuevasOrdenes);
-    } catch (error) {
-      setMostrarModalOrden(false);
-      alert("Error al agregar la orden");
-      console.error(error);
-    }
-  }
-
+  // Handlers para la tabla de órdenes
+  const handlerSubirOrden = async (ordenData) => {
+    await subirOrden(ordenData);
+    setMostrarModalOrden(false);
+  };
   const handlerModalOrden = () => {
     console.log("Abrir modal para subir orden");
     setMostrarModalOrden(true);
   };
 
   const handleDescargarOrden = async (orden) => {
-    // Aquí deberías consumir el endpoint del backend que devuelve el archivo
-    // Por ejemplo: traerArchivoPDF(orden.orden, token)
-    try {
-      const token = localStorage.getItem("token");
-      const blob = await traerArchivoPDF(orden.id, token); // Ajusta el método si es necesario
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = orden.nroDocumento || `documento_${orden.id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err) {
-      alert("No se pudo descargar el documento");
-    }
+    await descargarOrden(orden);
   };
-  const handleVerOrden = async (orden) => { // cambiarlo y poner el mismo método de DetalleDenuncia
-    // Visualiza el PDF en un modal
+  const handleVerOrden = async (orden) => {
     try {
       const token = localStorage.getItem("token");
       const blob = await traerArchivoPDF(orden.id, token); // Ajusta el método si es necesario
@@ -275,29 +133,9 @@ export default function DetalleExpediente() {
       alert("No se pudo visualizar el documento");
     }
   };
-
   const handleEliminarOrden = async (orden) => {
-    // Aquí deberías consumir el endpoint para eliminar la orden
-    // Por ejemplo: await eliminarOrden(id, token)
     if (!window.confirm("¿Seguro que desea eliminar este documento?")) return;
-    try {
-      // TODO: implementar eliminarOrden en ordenesApi.js
-      if (orden.referencia == "Pase" ) {
-        handleEliminarPase(orden.id_pase);
-      } else if (orden.referencia == "Usuario Externo") {
-        alert("No se puede eliminar un documento de usuario externo");
-      }
-      const token = localStorage.getItem("token");
-      await eliminarOrden(orden.id, token);
-      //Recargar órdenes
-      const nuevasOrdenes = await traerOrdenesPorExpediente(
-        expediente.id,
-        token
-      );
-      setOrdenes(nuevasOrdenes);
-    } catch (err) {
-      alert("No se pudo eliminar el documento");
-    }
+    await borrarOrden(orden);
   };
 
   if (cargando)
@@ -580,9 +418,9 @@ export default function DetalleExpediente() {
                 <div key={persona.id} className="mb-2">
                   <strong>
                     {persona.rol
-                      ? persona.rol.charAt(0).toUpperCase() + persona.rol.slice(1)
+                      ? persona.rol.charAt(0).toUpperCase() +
+                        persona.rol.slice(1)
                       : "Sin rol"}
-                      
                     :
                   </strong>{" "}
                   {persona.nombre} {persona.apellido} - DNI: {persona.documento}
@@ -602,7 +440,12 @@ export default function DetalleExpediente() {
         expedienteId={expediente.id} // id real del expediente, no nro_exp
         personasInvolucradas={expediente.denuncia?.personas || []}
       />
-      <ModalSubirOrden show={mostrarModalOrden} onClose={() => setMostrarModalOrden(false)} expedienteId={expediente.id} onSubmitOrden={onSubmitOrden}  />
+      <ModalSubirOrden
+        show={mostrarModalOrden}
+        onClose={() => setMostrarModalOrden(false)}
+        expedienteId={expediente.id}
+        onSubmitOrden={handlerSubirOrden}
+      />
       {/* Modal para crear/editar pase */}
       <FormularioPaseModal
         show={modalPase.show}

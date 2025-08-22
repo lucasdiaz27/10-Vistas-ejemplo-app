@@ -17,7 +17,7 @@ export default function TablaExpedientes({ filtro, elementosPorPagina }) {
       try {
         const token = localStorage.getItem("token");
         const decoded = jwtDecode(token);
-        if (decoded.rol == "ADMIN") {
+        if (decoded.rol == "DIRECCION") {
           const data = await traerExpedientes(token);
           setExpedientes(data);
         } else {

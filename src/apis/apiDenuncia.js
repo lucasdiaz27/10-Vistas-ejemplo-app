@@ -59,7 +59,7 @@ export const actualizarEstadoDenuncia = async (id, nuevoEstado, motivoEstado, to
 // ale
 
 export const traerDocDenuncia = async (id, token) => {
-  const res = await axios.get(`https://site-backend-f8xg.onrender.com/doc/traerPorDenuncia/${id}`, {
+  const res = await axios.get(`http://localhost:8080/doc/traerPorDenuncia/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -68,7 +68,7 @@ export const traerDocDenuncia = async (id, token) => {
 }
 
 export const mandarCorreo = async (id, observacion, token) => {
-  return axios.post(`https://site-backend-f8xg.onrender.com/denuncia/mandarCorreo/${id}`, 
+  return axios.post(`${BASE_URL}/mandarCorreo/${id}`, 
     observacion, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ export const mandarCorreo = async (id, observacion, token) => {
 }
 
 export const traerHistorialDenuncia = async (nroExp, token) => {
-  const res = await axios.get(`https://site-backend-f8xg.onrender.com/denuncia/historial/${nroExp}`, {
+  const res = await axios.get(`${BASE_URL}/historial/${nroExp}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -86,7 +86,7 @@ export const traerHistorialDenuncia = async (nroExp, token) => {
 };
 
 export const traerDenunciaPorUsuario = async (token) => {
-  const res = await axios.get(`https://site-backend-f8xg.onrender.com/denuncia/traerDenunciasPorUsuario`, {
+  const res = await axios.get(`${BASE_URL}/traerDenunciasPorUsuario`, {
     headers: {
       Authorization: `Bearer ${token}`
     },
