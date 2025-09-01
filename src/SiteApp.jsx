@@ -25,6 +25,8 @@ import PrivateRoute from "./routes/PrivateRoute";
 import GeneradorPDF from "./components/pdf/GeneradorPDF";
 import { Navbar } from "react-bootstrap";
 import { InternalLayout } from "./routes/InternalLayout";
+import { PaginaModal } from "./components/expedientes/modales/PaginaModal";
+import { ModalPdf } from "./components/expedientes/modales/ModalPdf";
 
 function SiteApp() {
   return (
@@ -40,6 +42,7 @@ function SiteApp() {
           }
         >
           <Route path="/" element={<Inicio />} />
+          <Route path="/modal" element={<ModalPdf />} />
           <Route path="/formulario" element={<Formulario />} />
           <Route path="/formularioPersona" element={<FormPersona />} />
           <Route path="/consulta" element={<Consulta />} />
