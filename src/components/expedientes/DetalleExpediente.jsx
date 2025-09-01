@@ -18,6 +18,7 @@ import ModalSubirOrden from "./modales/ModalSubirOrden";
 import { useExpediente } from "../../hooks/useExpediente";
 import { useAudiencias } from "../../hooks/useAudiencias";
 import { usePases } from "../../hooks/usePases";
+import { ModalPdf } from "./modales/ModalPdf";
 import { useOrdenes } from "../../hooks/useOrdenes";
 
 export default function DetalleExpediente() {
@@ -151,11 +152,13 @@ export default function DetalleExpediente() {
           </div>
         )}
         <button
-          className="btn btn-outline-secondary"
+          className="btn btn-outline-secondary me-2"
           onClick={() => navigate(-1)}
         >
           <i className="bi bi-arrow-left"></i> Volver
         </button>
+
+        <ModalPdf />
       </div>
 
       {mostrarPDF && (
