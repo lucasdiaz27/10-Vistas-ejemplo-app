@@ -19,7 +19,6 @@ import { useExpediente } from "../../hooks/useExpediente";
 import { useAudiencias } from "../../hooks/useAudiencias";
 import { usePases } from "../../hooks/usePases";
 import { useOrdenes } from "../../hooks/useOrdenes";
-import { useDocumentos } from "../../hooks/useDocumentos";
 
 export default function DetalleExpediente() {
   const { id } = useParams();
@@ -27,28 +26,21 @@ export default function DetalleExpediente() {
   const [tab, setTab] = useState("pases");
   const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
-  const [modalAudiencia, setModalAudiencia] = useState({show: false, modo: null, audiencia: null});
   const [mensaje, setMensaje] = useState("");
   const [mostrarPDF, setMostrarPDF] = useState(false);
   const [archivos, setArchivos] = useState([]);
+
+  // Modales de los componentes
+  const [modalAudiencia, setModalAudiencia] = useState({show: false, modo: null, audiencia: null});
   const [modalPase, setModalPase] = useState({show: false, modo: null, pase: null});
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mostrarModalOrden, setMostrarModalOrden] = useState(false);
 
   // Llama al hook de Expedientes
-  const { expediente, cargando, error } = useExpediente(id);
-  const { audiencias, guardarAudiencia, borrarAudiencia} =
-    useAudiencias(id, setMensaje);
-    const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes } = useOrdenes(id, setMensaje);
-    const { pases, guardarPase, borrarPase } = usePases(id, setMensaje, fetchOrdenes);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (expediente?.id) {
-      // Traer órdenes del backend
-      console.log("Ordenes en el useEffect");
-    }
-  }, [expediente]);
+  const { expediente, cargando, error, setExpediente } = useExpediente(id);
+  const { audiencias, guardarAudiencia, borrarAudiencia} = useAudiencias(id, setMensaje);
+  const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes } = useOrdenes(id, setMensaje);
+  const { pases, guardarPase, borrarPase } = usePases(id, setMensaje, fetchOrdenes);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -58,16 +50,6 @@ export default function DetalleExpediente() {
         .catch(() => setArchivos([]));
     }
   }, [expediente]);
-
-  const handleVerArchivo = async (archivo) => {
-    const token = localStorage.getItem("token");
-    const blob = await traerArchivoPDF(archivo.id, token);
-    const url = URL.createObjectURL(blob);
-    setPdfUrl(url);
-    setArchivoSeleccionado(archivo);
-    //window.open(url);
-    //console.log(blob.size);
-  };
 
   // Abren los modales según lo que sea --- Para cerrar también
   const handleNuevaAudiencia = () => {
@@ -174,16 +156,6 @@ export default function DetalleExpediente() {
         >
           <i className="bi bi-arrow-left"></i> Volver
         </button>
-        {/* <button className="btn btn-success" onClick={() => setMostrarPDF(true)}>
-          <i className="bi bi-file-earmark-pdf"></i> Generar PDF
-        </button>
-        <PDFDownloadLink
-          document={<ExpedientePDF expediente={expediente} />}
-          fileName={`expediente_${expediente.id}.pdf`}
-          className="btn btn-primary"
-        >
-          Descargar PDF
-        </PDFDownloadLink> */}
       </div>
 
       {mostrarPDF && (
@@ -285,57 +257,24 @@ export default function DetalleExpediente() {
                 </div>
               </div>
               <div className="mb-2">
-                <div
-                  style={{ fontWeight: 500, fontSize: "1em", marginBottom: 2 }}
-                >
+                <div style={{ fontWeight: 500, fontSize: "1em", marginBottom: 2 }}>
                   <strong>Estado:</strong>
                 </div>
                 <div>
-                  {(() => {
-                    const estado = (
-                      expediente.denuncia?.estado || ""
-                    ).toUpperCase();
-                    let color = "#fff3cd",
-                      text = "PENDIENTE",
-                      icon = <i className="bi bi-hourglass-split me-1"></i>,
-                      textColor = "#856404";
-                    if (estado === "EN PROCESO") {
-                      color = "#ffe5b4";
-                      textColor = "#a05a00";
-                      text = "En Proceso";
-                      icon = <i className="bi bi-arrow-repeat me-1"></i>;
-                    } else if (
-                      estado === "FINALIZADO" ||
-                      estado === "APROBADO"
-                    ) {
-                      color = "#d4edda";
-                      textColor = "#256029";
-                      text = estado.charAt(0) + estado.slice(1).toLowerCase();
-                      icon = <i className="bi bi-check-circle me-1"></i>;
-                    } else if (estado && estado !== "PENDIENTE") {
-                      color = "#e2e3e5";
-                      textColor = "#383d41";
-                      text = estado.charAt(0) + estado.slice(1).toLowerCase();
-                      icon = <i className="bi bi-info-circle me-1"></i>;
-                    }
-                    return (
-                      <span
-                        className="badge d-inline-flex align-items-center"
-                        style={{
-                          backgroundColor: color,
-                          color: textColor,
-                          fontWeight: 500,
-                          fontSize: "1em",
-                          borderRadius: "0.5rem",
-                          padding: "0.5em 1em",
-                          verticalAlign: "middle",
-                        }}
-                      >
-                        {icon}
-                        {text}
-                      </span>
-                    );
-                  })()}
+                  <span
+                    className="badge d-inline-flex gap-2 align-items-center"
+                    style={{
+                      backgroundColor: "#e2e3e5",
+                      color: "#383d41",
+                      fontWeight: 500,
+                      fontSize: "1em",
+                      borderRadius: "0.5rem",
+                      padding: "0.5em 1em",
+                      verticalAlign: "middle",
+                    }}>
+                    <i className="bi bi-info-circle"></i>
+                    {expediente.denuncia?.estado}
+                  </span>
                 </div>
               </div>
             </div>

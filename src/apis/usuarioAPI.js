@@ -39,3 +39,12 @@ export const cambiarPassword = async (passwords, token) => {
     );
     return response.data;
 };
+
+export const traerUsuarios = async (token) => {
+  const res = await axios.get(`${API_URL}/traerUsuarios`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
+};

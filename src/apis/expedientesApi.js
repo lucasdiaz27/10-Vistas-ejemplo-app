@@ -93,15 +93,6 @@ export const editarExpediente = async (id, expedienteUpdateDTO, token) => {
   return res.data;
 };
 
-export const traerUsuarios = async (token) => {
-  const res = await axios.get("https://site-backend-f8xg.onrender.com/usuarios/traerUsuarios", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.data;
-};
-
 export const traerPorUsuario = async (token) => {
   const res = await axios.get(`${BASE_URL}/traerPorUsuario`, {
     headers: {

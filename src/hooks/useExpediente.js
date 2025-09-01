@@ -22,5 +22,5 @@ export const useExpediente = (id) => {
     fetchExpediente();
   }, [id]);
 
-  return { expediente, cargando, error };
+  return { expediente, cargando, error, setExpediente };
 }

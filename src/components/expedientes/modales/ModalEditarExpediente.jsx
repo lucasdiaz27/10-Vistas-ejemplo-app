@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { editarExpediente, traerExpedientePorId} from "../../../apis/expedientesApi";
+import Swal from 'sweetalert2';
+import PropTypes from 'prop-types';
+import { useUsuarios } from '../../../hooks/useUsuarios';
 // Componente reutilizable para seleccionar usuario
 function UsuarioSelect({ label, name, value, onChange, usuariosDisponibles }) {
   return (
@@ -13,32 +17,19 @@ function UsuarioSelect({ label, name, value, onChange, usuariosDisponibles }) {
         <option value="">Seleccionar...</option>
         {usuariosDisponibles.map(usuario => (
           <option key={usuario.id} value={usuario.id}>
-            {usuario.nombreUsuario}
+            {usuario.nombreUsuario} - {usuario.rol}
           </option>
         ))}
       </select>
     </div>
   );
 }
-import { editarExpediente, traerExpedientePorId, traerUsuarios } from "../../../apis/expedientesApi";
-import Swal from 'sweetalert2';
-import PropTypes from 'prop-types';
 
 export default function ModalEditarExpediente({ onClose, expediente, actualizarExpediente }) {
   const [form, setForm] = useState({ ...expediente });
-  const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
+  const {usuarios, fetchUsuarios} = useUsuarios()
 
   useEffect(() => {
-    const fetchUsuarios = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const usuarios = await traerUsuarios(token);
-        setUsuariosDisponibles(usuarios);
-      } catch (err) {
-        console.error("Error al traer usuarios:", err);
-      }
-    };
-
     fetchUsuarios();
   }, []);
 
@@ -101,7 +92,7 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
     onClose();
   };
 
-  const usuarioPrincipal = usuariosDisponibles.find(u => u.id === form.usuarios?.[0]);
+  const usuarioPrincipal = usuarios.find(u => u.id === form.usuarios?.[0]);
 
   return (
     <div className="modal fade show d-block" tabIndex="-1" role="dialog">
@@ -175,28 +166,28 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
                 name="usuario0"
                 value={form.usuarios?.[0] ?? ''}
                 onChange={handleChange}
-                usuariosDisponibles={usuariosDisponibles}
+                usuariosDisponibles={usuarios}
               />
               <UsuarioSelect
                 label="Usuario 2"
                 name="usuario1"
                 value={form.usuarios?.[1] ?? ''}
                 onChange={handleChange}
-                usuariosDisponibles={usuariosDisponibles}
+                usuariosDisponibles={usuarios}
               />
               <UsuarioSelect
                 label="Usuario 3"
                 name="usuario2"
                 value={form.usuarios?.[2] ?? ''}
                 onChange={handleChange}
-                usuariosDisponibles={usuariosDisponibles}
+                usuariosDisponibles={usuarios}
               />
               <UsuarioSelect
                 label="Usuario 4"
                 name="usuario3"
                 value={form.usuarios?.[3] ?? ''}
                 onChange={handleChange}
-                usuariosDisponibles={usuariosDisponibles}
+                usuariosDisponibles={usuarios}
               />
 
             </div>
