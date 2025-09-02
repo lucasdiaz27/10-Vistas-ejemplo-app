@@ -99,31 +99,39 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
         }
     };
 
-    // Envía el formulario al backend como form-data (pase y file)
+    // Envía el formulario al backend
     const handleSubmit = e => {
         e.preventDefault();
-        const formDataToSend = new FormData();
-        // El JSON del pase va como string bajo la key "pase"
-        const paseJson = JSON.stringify({
-            asunto: formData.asunto,
-            cantFolios: Number(formData.cantFolios), // Asegura tipo Long
-            areaOrigen: formData.areaOrigen, // Debe coincidir con ENUM
-            areaDestino: formData.areaDestino, // Debe coincidir con ENUM
-            descripcion: formData.descripcion,
-            expedienteId: Number(expedienteId), // Asegura tipo Long
-            usuarioId: Number(usuarioId), // Asegura tipo Long
-            tipoDocumento: formData.tipoDocumento // Debe coincidir con ENUM
-        });
-        
-        formDataToSend.append('pase', paseJson);
-        // El archivo PDF va bajo la key "file"
-        if (formData.file) formDataToSend.append('file', formData.file);
-        // if (formData.file) {
-        //     console.log('Archivo PDF:', formData.file.name, formData.file.size, formData.file.type);
-        // } else {
-        //     console.log('Sin archivo PDF');
-        // }
-        onGuardar(formDataToSend);
+        if (modo === "crear") {
+            // FormData para crear (con archivo)
+            const formDataToSend = new FormData();
+            const paseJson = JSON.stringify({
+                asunto: formData.asunto,
+                cantFolios: Number(formData.cantFolios),
+                areaOrigen: formData.areaOrigen,
+                areaDestino: formData.areaDestino,
+                descripcion: formData.descripcion,
+                expedienteId: Number(expedienteId),
+                usuarioId: Number(usuarioId),
+                tipoDocumento: formData.tipoDocumento
+            });
+            formDataToSend.append('pase', paseJson);
+            if (formData.file) formDataToSend.append('file', formData.file);
+            onGuardar(formDataToSend);
+        } else {
+            // JSON para editar (sin archivo)
+            const paseJson = {
+                asunto: formData.asunto,
+                cantFolios: Number(formData.cantFolios),
+                areaOrigen: formData.areaOrigen,
+                areaDestino: formData.areaDestino,
+                descripcion: formData.descripcion,
+                expedienteId: Number(expedienteId),
+                usuarioId: Number(usuarioId),
+                tipoDocumento: formData.tipoDocumento
+            };
+            onGuardar(paseJson);
+        }
     };
 
     return (
@@ -163,11 +171,13 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
                             ))}
                         </Form.Select>
                     </Form.Group>
-                    {/* Campo para subir PDF y contar folios */}
-                    <Form.Group className="mb-3">
-                        <Form.Label>Archivo PDF</Form.Label>
-                        <Form.Control type="file" accept="application/pdf" onChange={handleFileChange} />
-                    </Form.Group>
+                    {/* Campo para subir PDF y contar folios SOLO en modo CREAR */}
+                    {modo !== "editar" && (
+                        <Form.Group className="mb-3">
+                            <Form.Label>Archivo PDF</Form.Label>
+                            <Form.Control type="file" accept="application/pdf" onChange={handleFileChange} />
+                        </Form.Group>
+                    )}
                     {/* Campo Texto del Pase (Descripción) */}
                     <Form.Group className="mb-3">
                         <Form.Label>Texto del Pase</Form.Label>

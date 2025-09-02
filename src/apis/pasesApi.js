@@ -25,9 +25,16 @@ export const crearPase = async (formData, token) => {
 
 // Editar un pase existente
 export const editarPase = async (id, pase, token) => {
-  const res = await axios.put(`${BASE_URL}/editarPase/${id}`, pase, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await axios.put(
+    `${BASE_URL}/editarPase/${id}`,
+    pase,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
   return res.data;
 };
 
