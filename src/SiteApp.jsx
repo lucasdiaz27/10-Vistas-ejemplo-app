@@ -27,6 +27,7 @@ import { Navbar } from "react-bootstrap";
 import { InternalLayout } from "./routes/InternalLayout";
 import { PaginaModal } from "./components/expedientes/modales/PaginaModal";
 import { ModalPdf } from "./components/expedientes/modales/ModalPdf";
+import PaginaTerminos from "./pages/PaginaTerminos";
 
 function SiteApp() {
   return (
@@ -42,11 +43,12 @@ function SiteApp() {
           }
         >
           <Route path="/" element={<Inicio />} />
-          <Route path="/modal" element={<ModalPdf />} />
-          <Route path="/formulario" element={<Formulario />} />
-          <Route path="/formularioPersona" element={<FormPersona />} />
-          <Route path="/consulta" element={<Consulta />} />
-          <Route path="/login" element={<Login />} />
+    <Route path="/modal" element={<ModalPdf />} />
+    <Route path="/formulario" element={<Formulario />} />
+    <Route path="/formularioPersona" element={<FormPersona />} />
+    <Route path="/consulta" element={<Consulta />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/PaginaTerminos" element={<PaginaTerminos />} />
         </Route>
 
         {/* Paginas Internos con NavBarInterno */}
