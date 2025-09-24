@@ -1,12 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { editarExpediente, traerExpedientePorId} from "../../../apis/expedientesApi";
+import { editarExpediente, traerExpedientePorId } from "../../../apis/expedientesApi";
 import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
 import { useUsuarios } from '../../../hooks/useUsuarios';
+
 // Componente reutilizable para seleccionar usuario
-function UsuarioSelect({ label, name, value, onChange, usuariosDisponibles }) {
+function UsuarioSelect({
+  label,
+  name,
+  value,
+  onChange,
+  usuariosDisponibles = [],
+  usuariosSeleccionados = []
+}) {
+  // normalizar ids seleccionados a números (sin valores vacíos)
+  const selectedIds = (usuariosSeleccionados || [])
+    .filter(Boolean)
+    .map(id => Number(id));
+
+  const valNum = value === "" || value === null || value === undefined
+    ? null
+    : Number(value);
+
+  const opciones = (usuariosDisponibles || []).filter(u => {
+    const uId = Number(u.id);
+    // permitir si no está seleccionado en otro select, o si es el valor actual del select
+    return !selectedIds.includes(uId) || uId === valNum;
+  });
+
   return (
-    <div className="mb-3">
+    <div className="mb-3" style={{ minWidth: 240 }}>
       <label className="form-label">{label}</label>
       <select
         className="form-select"
@@ -15,9 +38,9 @@ function UsuarioSelect({ label, name, value, onChange, usuariosDisponibles }) {
         onChange={onChange}
       >
         <option value="">Seleccionar...</option>
-        {usuariosDisponibles.map(usuario => (
+        {opciones.map(usuario => (
           <option key={usuario.id} value={usuario.id}>
-            {usuario.nombreUsuario} - {usuario.rol}
+            {usuario.nombreUsuario} {usuario.rol ? `- ${usuario.rol}` : ''}
           </option>
         ))}
       </select>
@@ -26,24 +49,35 @@ function UsuarioSelect({ label, name, value, onChange, usuariosDisponibles }) {
 }
 
 export default function ModalEditarExpediente({ onClose, expediente, actualizarExpediente }) {
-  const [form, setForm] = useState({ ...expediente });
-  const {usuarios, fetchUsuarios} = useUsuarios()
+  // aseguramos que form siempre exista y que usuarios sea array
+  const [form, setForm] = useState(() => ({ ...(expediente || {}), usuarios: (expediente?.usuarios ?? []).slice() }));
+  const { usuarios = [], fetchUsuarios } = useUsuarios() || {};
 
+  // cuando llega un nuevo expediente por props, actualizar el form
   useEffect(() => {
-    fetchUsuarios();
-  }, []);
+    setForm({ ...(expediente || {}), usuarios: (expediente?.usuarios ?? []).slice() });
+  }, [expediente]);
+
+  // traer usuarios (si tu hook lo requiere)
+  useEffect(() => {
+    if (fetchUsuarios) fetchUsuarios();
+  }, [fetchUsuarios]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // name será usuario0, usuario1, usuario2, usuario3
-    if (name.startsWith("usuario")) {
-      const idSeleccionado = parseInt(value);
-      const index = parseInt(name.replace("usuario", ""));
+    if (name && name.startsWith("usuario")) {
+      // si value === '' -> dejamos string vacío (no seleccionado) en ese índice
+      const idSeleccionado = value === "" ? "" : parseInt(value, 10);
+      const index = parseInt(name.replace("usuario", ""), 10);
       const nuevosUsuarios = [...(form.usuarios ?? [])];
+
+      // si el índice no existía, aseguramos longitud
+      for (let i = nuevosUsuarios.length; i <= index; i++) nuevosUsuarios[i] = "";
+
       nuevosUsuarios[index] = idSeleccionado;
-      setForm((prev) => ({ ...prev, usuarios: nuevosUsuarios }));
+      setForm(prev => ({ ...prev, usuarios: nuevosUsuarios }));
     } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
+      setForm(prev => ({ ...prev, [name]: value }));
     }
   };
 
@@ -52,20 +86,26 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
     try {
       const token = localStorage.getItem('token');
 
+      // filtrar valores vacíos y convertir a números si corresponde
+      const usuariosAEnviar = (form.usuarios ?? [])
+        .filter(u => u !== "" && u !== null && u !== undefined)
+        .map(u => Number(u));
+
       const expedienteUpdateDTO = {
         nroExp: form.nro_exp,
         cant_folios: form.cant_folios,
         fecha_inicio: form.fecha_inicio,
         fecha_finalizacion: form.fecha_finalizacion,
         hipervulnerable: form.hipervulnerable,
-        delegacion: 'DGC',
-        usuarios: form.usuarios ?? [],
+        delegacion: form.delegacion ?? 'DGC',
+        usuarios: usuariosAEnviar,
       };
 
       await editarExpediente(expediente.id, expedienteUpdateDTO, token);
-        
+
       const data = await traerExpedientePorId(expediente.id, token);
-      actualizarExpediente(data);
+      if (actualizarExpediente) actualizarExpediente(data);
+
       Swal.fire({
         icon: 'success',
         title: 'Editar expediente',
@@ -73,26 +113,20 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
         confirmButtonText: 'Aceptar',
         confirmButtonColor: '#00bcd4',
         background: '#f8fafc',
-        customClass: {
-          title: 'swal2-title-modern',
-          popup: 'swal2-popup-modern',
-        },
-        showClass: {
-          popup: 'animate__animated animate__fadeInDown'
-        },
-        hideClass: {
-          popup: 'animate__animated animate__fadeOutUp'
-        }
       });
-      onClose();
+
+      onClose?.();
     } catch (error) {
       console.error('Error al actualizar expediente:', error);
       alert('Ocurrió un error al actualizar el expediente');
     }
-    onClose();
   };
 
-  const usuarioPrincipal = usuarios.find(u => u.id === form.usuarios?.[0]);
+  // Helper: nombres de usuarios seleccionados para la cabecera
+  const usuariosNombres = (form.usuarios ?? [])
+    .filter(u => u !== "" && u !== null && u !== undefined)
+    .map(id => usuarios.find(u => Number(u.id) === Number(id))?.nombreUsuario)
+    .filter(Boolean);
 
   return (
     <div className="modal fade show d-block" tabIndex="-1" role="dialog">
@@ -103,9 +137,8 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
               <h5 className="modal-title">Editar Expediente</h5>
               <button type="button" className="btn-close" onClick={onClose}></button>
             </div>
-            <div className="modal-body">
 
-              {/* <div className="mb-3"> ... nro_exp ... </div> */}
+            <div className="modal-body">
 
               <div className="mb-3">
                 <label className="form-label">Cantidad de Folios</label>
@@ -117,8 +150,6 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
                   onChange={handleChange}
                 />
               </div>
-
-              {/* <div className="mb-3"> ... fecha_inicio ... </div> */}
 
               <div className="mb-3">
                 <label className="form-label">Fecha de Finalización</label>
@@ -136,7 +167,7 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
                 <select
                   className="form-select"
                   name="hipervulnerable"
-                  value={form.hipervulnerable === true ? "Sí" : form.hipervulnerable === false ? "No" : (form.hipervulnerable ?? "")}
+                  value={form.hipervulnerable ?? ''}
                   onChange={handleChange}
                 >
                   <option value="">Seleccionar...</option>
@@ -151,54 +182,51 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
                   type="text"
                   className="form-control"
                   name="delegacion"
-                  value={'DGC'}
-                  disabled
+                  value={form.delegacion ?? 'DGC'}
                   onChange={handleChange}
                 />
               </div>
 
               <div className="mb-3">
-                <strong>Usuario: </strong>{usuarioPrincipal?.nombreUsuario ?? 'No seleccionado'}
+                <strong>Usuarios: </strong>
+                {usuariosNombres.length > 0 ? usuariosNombres.join(', ') : 'No seleccionados'}
               </div>
 
+              {/* renderizar selects dinámicos */}
               {(form.usuarios ?? []).map((usuarioId, index) => (
-  <div key={index} className="d-flex align-items-center mb-2">
-    <UsuarioSelect
-      label={`Usuario ${index + 1}`}
-      name={`usuario${index}`}
-      value={usuarioId}
-      onChange={handleChange}
-      usuariosDisponibles={usuarios}
-    />
-    <button
-      type="button"
-      className="btn btn-danger ms-2"
-      onClick={() => {
-        const nuevosUsuarios = [...form.usuarios];
-        nuevosUsuarios.splice(index, 1); // elimina ese select
-        setForm((prev) => ({ ...prev, usuarios: nuevosUsuarios }));
-      }}
-    >
-      -
-    </button>
-  </div>
-))}
+                <div key={index} className="d-flex align-items-center mb-2">
+                  <UsuarioSelect
+                    label={`Usuario ${index + 1}`}
+                    name={`usuario${index}`}
+                    value={usuarioId}
+                    onChange={handleChange}
+                    usuariosDisponibles={usuarios}
+                    usuariosSeleccionados={form.usuarios ?? []}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-danger ms-2"
+                    onClick={() => {
+                      const nuevosUsuarios = [...(form.usuarios ?? [])];
+                      nuevosUsuarios.splice(index, 1);
+                      setForm(prev => ({ ...prev, usuarios: nuevosUsuarios }));
+                    }}
+                  >
+                    -
+                  </button>
+                </div>
+              ))}
 
-<button
-  type="button"
-  className="btn btn-success"
-  onClick={() =>
-    setForm((prev) => ({
-      ...prev,
-      usuarios: [...(prev.usuarios ?? []), ""], // agrega un nuevo select vacío
-    }))
-  }
->
-  + Añadir Usuario
-</button>
-
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={() => setForm(prev => ({ ...prev, usuarios: [...(prev.usuarios ?? []), ""] }))}
+              >
+                + Añadir Usuario
+              </button>
 
             </div>
+
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>
                 Cancelar
@@ -217,4 +245,5 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
 ModalEditarExpediente.propTypes = {
   onClose: PropTypes.func.isRequired,
   expediente: PropTypes.object.isRequired,
+  actualizarExpediente: PropTypes.func
 };
