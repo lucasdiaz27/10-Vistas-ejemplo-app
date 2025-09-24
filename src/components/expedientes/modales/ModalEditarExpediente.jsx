@@ -161,34 +161,42 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
                 <strong>Usuario: </strong>{usuarioPrincipal?.nombreUsuario ?? 'No seleccionado'}
               </div>
 
-              <UsuarioSelect
-                label="Usuario 1"
-                name="usuario0"
-                value={form.usuarios?.[0] ?? ''}
-                onChange={handleChange}
-                usuariosDisponibles={usuarios}
-              />
-              <UsuarioSelect
-                label="Usuario 2"
-                name="usuario1"
-                value={form.usuarios?.[1] ?? ''}
-                onChange={handleChange}
-                usuariosDisponibles={usuarios}
-              />
-              <UsuarioSelect
-                label="Usuario 3"
-                name="usuario2"
-                value={form.usuarios?.[2] ?? ''}
-                onChange={handleChange}
-                usuariosDisponibles={usuarios}
-              />
-              <UsuarioSelect
-                label="Usuario 4"
-                name="usuario3"
-                value={form.usuarios?.[3] ?? ''}
-                onChange={handleChange}
-                usuariosDisponibles={usuarios}
-              />
+              {(form.usuarios ?? []).map((usuarioId, index) => (
+  <div key={index} className="d-flex align-items-center mb-2">
+    <UsuarioSelect
+      label={`Usuario ${index + 1}`}
+      name={`usuario${index}`}
+      value={usuarioId}
+      onChange={handleChange}
+      usuariosDisponibles={usuarios}
+    />
+    <button
+      type="button"
+      className="btn btn-danger ms-2"
+      onClick={() => {
+        const nuevosUsuarios = [...form.usuarios];
+        nuevosUsuarios.splice(index, 1); // elimina ese select
+        setForm((prev) => ({ ...prev, usuarios: nuevosUsuarios }));
+      }}
+    >
+      -
+    </button>
+  </div>
+))}
+
+<button
+  type="button"
+  className="btn btn-success"
+  onClick={() =>
+    setForm((prev) => ({
+      ...prev,
+      usuarios: [...(prev.usuarios ?? []), ""], // agrega un nuevo select vacío
+    }))
+  }
+>
+  + Añadir Usuario
+</button>
+
 
             </div>
             <div className="modal-footer">
