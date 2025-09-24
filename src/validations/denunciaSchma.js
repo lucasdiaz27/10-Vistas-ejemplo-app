@@ -27,8 +27,9 @@ const personaSchema = z.object({ // Creamos un esquema sobre persona, que es un 
             .min(6, { message: "El telefono debe tener al menos 6 dígitos" })
             .max(15,{ message:"El telefono no debe superar los 15 dígitos"}),
 
-    email: z.string()
-            .email( { message: "Debe ingresar un email valido" }),
+        email: z.string()
+                        .email( { message: "El email debe ser válido" } )
+                        .optional(),
 
     fax: z.string().optional() //esto no se si quieren que lo deje como algo opcional o que por eso lo deojo asi pero parece irrelevante
     

@@ -133,11 +133,34 @@ export const Formulario = () => {
                   ref={fileInputRef}
                 />
               </div>
-              <div className="text-center col-12 col-md-6">
-                <button type="submit" className="btn btn-success mt-4">
-                  Enviar formulario
-                </button>
+            {/* Al final del formulario: términos y botón */}
+            <div className="row mt-4">
+              <div className="col-12">
+                <div className="mb-3">
+                  <input
+                    type="checkbox"
+                    id="aceptarTerminos"
+                    checked={watch("aceptarTerminos") || false}
+                    {...register("aceptarTerminos", { required: true })}
+                  />
+                  <label htmlFor="aceptarTerminos" className="ms-2">
+                    Acepto los <a href="/PaginaTerminos" target="_blank" rel="noopener noreferrer">Términos y Condiciones</a>
+                  </label>
+                  {errors.aceptarTerminos && (
+                    <p className="text-danger">Debes aceptar los términos y condiciones para continuar.</p>
+                  )}
+                </div>
+                <div className="text-center">
+                  <button
+                    type="submit"
+                    className="btn btn-success mt-2"
+                    disabled={!watch("aceptarTerminos")}
+                  >
+                    Enviar formulario
+                  </button>
+                </div>
               </div>
+            </div>
             </div>
           </form>
           {toast.show && (
