@@ -2,7 +2,6 @@ import React from "react";
 import { InputsDelegado } from "./InputsDelegado";
 
 export const FormPersona = ({ tipoPersona, register, errors, index }) => {
-  // Agregamos la propiedad errors
   return (
     <>
       <div className="mb-4">
@@ -10,32 +9,30 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
           <h5>Datos del {tipoPersona}:</h5>
 
           <div className="mb-3">
-            <label htmlFor="nombre" className="form-label">
+            <label htmlFor={`personas[${index}].persona.nombre`} className="form-label">
               Nombre o razón social
             </label>
             <input
               type="text"
               className="form-control"
-              id="nombre"
+              id={`personas[${index}].persona.nombre`}
               placeholder="Ingrese el nombre o razón social"
               {...register(`personas.${index}.persona.nombre`)}
             />
-            {
-              errors?.personas?.[index]?.persona?.nombre?.message && (
-                <p className="text-danger">
-                  {errors.personas[index].persona.nombre.message}
-                </p>
-              ) // Aquí pregunta si hay un error sobre cada tipo de persona y en cada atributo. Esto lo debes poner en todos
-            }
+            {errors?.personas?.[index]?.persona?.nombre?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.nombre.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
-            <label htmlFor="apellido" className="form-label">
+            <label htmlFor={`personas[${index}].persona.apellido`} className="form-label">
               Apellido
             </label>
             <input
               type="text"
               className="form-control"
-              id="apellido"
+              id={`personas[${index}].persona.apellido`}
               placeholder="Ingrese el apellido"
               {...register(`personas.${index}.persona.apellido`)}
             />
@@ -46,13 +43,13 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor="dni" className="form-label">
+            <label htmlFor={`personas[${index}].persona.documento`} className="form-label">
               DNI/CUIT
             </label>
             <input
               type="number"
               className="form-control"
-              id="dni"
+              id={`personas[${index}].persona.documento`}
               min={0}
               placeholder="Ingrese DNI o CUIT"
               {...register(`personas.${index}.persona.documento`)}
@@ -62,22 +59,20 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
                 }
               }}
             />
-            {
-              errors?.personas?.[index]?.persona?.documento?.message && (
-                <p className="text-danger">
-                  {errors.personas[index].persona.documento.message}
-                </p>
-              ) // Ves, aquí va lo mismo pero con dni
-            }
+            {errors?.personas?.[index]?.persona?.documento?.message && (
+              <p className="text-danger">
+                {errors.personas[index].persona.documento.message}
+              </p>
+            )}
           </div>
           <div className="mb-3">
-            <label htmlFor="domicilio" className="form-label">
+            <label htmlFor={`personas[${index}].persona.domicilio`} className="form-label">
               Domicilio
             </label>
             <input
               type="text"
               className="form-control"
-              id="domicilio"
+              id={`personas[${index}].persona.domicilio`}
               placeholder="Ingrese el domicilio"
               {...register(`personas.${index}.persona.domicilio`)}
             />
@@ -88,13 +83,13 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor="localidad" className="form-label">
+            <label htmlFor={`personas[${index}].persona.localidad`} className="form-label">
               Localidad
             </label>
             <input
               type="text"
               className="form-control"
-              id="localidad"
+              id={`personas[${index}].persona.localidad`}
               placeholder="Ingrese la localidad"
               {...register(`personas.${index}.persona.localidad`)}
             />
@@ -105,13 +100,13 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor="cp" className="form-label">
+            <label htmlFor={`personas[${index}].persona.cp`} className="form-label">
               Código postal
             </label>
             <input
               type="text"
               className="form-control"
-              id="cp"
+              id={`personas[${index}].persona.cp`}
               min={0}
               placeholder="Ingrese el código postal"
               {...register(`personas.${index}.persona.cp`)}
@@ -123,13 +118,13 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor="telefono" className="form-label">
+            <label htmlFor={`personas[${index}].persona.telefono`} className="form-label">
               Teléfono
             </label>
             <input
               type="number"
               className="form-control"
-              id="telefono"
+              id={`personas[${index}].persona.telefono`}
               min={0}
               placeholder="Ingrese el teléfono"
               {...register(`personas.${index}.persona.telefono`)}
@@ -141,13 +136,13 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">
+            <label htmlFor={`personas[${index}].persona.email`} className="form-label">
               Email
             </label>
             <input
               type="email"
               className="form-control"
-              id="email"
+              id={`personas[${index}].persona.email`}
               placeholder="Ingrese el email"
               {...register(`personas.${index}.persona.email`)}
             />
@@ -157,26 +152,9 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
               </p>
             )}
           </div>
-          <div className="mb-3">
-            <label htmlFor="fax" className="form-label">
-              Fax
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              id="fax"
-              placeholder="Ingrese el fax"
-              min={0}
-              {...register(`personas.${index}.persona.fax`)}
-            />
-            {errors?.personas?.[index]?.persona?.fax?.message && (
-              <p className="text-danger">
-                {errors.personas[index].persona.fax.message}
-              </p>
-            )}
-          </div>
+
           {/* Delegado */}
-          {tipoPersona == "Denunciante" ? <InputsDelegado register={register} index={index} errors={errors} /> : null}
+          {tipoPersona === "Denunciante" ? <InputsDelegado register={register} index={index} errors={errors} /> : null}
           <input
             type="hidden"
             value={tipoPersona

@@ -49,6 +49,6 @@ export const denunciaSchema = z.object({ // Este es el que se exporta
         objeto: z.array(z.string()).min(1, { message: "El objeto es requerido" }), // Aquí le pasas el array de objetos y le pones que sea requerido
         descripcion: z.string().min(1, { message: "La descripción es requerida" }),
         personas: z.array(personaConDelegadoSchema).min(1, { message: "Debe haber al menos una persona" }),
-
+        notificar: z.boolean().optional(),
 });
 
