@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../validations/loginSchema';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import { authAxios as axios } from '../utils/auth';
 
 
 const Login = () => {
@@ -18,15 +18,25 @@ const Login = () => {
 
     const onSubmit = async (data) => {
         try {
+            console.log('Intentando login...');
             // nombres llave
             const payload = {
                 email: data.usuario,
                 password: data.contraseña,
             };
 
-            const response = await axios.post("http://localhost:8080/auth/login", payload);
+            const response = await axios.post("/auth/login", payload);
+            console.log('Login exitoso:', response.data);
 
+            // Verificar el tiempo de expiración del token
+            const token = response.data.access_token;
+            const tokenData = JSON.parse(atob(token.split('.')[1]));
+            console.log('Token expira en:', new Date(tokenData.exp * 1000).toLocaleString());
+
+            // guardamos ambos tokens
             localStorage.setItem("token", response.data.access_token);
+            localStorage.setItem("refreshToken", response.data.refresh_token);
+            
             navigate("/menu-interno?vista=mesa-entrada");
         } catch (error) {
             alert("Usuario o contraseña incorrectos");

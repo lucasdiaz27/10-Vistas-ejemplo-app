@@ -1,6 +1,6 @@
-import axios from "axios";
+import { authAxios as axios } from '../utils/auth';
 
-const BASE_URL = "http://localhost:8080/denuncia"
+const BASE_URL = "/denuncia"
 
 export const enviarDenuncia = async (data, files) => {
   const formData = new FormData();

@@ -1,4 +1,4 @@
-import axios from "axios";
+import { authAxios as axios } from '../utils/auth';
 
 const API_URL = "http://localhost:8080/rol";
 

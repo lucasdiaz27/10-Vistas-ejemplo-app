@@ -1,14 +1,10 @@
-import axios from "axios";
+import { authAxios as axios } from '../utils/auth';
 import Swal from 'sweetalert2';
 
-const BASE_URL = "http://localhost:8080/expediente";
+const BASE_URL = "/expediente";
 
 export const traerExpedientes = async (token) => {
-  const res = await axios.get(`${BASE_URL}/traerExpedientes`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await axios.get(`${BASE_URL}/traerExpedientes`);
   return res.data;
 };
 export const traerExpedientePorId = async (id, token) => {

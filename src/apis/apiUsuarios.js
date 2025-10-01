@@ -1,4 +1,4 @@
-import axios from "axios";
+import { authAxios as axios } from '../utils/auth';
 
 const API_URL = "http://localhost:8080/auth"; // Cambia el puerto si tu backend usa otro
 const USUARIOS_URL = "http://localhost:8080/usuarios";
