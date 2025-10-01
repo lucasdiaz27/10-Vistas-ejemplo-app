@@ -21,12 +21,12 @@ export default function VistaUsuarios2() {
       try {
         const token = localStorage.getItem('token');
         const data = await traerUsuarios(token);
+        // Mapeamos los datos para la tabla, asegurando que 'nombre' y 'rol' sean strings simples
         setUsuarios(data.map(u => ({
+          ...u, // Pasamos todo el objeto de usuario para tener los datos de persona al editar
           id: u.id,
-          nombre: u.nombreUsuario || u.nombre,
-          email: u.email,
+          nombre: u.name || u.nombreUsuario || u.nombre,
           rol: (u.rol && typeof u.rol === 'object' && u.rol.nombre) ? u.rol.nombre : (typeof u.rol === 'string' ? u.rol : ''),
-          persona: u.persona 
         })));
       } catch (error) {
         alert('Error al traer usuarios: ' + error.message);
@@ -56,31 +56,31 @@ export default function VistaUsuarios2() {
   };
 
   const handleGuardarUsuario = (usuarioEditado) => {
+    // TODO: Implementar la llamada a la API para actualizar (PUT) el usuario.
     console.log("Guardando usuario editado:", usuarioEditado); 
     setUsuarios((prev) =>
-      prev.map((u) => (u.id === usuarioEditado.id ? { ...u, ...usuarioEditado } : u))
+      prev.map((u) => (u.id === usuarioEditado.id ? { ...u, ...usuarioEditado, nombre: usuarioEditado.name } : u))
     );
     cerrarModal();
   };
 
-  // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
+  // --- ¡AQUÍ ESTÁ LA LÓGICA CLAVE CORREGIDA! ---
   const handleCrearUsuario = async (nuevoUsuario) => {
     try {
       const token = localStorage.getItem('token');
       
-      // 'nuevoUsuario' ya viene con la estructura correcta { nombre, email, ..., persona: { ... } }
-      // Simplemente lo pasamos COMPLETO a la función de la API.
+      // 'nuevoUsuario' ya viene con la estructura plana y correcta desde el modal.
+      // Lo pasamos COMPLETO a la función de la API.
       const usuarioCreado = await crearUsuario(nuevoUsuario, token);
 
-      // Actualizamos el estado local con la respuesta del backend
+      // Actualizamos el estado local con la respuesta del backend para que la tabla se refresque
       setUsuarios((prev) => [
         ...prev,
         {
+          ...usuarioCreado,
           id: usuarioCreado.id || prev.length + 1,
-          nombre: usuarioCreado.nombreUsuario || nuevoUsuario.nombre,
-          email: usuarioCreado.email || nuevoUsuario.email,
+          nombre: usuarioCreado.name || nuevoUsuario.name,
           rol: usuarioCreado.rol?.nombre || nuevoUsuario.rol,
-          persona: usuarioCreado.persona || nuevoUsuario.persona,
         },
       ]);
       cerrarModal();
@@ -96,13 +96,7 @@ export default function VistaUsuarios2() {
         await eliminarUsuario(id, token);
         setUsuarios(usuarios.filter((u) => u.id !== id));
       } catch (error) {
-        if (error.response && error.response.status === 403) {
-          alert('No tienes permisos para eliminar usuarios. Inicia sesión como ADMIN.');
-        } else if (error.response && error.response.status === 401) {
-          alert('Sesión expirada o no autorizada. Por favor, vuelve a iniciar sesión.');
-        } else {
-          alert('Error al eliminar usuario: ' + (error.response?.data?.message || error.message));
-        }
+        alert('Error al eliminar usuario: ' + (error.response?.data?.message || error.message));
       }
     }
   };
@@ -123,10 +117,7 @@ export default function VistaUsuarios2() {
   const indiceFin = indiceInicio + elementosPorPagina;
   const usuariosPaginados = usuariosFiltrados.slice(indiceInicio, indiceFin);
 
-  const irAPagina = (pagina) => {
-    setPaginaActual(Math.max(1, Math.min(pagina, totalPaginas)));
-  };
-
+  const irAPagina = (pagina) => setPaginaActual(Math.max(1, Math.min(pagina, totalPaginas)));
   const cambiarElementosPorPagina = (cantidad) => {
     setElementosPorPagina(cantidad);
     setPaginaActual(1);
@@ -147,11 +138,11 @@ export default function VistaUsuarios2() {
     <div className="p-4 bg-white rounded shadow-sm">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold">Usuarios</h2>
-        <button className="btn btn-primary d-flex align-items-center px-3 py-2" style={{ fontSize: '1em', borderRadius: '0.5rem', minHeight: '40px', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }} onClick={() => abrirModal('nuevo')}>
+        <button className="btn btn-primary d-flex align-items-center px-3 py-2" style={{ fontSize: '1em', borderRadius: '0.5rem', minHeight: '40px' }} onClick={() => abrirModal('nuevo')}>
           <i className="bi bi-plus-lg me-2"></i> Nuevo Usuario
         </button>
       </div>
-      <div className="bg-light border p-3 mb-0" style={{ borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+      <div className="bg-light border p-3 mb-0" style={{ borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem', borderBottom: 0 }}>
         <div className="row g-2 align-items-center">
           <div className="col-md-6 col-12 mb-2 mb-md-0">
             <div className="position-relative">
@@ -162,14 +153,11 @@ export default function VistaUsuarios2() {
           <div className="col-md-3 col-12 mb-2 mb-md-0">
             <select className="form-select" value={rolFiltro} onChange={(e) => setRolFiltro(e.target.value)}>
               <option value="">Todos los roles</option>
-              {roles && roles.length > 0 && roles.map((rol) => (
-                <option key={rol.id || rol.nombre || rol} value={rol.nombre || rol}>{rol.nombre || rol}</option>
-              ))}
+              {roles.map((rol) => ( <option key={rol.id || rol} value={rol.nombre || rol}>{rol.nombre || rol}</option> ))}
             </select>
           </div>
           <div className="col-md-3 col-12">
             <select className="form-select" value={elementosPorPagina} onChange={e => cambiarElementosPorPagina(Number(e.target.value))}>
-              <option value={5}>5 por página</option>
               <option value={10}>10 por página</option>
               <option value={25}>25 por página</option>
               <option value={50}>50 por página</option>
@@ -177,7 +165,7 @@ export default function VistaUsuarios2() {
           </div>
         </div>
       </div>
-      <div style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: '0.5rem', borderBottomRightRadius: '0.5rem', overflow: 'hidden' }}>
+      <div style={{ overflow: 'hidden', borderBottomLeftRadius: '0.5rem', borderBottomRightRadius: '0.5rem' }}>
         <TablaUsuarios usuarios={usuariosPaginados} onEditar={(u) => abrirModal('editar', u)} onEliminar={handleEliminarUsuario} />
         {usuariosFiltrados.length > 0 && (
           <div className="bg-light border-top p-3">
