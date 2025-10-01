@@ -55,7 +55,7 @@ export const Formulario = () => {
         success: false,
         message: "No se pudo enviar el formulario.",
       });
-      console.log(error);
+  // console.log(error);
     } finally {
       setIsSubmitting(false);
     }

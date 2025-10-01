@@ -96,7 +96,7 @@ export default function DetalleExpediente() {
     setMostrarModalOrden(false);
   };
   const handlerModalOrden = () => {
-    console.log("Abrir modal para subir orden");
+  // console.log("Abrir modal para subir orden");
     setMostrarModalOrden(true);
   };
 
