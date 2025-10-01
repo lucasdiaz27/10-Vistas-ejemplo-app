@@ -10,10 +10,9 @@ export default function VistaUsuarios2() {
   const [usuarios, setUsuarios] = useState([]);
   const [filtro, setFiltro] = useState('');
   const [rolFiltro, setRolFiltro] = useState('');
-  const [modal, setModal] = useState(null); // 'nuevo' | 'editar'
+  const [modal, setModal] = useState(null);
   const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
   const [roles, setRoles] = useState([]);
-  // Estados para la paginación
   const [paginaActual, setPaginaActual] = useState(1);
   const [elementosPorPagina, setElementosPorPagina] = useState(10);
 
@@ -27,6 +26,7 @@ export default function VistaUsuarios2() {
           nombre: u.nombreUsuario || u.nombre,
           email: u.email,
           rol: (u.rol && typeof u.rol === 'object' && u.rol.nombre) ? u.rol.nombre : (typeof u.rol === 'string' ? u.rol : ''),
+          persona: u.persona 
         })));
       } catch (error) {
         alert('Error al traer usuarios: ' + error.message);
@@ -55,31 +55,32 @@ export default function VistaUsuarios2() {
     setUsuarioSeleccionado(null);
   };
 
-  // Actualiza el usuario en la lista después de editar
   const handleGuardarUsuario = (usuarioEditado) => {
+    console.log("Guardando usuario editado:", usuarioEditado); 
     setUsuarios((prev) =>
-      prev.map((u) => (u.id === usuarioEditado.id ? usuarioEditado : u))
+      prev.map((u) => (u.id === usuarioEditado.id ? { ...u, ...usuarioEditado } : u))
     );
     cerrarModal();
   };
 
-  // Agrega un nuevo usuario
+  // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
   const handleCrearUsuario = async (nuevoUsuario) => {
     try {
       const token = localStorage.getItem('token');
-      const usuarioCreado = await crearUsuario({
-        email: nuevoUsuario.email,
-        password: nuevoUsuario.password,
-        nombre: nuevoUsuario.nombre,
-        rol: nuevoUsuario.rol,
-      }, token);
+      
+      // 'nuevoUsuario' ya viene con la estructura correcta { nombre, email, ..., persona: { ... } }
+      // Simplemente lo pasamos COMPLETO a la función de la API.
+      const usuarioCreado = await crearUsuario(nuevoUsuario, token);
+
+      // Actualizamos el estado local con la respuesta del backend
       setUsuarios((prev) => [
         ...prev,
         {
           id: usuarioCreado.id || prev.length + 1,
-          nombre: usuarioCreado.nombre || usuarioCreado.name || nuevoUsuario.nombre || '',
-          email: usuarioCreado.email || nuevoUsuario.email || '',
-          rol: usuarioCreado.rol || (usuarioCreado.rol && usuarioCreado.rol.nombre) || nuevoUsuario.rol || ''
+          nombre: usuarioCreado.nombreUsuario || nuevoUsuario.nombre,
+          email: usuarioCreado.email || nuevoUsuario.email,
+          rol: usuarioCreado.rol?.nombre || nuevoUsuario.rol,
+          persona: usuarioCreado.persona || nuevoUsuario.persona,
         },
       ]);
       cerrarModal();
@@ -88,12 +89,10 @@ export default function VistaUsuarios2() {
     }
   };
 
-  // Elimina un usuario
   const handleEliminarUsuario = async (id) => {
     if (window.confirm('¿Seguro que deseas eliminar este usuario?')) {
       try {
         const token = localStorage.getItem('token');
-        console.log('Token para eliminar usuario:', token);
         await eliminarUsuario(id, token);
         setUsuarios(usuarios.filter((u) => u.id !== id));
       } catch (error) {
@@ -110,50 +109,37 @@ export default function VistaUsuarios2() {
 
   const usuariosFiltrados = useMemo(() => {
     return usuarios.filter(u => {
+      const uRol = (typeof u.rol === 'object' && u.rol !== null) ? u.rol.nombre : u.rol;
       const coincideTexto = u.nombre.toLowerCase().includes(filtro.toLowerCase()) ||
                             u.email.toLowerCase().includes(filtro.toLowerCase()) ||
-                            u.rol.toLowerCase().includes(filtro.toLowerCase());
-      const coincideRol = rolFiltro === '' || u.rol === rolFiltro;
+                            (uRol && uRol.toLowerCase().includes(filtro.toLowerCase()));
+      const coincideRol = rolFiltro === '' || uRol === rolFiltro;
       return coincideTexto && coincideRol;
     });
   }, [usuarios, filtro, rolFiltro]);
-
-  // Calcular datos de paginación
+  
   const totalPaginas = Math.ceil(usuariosFiltrados.length / elementosPorPagina);
   const indiceInicio = (paginaActual - 1) * elementosPorPagina;
   const indiceFin = indiceInicio + elementosPorPagina;
   const usuariosPaginados = usuariosFiltrados.slice(indiceInicio, indiceFin);
 
-  // Funciones de paginación
   const irAPagina = (pagina) => {
     setPaginaActual(Math.max(1, Math.min(pagina, totalPaginas)));
   };
 
   const cambiarElementosPorPagina = (cantidad) => {
     setElementosPorPagina(cantidad);
-    setPaginaActual(1); // Resetear a la primera página
+    setPaginaActual(1);
   };
 
-  // Generar números de página para mostrar
   const generarNumerosPagina = () => {
     const numeros = [];
-    const rango = 2; // Mostrar 2 páginas antes y después de la actual
-    
+    const rango = 2;
     let inicio = Math.max(1, paginaActual - rango);
     let fin = Math.min(totalPaginas, paginaActual + rango);
-    
-    // Ajustar el rango si estamos cerca del inicio o final
-    if (paginaActual <= rango) {
-      fin = Math.min(totalPaginas, 2 * rango + 1);
-    }
-    if (paginaActual > totalPaginas - rango) {
-      inicio = Math.max(1, totalPaginas - 2 * rango);
-    }
-    
-    for (let i = inicio; i <= fin; i++) {
-      numeros.push(i);
-    }
-    
+    if (paginaActual <= rango) fin = Math.min(totalPaginas, 2 * rango + 1);
+    if (paginaActual > totalPaginas - rango) inicio = Math.max(1, totalPaginas - 2 * rango);
+    for (let i = inicio; i <= fin; i++) numeros.push(i);
     return numeros;
   };
 
@@ -170,35 +156,19 @@ export default function VistaUsuarios2() {
           <div className="col-md-6 col-12 mb-2 mb-md-0">
             <div className="position-relative">
               <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-              <input
-                type="text"
-                className="form-control ps-5"
-                placeholder="Buscar por nombre, correo o rol"
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
-              />
+              <input type="text" className="form-control ps-5" placeholder="Buscar por nombre, correo o rol" value={filtro} onChange={(e) => setFiltro(e.target.value)} />
             </div>
           </div>
           <div className="col-md-3 col-12 mb-2 mb-md-0">
-            <select
-              className="form-select"
-              value={rolFiltro}
-              onChange={(e) => setRolFiltro(e.target.value)}
-            >
+            <select className="form-select" value={rolFiltro} onChange={(e) => setRolFiltro(e.target.value)}>
               <option value="">Todos los roles</option>
               {roles && roles.length > 0 && roles.map((rol) => (
-                <option key={rol.id || rol.nombre || rol} value={rol.nombre || rol}>
-                  {rol.nombre || rol}
-                </option>
+                <option key={rol.id || rol.nombre || rol} value={rol.nombre || rol}>{rol.nombre || rol}</option>
               ))}
             </select>
           </div>
           <div className="col-md-3 col-12">
-            <select
-              className="form-select"
-              value={elementosPorPagina}
-              onChange={e => cambiarElementosPorPagina(Number(e.target.value))}
-            >
+            <select className="form-select" value={elementosPorPagina} onChange={e => cambiarElementosPorPagina(Number(e.target.value))}>
               <option value={5}>5 por página</option>
               <option value={10}>10 por página</option>
               <option value={25}>25 por página</option>
@@ -209,65 +179,18 @@ export default function VistaUsuarios2() {
       </div>
       <div style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: '0.5rem', borderBottomRightRadius: '0.5rem', overflow: 'hidden' }}>
         <TablaUsuarios usuarios={usuariosPaginados} onEditar={(u) => abrirModal('editar', u)} onEliminar={handleEliminarUsuario} />
-        
-        {/* Controles de paginación */}
         {usuariosFiltrados.length > 0 && (
           <div className="bg-light border-top p-3">
             <div className="d-flex justify-content-between align-items-center">
-              <div className="text-muted">
-                Mostrando {indiceInicio + 1} a {Math.min(indiceFin, usuariosFiltrados.length)} de {usuariosFiltrados.length} usuarios
-              </div>
+              <div className="text-muted">Mostrando {indiceInicio + 1} a {Math.min(indiceFin, usuariosFiltrados.length)} de {usuariosFiltrados.length} usuarios</div>
               {totalPaginas > 1 && (
                 <nav>
                   <ul className="pagination pagination-sm mb-0">
-                    <li className={`page-item ${paginaActual === 1 ? 'disabled' : ''}`}>
-                      <button 
-                        className="page-link" 
-                        onClick={() => irAPagina(1)}
-                        disabled={paginaActual === 1}
-                      >
-                        <i className="bi bi-chevron-double-left"></i>
-                      </button>
-                    </li>
-                    <li className={`page-item ${paginaActual === 1 ? 'disabled' : ''}`}>
-                      <button 
-                        className="page-link" 
-                        onClick={() => irAPagina(paginaActual - 1)}
-                        disabled={paginaActual === 1}
-                      >
-                        <i className="bi bi-chevron-left"></i>
-                      </button>
-                    </li>
-                    
-                    {generarNumerosPagina().map(numero => (
-                      <li key={numero} className={`page-item ${numero === paginaActual ? 'active' : ''}`}>
-                        <button 
-                          className="page-link" 
-                          onClick={() => irAPagina(numero)}
-                        >
-                          {numero}
-                        </button>
-                      </li>
-                    ))}
-                    
-                    <li className={`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`}>
-                      <button 
-                        className="page-link" 
-                        onClick={() => irAPagina(paginaActual + 1)}
-                        disabled={paginaActual === totalPaginas}
-                      >
-                        <i className="bi bi-chevron-right"></i>
-                      </button>
-                    </li>
-                    <li className={`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`}>
-                      <button 
-                        className="page-link" 
-                        onClick={() => irAPagina(totalPaginas)}
-                        disabled={paginaActual === totalPaginas}
-                      >
-                        <i className="bi bi-chevron-double-right"></i>
-                      </button>
-                    </li>
+                    <li className={`page-item ${paginaActual === 1 ? 'disabled' : ''}`}><button className="page-link" onClick={() => irAPagina(1)} disabled={paginaActual === 1}><i className="bi bi-chevron-double-left"></i></button></li>
+                    <li className={`page-item ${paginaActual === 1 ? 'disabled' : ''}`}><button className="page-link" onClick={() => irAPagina(paginaActual - 1)} disabled={paginaActual === 1}><i className="bi bi-chevron-left"></i></button></li>
+                    {generarNumerosPagina().map(numero => (<li key={numero} className={`page-item ${numero === paginaActual ? 'active' : ''}`}><button className="page-link" onClick={() => irAPagina(numero)}>{numero}</button></li>))}
+                    <li className={`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`}><button className="page-link" onClick={() => irAPagina(paginaActual + 1)} disabled={paginaActual === totalPaginas}><i className="bi bi-chevron-right"></i></button></li>
+                    <li className={`page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`}><button className="page-link" onClick={() => irAPagina(totalPaginas)} disabled={paginaActual === totalPaginas}><i className="bi bi-chevron-double-right"></i></button></li>
                   </ul>
                 </nav>
               )}
@@ -276,14 +199,9 @@ export default function VistaUsuarios2() {
         )}
       </div>
       {modal && (
-        <ModalUsuario
-          tipo={modal}
-          usuario={usuarioSeleccionado}
-          onClose={cerrarModal}
-          onGuardar={modal === 'editar' ? handleGuardarUsuario : handleCrearUsuario}
-          roles={roles}
-        />
+        <ModalUsuario tipo={modal} usuario={usuarioSeleccionado} onClose={cerrarModal} onGuardar={modal === 'editar' ? handleGuardarUsuario : handleCrearUsuario} roles={roles} />
       )}
     </div>
   );
 }
+
