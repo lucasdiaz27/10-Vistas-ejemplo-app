@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/auth"; // Cambia el puerto si tu backend usa otro
+const API_URL = "http://localhost:8080/auth"; 
 const USUARIOS_URL = "http://localhost:8080/usuarios";
 
 export async function crearUsuario({ email, password, nombre, rol }, token) {

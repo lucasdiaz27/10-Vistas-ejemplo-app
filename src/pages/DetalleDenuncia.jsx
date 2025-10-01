@@ -134,7 +134,7 @@ export const DetalleDenuncia = () => {
     setPdfUrl(url);
     setArchivoSeleccionado(archivo);
     //window.open(url);
-    //console.log(blob.size);
+  // console.log(blob.size);
   };
 
   const handleEnviarMotivo = async () => {

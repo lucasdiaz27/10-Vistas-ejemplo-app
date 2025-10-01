@@ -56,7 +56,7 @@ export default function VistaUsuarios2() {
   };
 
   const handleGuardarUsuario = (usuarioEditado) => {
-    console.log("Guardando usuario editado:", usuarioEditado); 
+  // console.log("Guardando usuario editado:", usuarioEditado); 
     setUsuarios((prev) =>
       prev.map((u) => (u.id === usuarioEditado.id ? { ...u, ...usuarioEditado } : u))
     );
