@@ -114,7 +114,7 @@ export const SideBar = ({ abierto, setAbierto }) => {
                 </Link>
               </li>
               {rol ==
-                "ADMIN" && (
+                "DIRECCION" && (
                   <li>
                     <Link
                       to="/menu-interno?vista=usuarios"
