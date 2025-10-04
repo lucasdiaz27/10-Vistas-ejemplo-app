@@ -3,7 +3,10 @@
 import { useEffect, useState, useMemo } from 'react';
 import TablaUsuarios from './TablaUsuarios';
 import ModalUsuario from './modales/ModalUsuario';
-import { crearUsuario, traerUsuarios, eliminarUsuario } from '../../apis/apiUsuarios';
+// --- CAMBIO 1: Quitamos la vieja función 'crearUsuario' de aquí ---
+import { traerUsuarios, eliminarUsuario } from '../../apis/apiUsuarios'; 
+// --- CAMBIO 2: ¡Importamos la función correcta desde tu apiAuth.js! ---
+import { registerUsuario } from '../../apis/apiAuth'; 
 import { traerRoles } from '../../apis/apiRoles';
 
 export default function VistaUsuarios2() {
@@ -21,9 +24,8 @@ export default function VistaUsuarios2() {
       try {
         const token = localStorage.getItem('token');
         const data = await traerUsuarios(token);
-        // Mapeamos los datos para la tabla, asegurando que 'nombre' y 'rol' sean strings simples
         setUsuarios(data.map(u => ({
-          ...u, // Pasamos todo el objeto de usuario para tener los datos de persona al editar
+          ...u,
           id: u.id,
           nombre: u.name || u.nombreUsuario || u.nombre,
           rol: (u.rol && typeof u.rol === 'object' && u.rol.nombre) ? u.rol.nombre : (typeof u.rol === 'string' ? u.rol : ''),
@@ -57,35 +59,32 @@ export default function VistaUsuarios2() {
 
   const handleGuardarUsuario = (usuarioEditado) => {
     // TODO: Implementar la llamada a la API para actualizar (PUT) el usuario.
-    console.log("Guardando usuario editado:", usuarioEditado); 
+    console.log("Guardando usuario editado:", usuarioEditado);
     setUsuarios((prev) =>
       prev.map((u) => (u.id === usuarioEditado.id ? { ...u, ...usuarioEditado, nombre: usuarioEditado.name } : u))
     );
     cerrarModal();
   };
-
-  // --- ¡AQUÍ ESTÁ LA LÓGICA CLAVE CORREGIDA! ---
+  
   const handleCrearUsuario = async (nuevoUsuario) => {
     try {
-      const token = localStorage.getItem('token');
-      
-      // 'nuevoUsuario' ya viene con la estructura plana y correcta desde el modal.
-      // Lo pasamos COMPLETO a la función de la API.
-      const usuarioCreado = await crearUsuario(nuevoUsuario, token);
+      // 'nuevoUsuario' ya tiene el formato plano correcto desde el modal.
+      // Lo pasamos COMPLETO a nuestra nueva función de registro.
+      const usuarioCreado = await registerUsuario(nuevoUsuario);
 
-      // Actualizamos el estado local con la respuesta del backend para que la tabla se refresque
+      // Actualizamos la tabla con la respuesta del backend
       setUsuarios((prev) => [
         ...prev,
         {
-          ...usuarioCreado,
-          id: usuarioCreado.id || prev.length + 1,
-          nombre: usuarioCreado.name || nuevoUsuario.name,
-          rol: usuarioCreado.rol?.nombre || nuevoUsuario.rol,
+          ...usuarioCreado.data,
+          id: usuarioCreado.data.id || prev.length + 1,
+          nombre: usuarioCreado.data.name || nuevoUsuario.name,
+          rol: usuarioCreado.data.rol?.nombre || nuevoUsuario.rol,
         },
       ]);
       cerrarModal();
     } catch (error) {
-      alert('Error al crear usuario: ' + error.message);
+      alert('Error al crear usuario: ' + (error.response?.data?.message || error.message));
     }
   };
 
