@@ -32,16 +32,13 @@ const isTokenExpired = (token) => {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
     const parsed = JSON.parse(jsonPayload);
-    // Cambiar a 1 minuto desde la emisión del token
-    const issueTime = parsed.iat * 1000; // tiempo de emisión en milisegundos
-    const oneMinute = 1 * 60 * 1000; // 1 minuto en milisegundos
-    const forcedExpirationTime = issueTime + oneMinute;
+    const expirationTime = parsed.exp * 1000; // tiempo de expiración en milisegundos
+    const currentTime = Date.now();
     
-    console.log('Token emitido:', new Date(issueTime).toLocaleString());
-    console.log('Forzando expiración:', new Date(forcedExpirationTime).toLocaleString());
-    console.log('Tiempo actual:', new Date().toLocaleString());
+    console.log('Token expira:', new Date(expirationTime).toLocaleString());
+    console.log('Tiempo actual:', new Date(currentTime).toLocaleString());
     
-    return Date.now() >= forcedExpirationTime;
+    return currentTime >= expirationTime;
   } catch (error) {
     console.error('Error al decodificar token:', error);
     return true;
@@ -52,6 +49,9 @@ const isTokenExpired = (token) => {
 axiosInstance.interceptors.request.use(
   (config) => {
     console.log('Interceptor de petición ejecutándose');
+    if (config.url.includes('auth/login')) {
+      return config;
+    }
     const token = localStorage.getItem('token');
     if (token) {
       // Verificar si el token está expirado antes de usarlo
@@ -95,6 +95,15 @@ axiosInstance.interceptors.response.use(
     });
     const originalRequest = error.config;
 
+
+    // si el error es 403, redirigimos al login directamente
+    if (error.response?.status === 403) {
+      console.log('🚫 Acceso prohibido (403), redirigiendo al login');
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
 
     // si el error no es 401 o ya intentamos refrescar el token, rechazamos
     if (error.response?.status !== 401 || originalRequest._retry) {
