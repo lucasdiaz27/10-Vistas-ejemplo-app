@@ -21,6 +21,7 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+
 // función para verificar si un token está expirado
 const isTokenExpired = (token) => {
   if (!token) return true;
@@ -31,16 +32,15 @@ const isTokenExpired = (token) => {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
     const parsed = JSON.parse(jsonPayload);
-    // Forzar expiración después de 15 minutos desde la emisión del token
+    // Cambiar a 1 minuto desde la emisión del token
     const issueTime = parsed.iat * 1000; // tiempo de emisión en milisegundos
-    const fifteenMinutes = 15 * 60 * 1000; // 15 minutos en milisegundos
-    const forcedExpirationTime = issueTime + fifteenMinutes;
+    const oneMinute = 1 * 60 * 1000; // 1 minuto en milisegundos
+    const forcedExpirationTime = issueTime + oneMinute;
     
     console.log('Token emitido:', new Date(issueTime).toLocaleString());
     console.log('Forzando expiración:', new Date(forcedExpirationTime).toLocaleString());
     console.log('Tiempo actual:', new Date().toLocaleString());
     
-    // El token expirará después de 15 minutos de su emisión
     return Date.now() >= forcedExpirationTime;
   } catch (error) {
     console.error('Error al decodificar token:', error);
@@ -56,38 +56,49 @@ axiosInstance.interceptors.request.use(
     if (token) {
       // Verificar si el token está expirado antes de usarlo
       const expired = isTokenExpired(token);
-      console.log('Estado del token:', { 
-        expired,
-        tiempoRestante: token ? new Date(JSON.parse(atob(token.split('.')[1])).exp * 1000) - Date.now() : 'N/A'
-      });
+      console.log('Estado del token:', { expired,
+        url: config.url,
+        isRefreshUrl: config.url.includes('/auth/refresh') });
+      
+      if (expired && !config.url.includes('/auth/refresh')) {
+        console.log('⚠️ Token expirado, se lanzará error 401');
+        // En lugar de throw axios.Cancel, retornamos Promise.reject
+        return Promise.reject({
+          response: { status: 401 },
+          config: config
+        });
+      }
       
       config.headers.Authorization = `Bearer ${token}`;
       console.log('Token agregado a la petición');
-    } else {
-      console.log('No hay token disponible');
-    }
+    } 
     return config;
   },
   (error) => {
+    console.log(' Error en interceptor de petición:', error);
     return Promise.reject(error);
   }
 );
+
+
 
 // interceptor para las respuestas
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    console.log('Interceptor error:', {
+    console.log('🚨 Interceptor error:', {
       status: error.response?.status,
       url: error.config?.url,
       message: error.response?.data?.message || error.message,
-      headers: error.config?.headers
+      isRetry: error.config?._retry,
+      isRefreshing
     });
     const originalRequest = error.config;
 
+
     // si el error no es 401 o ya intentamos refrescar el token, rechazamos
     if (error.response?.status !== 401 || originalRequest._retry) {
-      console.log('No intentamos refresh porque:', {
+      console.log('❌ No intentamos refresh porque:', {
         status: error.response?.status,
         alreadyRetried: originalRequest._retry
       });
@@ -96,10 +107,12 @@ axiosInstance.interceptors.response.use(
 
     // si ya estamos refrescando, agregamos la petición a la cola
     if (isRefreshing) {
+      console.log('⏳ Refresh en proceso, agregando petición a cola');
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       })
         .then(token => {
+          console.log('✅ Usando nuevo token de la cola');
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return axiosInstance(originalRequest);
         })
@@ -112,40 +125,43 @@ axiosInstance.interceptors.response.use(
     const refreshToken = localStorage.getItem('refreshToken');
     
     if (!refreshToken) {
-      // si no hay refresh token, redirigimos al login
+      console.log('❌ No hay refresh token disponible');
+      isRefreshing = false;
       window.location.href = '/login';
       return Promise.reject(error);
     }
 
     try {
-      console.log('Intentando refresh token...');
-      // intentamos obtener un nuevo token
+      console.log('🔄 Iniciando refresh token silencioso...');
       const response = await axios.create().post('http://localhost:8080/auth/refresh', null, {
         headers: {
           Authorization: `Bearer ${refreshToken}`
         }
       });
-      console.log('Refresh token exitoso');
+      console.log('✅ Refresh token exitoso');
 
       const { access_token: newToken, refresh_token: newRefreshToken } = response.data;
       
-      // guardamos los nuevos tokens
       localStorage.setItem('token', newToken);
       localStorage.setItem('refreshToken', newRefreshToken);
       
-      // actualizamos el header de la petición original
       originalRequest.headers.Authorization = `Bearer ${newToken}`;
       
-      // procesamos la cola de peticiones pendientes
       processQueue(null, newToken);
+      console.log('✅ Cola de peticiones procesada con éxito');
       
       return axiosInstance(originalRequest);
     } catch (refreshError) {
+      console.log('❌ Error fatal durante el refresh:', refreshError);
       processQueue(refreshError, null);
-      // si falla el refresh, limpiamos todo y redirigimos al login
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      window.location.href = '/login';
+      
+    if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+        console.log('🚪 Refresh token inválido o expirado, redirigiendo al login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+      }
+      
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
