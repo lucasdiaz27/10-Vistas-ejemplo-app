@@ -155,11 +155,11 @@ const MesaEntradaTabla = ({ denuncias, filtroEstado, setFiltroEstado, busquedaDe
                     <td colSpan={8} className="text-center text-muted">No hay denuncias que coincidan con el filtro.</td>
                   </tr>
                 ) : (
-                  denunciasPaginadas.map((d) => {
+                  denunciasPaginadas.map((d, idx) => {
                     const estadoKey = (d.estado || "").toLowerCase().trim();
                     const estado = estadoConfig[estadoKey] || { label: d.estado || "Sin estado", color: "secondary" };
                     return (
-                      <tr key={d.id}>
+                      <tr key={idx}>
                         <td>{d.id}</td>
                         <td>{d.solicitante}</td>
                         <td>{d.objeto}</td>
