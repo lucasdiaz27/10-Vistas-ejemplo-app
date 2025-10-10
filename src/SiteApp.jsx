@@ -22,6 +22,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import SideBar from "./components/SideBar";
 import { useState } from "react";
 import PrivateRoute from "./routes/PrivateRoute";
+import ProtectedRoute from "./routes/RutaProtegida";
 import GeneradorPDF from "./components/pdf/GeneradorPDF";
 import { Navbar } from "react-bootstrap";
 import { InternalLayout } from "./routes/InternalLayout";
@@ -43,21 +44,23 @@ function SiteApp() {
           }
         >
           <Route path="/" element={<Inicio />} />
-    <Route path="/modal" element={<ModalPdf />} />
-    <Route path="/formulario" element={<Formulario />} />
-    <Route path="/formularioPersona" element={<FormPersona />} />
-    <Route path="/consulta" element={<Consulta />} />
-    <Route path="/login" element={<Login />} />
-    <Route path="/PaginaTerminos" element={<PaginaTerminos />} />
+          <Route path="/modal" element={<ModalPdf />} />
+          <Route path="/formulario" element={<Formulario />} />
+          <Route path="/formularioPersona" element={<FormPersona />} />
+          <Route path="/consulta" element={<Consulta />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/PaginaTerminos" element={<PaginaTerminos />} />
         </Route>
 
-        {/* Paginas Internos con NavBarInterno */}
-        <Route element={<PrivateRoute> <InternalLayout/> </PrivateRoute>}>
-          <Route path="/menu-interno" element={<MenuInterno />} />
-          <Route path="/lista-denuncias" element={<><ListaDenuncias /></>}/>
-          <Route path="/denuncia/:id" element={<><DetalleDenunciaPage /></>}/>
-          <Route path="/expedientes/:id" element={<DetalleExpediente />} />
-          <Route path="/ajustes" element={<Ajustes />} />
+        {/* Páginas internas protegidas con roles */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<InternalLayout />}>
+            <Route path="/menu-interno" element={<MenuInterno />} />
+            <Route path="/lista-denuncias" element={<ListaDenuncias />} />
+            <Route path="/denuncia/:id" element={<DetalleDenunciaPage />} />
+            <Route path="/expedientes/:id" element={<DetalleExpediente />} />
+            <Route path="/ajustes" element={<Ajustes />} />
+          </Route>
         </Route>
 
         {/* NUEVO: Ruta protegida para probar el generador de PDF */}

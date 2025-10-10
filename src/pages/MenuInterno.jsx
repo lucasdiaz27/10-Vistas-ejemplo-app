@@ -117,7 +117,7 @@ const MenuInterno = () => {
     if (vista === "mesa-entrada" && denuncias.length === 0) {
       setDenuncias([
         {
-          id: 101,
+          /*id: 101,
           solicitante: "Juan Pérez",
           objeto: "Ruidos molestos",
           motivo: "Vecino con música alta",
@@ -126,7 +126,7 @@ const MenuInterno = () => {
           fechaIngreso: "2025-06-04",
           estado: "Pendiente",
           archivo: null,
-        },
+        */ } /*,
         {
           id: 102,
           solicitante: "Ana Gómez",
@@ -147,7 +147,7 @@ const MenuInterno = () => {
           fechaIngreso: "2025-06-02",
           estado: "Rechazada",
           archivo: null,
-        },
+        },*/
       ]);
     }
   }, [vista, denuncias.length]);
