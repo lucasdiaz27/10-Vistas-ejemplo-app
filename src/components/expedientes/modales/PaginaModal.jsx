@@ -1,5 +1,7 @@
 import { useState } from "react";
 import ReactQuill from "react-quill";
+import { pdf } from "@react-pdf/renderer";
+import { DocumentoPDF } from "./DocumentoPDF";
 import "react-quill/dist/quill.snow.css";
 
 const textosPredeterminados = {
@@ -8,22 +10,37 @@ const textosPredeterminados = {
   otro: "Otro texto predeterminado...",
 };
 
-export const PaginaModal =({handleSubmit, show, onClose}) => {
+export const PaginaModal = ({ handleSubmit, show, onClose }) => {
   const [tipo, setTipo] = useState("");
   const [texto, setTexto] = useState("");
+
   const handleTipoChange = (e) => {
     const value = e.target.value;
     setTipo(value);
     setTexto(textosPredeterminados[value] || "");
   };
 
- // maneja el envio del form
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    handleSubmit({
-      tipo,
-      texto: texto.replace(/<[^>]+>/g, '') // remover tags HTML del editor
-    });
+    handleSubmit({ tipo, texto: texto.replace(/<[^>]+>/g, "") });
+  };
+
+  // nueva función para generar PDF y abrir firma
+  const handleGenerarFirma = async () => {
+    if (!tipo || !texto) return;
+
+    // crear blob del PDF
+    const blob = await pdf(<DocumentoPDF tipo={tipo} contenido={texto} />).toBlob();
+    const pdfUrl = URL.createObjectURL(blob);
+
+    // descargar PDF
+    const a = document.createElement("a");
+    a.href = pdfUrl;
+    a.download = "documento.pdf";
+    a.click();
+
+    // Abrir página de firma en nueva pestaña
+    window.open("https://firmar.gob.ar/firmador/#/", "_blank");
   };
 
   return (
@@ -36,11 +53,7 @@ export const PaginaModal =({handleSubmit, show, onClose}) => {
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">Nuevo Documento</h5>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={onClose}
-            ></button>
+            <button type="button" className="btn-close" onClick={onClose}></button>
           </div>
           <div className="modal-body">
             <form onSubmit={handleFormSubmit}>
@@ -60,35 +73,43 @@ export const PaginaModal =({handleSubmit, show, onClose}) => {
               </div>
               <div className="mb-3">
                 <label className="form-label">Contenido del Documento</label>
-                <ReactQuill 
-                  value={texto} 
-                  onChange={setTexto} 
+                <ReactQuill
+                  value={texto}
+                  onChange={setTexto}
                   theme="snow"
                   modules={{
                     toolbar: [
-                      [{ 'header': [1, 2, 3, false] }],
-                      ['bold', 'italic', 'underline'],
-                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                      [{ 'align': [] }],
-                      ['clean']
-                    ]
+                      [{ header: [1, 2, 3, false] }],
+                      ["bold", "italic", "underline"],
+                      [{ list: "ordered" }, { list: "bullet" }],
+                      [{ align: [] }],
+                      ["clean"],
+                    ],
                   }}
                 />
               </div>
-              <div className="text-end mt-4">
+              <div className="text-end mt-4 d-flex justify-content-end gap-2">
                 <button
                   type="button"
-                  className="btn btn-secondary me-2"
+                  className="btn btn-secondary"
                   onClick={onClose}
                 >
                   Cancelar
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn btn-primary"
                   disabled={!tipo || !texto}
                 >
                   Generar PDF
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={handleGenerarFirma}
+                  disabled={!tipo || !texto}
+                >
+                  Generar Firma
                 </button>
               </div>
             </form>
@@ -97,7 +118,4 @@ export const PaginaModal =({handleSubmit, show, onClose}) => {
       </div>
     </div>
   );
-}
-
-
-//mucha paja explicar pero bueno no es la grna modificacion
+};
