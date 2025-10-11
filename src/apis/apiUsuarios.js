@@ -1,39 +1,73 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/auth"; 
-const USUARIOS_URL = "http://localhost:8080/usuarios";
+const API_URL = "http://localhost:8080/usuarios";
 
-export async function crearUsuario({ email, password, nombre, rol }, token) {
-  const res = await axios.post(
-    `${API_URL}/register`,
-    {
-      email,
-      password,
-      name: nombre, // El backend espera 'name'
-      rol,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    }
-  );
+// --- FUNCIONES PARA LA GESTIÓN DE USUARIOS (VISTA ADMIN) ---
+
+export async function traerUsuarios(token) {
+  const res = await axios.get(`${API_URL}/traerUsuarios`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.data;
 }
 
-export async function traerUsuarios(token) {
-  const res = await axios.get(`${USUARIOS_URL}/traerUsuarios`, {
+export async function traerUsuarioPorId(usuarioId, token) {
+  const res = await axios.get(`${API_URL}/${usuarioId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+export async function actualizarUsuario(usuarioId, datosUsuario, token) {
+  const res = await axios.put(`${API_URL}/${usuarioId}`, datosUsuario, {
     headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     },
   });
   return res.data;
 }
 
 export async function eliminarUsuario(usuarioId, token) {
-  const res = await axios.delete(`${USUARIOS_URL}/borrar/${usuarioId}`, {
+  const res = await axios.delete(`${API_URL}/borrar/${usuarioId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 }
+
+// --- FUNCIONES PARA EL PERFIL DEL USUARIO LOGUEADO (VISTA AJUSTES) ---
+
+export const obtenerPerfilUsuario = async (token) => {
+  const response = await axios.get(`${API_URL}/perfilUsuario`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+export const actualizarPerfilUsuario = async (datosPerfil, token) => {
+  const response = await axios.put(
+    `${API_URL}/actualizarNombre`,
+    datosPerfil,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+    }
+  );
+  return response.data;
+};
+
+export const cambiarPassword = async (passwords, token) => {
+  const response = await axios.put(
+    `${API_URL}/cambiarPassword`,
+    passwords,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+    }
+  );
+  return response.data;
+};

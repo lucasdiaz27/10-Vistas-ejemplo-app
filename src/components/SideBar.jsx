@@ -102,7 +102,7 @@ export const SideBar = ({ abierto, setAbierto }) => {
                                     Pases
                                 </Link>
                             </li> */}
-              {rol == "DIRECCION" || rol == "ABOGADOS" || rol == "ASESORIA_LEGAL" && (
+              {(rol === "DIRECCION" || rol === "ABOGADOS" || rol === "ASESORIA_LEGAL") && (
                 <li>
                   <Link
                     to="/menu-interno?vista=expedientes"

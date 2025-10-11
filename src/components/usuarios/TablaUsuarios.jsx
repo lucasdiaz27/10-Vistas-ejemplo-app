@@ -1,4 +1,5 @@
 import { parseJwt } from '../../utils/auth';
+import PropTypes from 'prop-types';
 
 function TablaUsuarios({ usuarios, onEditar, onEliminar }) {
   // Obtener el rol del usuario logueado desde el token
@@ -29,7 +30,7 @@ function TablaUsuarios({ usuarios, onEditar, onEliminar }) {
         <tbody>
           {usuarios.map((u, idx) => (
             <tr key={u.id ?? idx}>
-              <td>{u.nombre}</td>
+              <td>{u.username || u.name || u.nombre || u.nombreUsuario}</td>
               <td>{u.email}</td>
               <td>{typeof u.rol === 'object' && u.rol !== null ? u.rol.nombre : u.rol}</td>
               <td className="text-end">
@@ -62,5 +63,24 @@ function TablaUsuarios({ usuarios, onEditar, onEliminar }) {
     </div>
   );
 }
+
+TablaUsuarios.propTypes = {
+  usuarios: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    username: PropTypes.string,
+    name: PropTypes.string,
+    nombre: PropTypes.string,
+    nombreUsuario: PropTypes.string,
+    email: PropTypes.string,
+    rol: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({
+        nombre: PropTypes.string
+      })
+    ])
+  })).isRequired,
+  onEditar: PropTypes.func.isRequired,
+  onEliminar: PropTypes.func.isRequired
+};
 
 export default TablaUsuarios;

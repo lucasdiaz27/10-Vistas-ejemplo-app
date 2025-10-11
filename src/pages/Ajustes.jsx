@@ -1,95 +1,82 @@
+// src/pages/Ajustes.jsx (VERSIÓN FINAL Y COMPLETA)
+
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import { obtenerPerfilUsuario, actualizarNombre, cambiarPassword } from "../apis/usuarioAPI";
-
+import { obtenerPerfilUsuario, actualizarPerfilUsuario, cambiarPassword } from "../apis/apiUsuarios";
 
 const Ajustes = () => {
-
+  // Estados para manejar la UI, carga y errores
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
   const [tab, setTab] = useState("personal");
-  const [form, setForm] = useState({
-    nombre: "",
-    email: "",
-    rol: "",
-  });
+  const [form, setForm] = useState(null);
   const [passwords, setPasswords] = useState({ actual: "", nueva: "", repetir: "" });
-  const [notificaciones, setNotificaciones] = useState({ correo: true, sistema: true });
-  const [tema, setTema] = useState("claro");
-  const [privacidad, setPrivacidad] = useState({ mostrarEmail: true, mostrarTelefono: false });
 
-
-  // Cargar perfil del usuario al iniciar
+  // useEffect para cargar los datos del perfil del usuario logueado
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    obtenerPerfilUsuario(token)
-      .then((data) => {
-        setForm({
-          nombre: data.nombre || "",
-          email: data.email || "",
-          rol: data.area || "",
-        });
-      })
-      .catch((err) => {
-        console.error("Error al obtener el perfil:", err);
-        Swal.fire("Error", "No se pudo cargar el perfil.", "error");
-      });
+    const cargarPerfil = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("Token no encontrado. Por favor, inicie sesión de nuevo.");
+        const data = await obtenerPerfilUsuario(token);
+        setForm(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setCargando(false);
+      }
+    };
+    cargarPerfil();
   }, []);
 
-  // Manejo de cambios en el formulario
-  const handleGuardarCambios = () => {
-    const token = localStorage.getItem("token");
-    actualizarNombre(form.nombre, token)
-      .then((msg) => {
-        Swal.fire("Éxito", msg, "success");
-      })
-      .catch(() => {
-        Swal.fire("Error", "No se pudo guardar el nombre", "error");
-      });
+  // Funciones para manejar los cambios y envíos de los formularios
+  const handleFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handlePasswordChange = (e) => setPasswords({ ...passwords, [e.target.name]: e.target.value });
+
+  const handleGuardarCambios = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const { email, area, ...datosParaActualizar } = form;
+      const mensaje = await actualizarPerfilUsuario(datosParaActualizar, token);
+      Swal.fire("¡Éxito!", mensaje, "success");
+    } catch (err) {
+      Swal.fire("Error", err.response?.data || "No se pudieron guardar los cambios.", "error");
+    }
   };
 
-// Manejo de cambio de contraseña
-  const handlePasswordSubmit = () => {
+  const handlePasswordSubmit = async () => {
     if (passwords.nueva !== passwords.repetir) {
       Swal.fire("Error", "Las nuevas contraseñas no coinciden.", "error");
       return;
     }
-
+    // Lógica de SweetAlert para confirmar
     Swal.fire({
       title: "¿Estás seguro?",
-      text: "¿Deseas cambiar tu contraseña?",
+      text: "Esta acción cambiará tu contraseña.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Sí, cambiar",
       cancelButtonText: "Cancelar",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const token = localStorage.getItem("token");
-        cambiarPassword(passwords, token)
-          .then((msg) => {
-            Swal.fire("Éxito", msg, "success");
-            setPasswords({ actual: "", nueva: "", repetir: "" });
-          })
-          .catch((err) => {
-            const msg = err.response?.data || "No se pudo cambiar la contraseña";
-            Swal.fire("Error", msg, "error");
-          });
+        try {
+          const token = localStorage.getItem("token");
+          const msg = await cambiarPassword(passwords, token);
+          Swal.fire("Éxito", msg, "success");
+          setPasswords({ actual: "", nueva: "", repetir: "" });
+        } catch (err) {
+          Swal.fire("Error", err.response?.data || "No se pudo cambiar la contraseña.", "error");
+        }
       }
     });
   };
 
+  // Renderizado condicional
+  if (cargando) return <div className="p-4">Cargando perfil...</div>;
+  if (error) return <div className="p-4 alert alert-danger">Error: {error}</div>;
+  if (!form) return <div className="p-4">No se encontraron datos del perfil.</div>;
 
-  const handleFormChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-  const handlePasswordChange = (e) => {
-    setPasswords({ ...passwords, [e.target.name]: e.target.value });
-  };
-  const handleNotifChange = (e) => {
-    setNotificaciones({ ...notificaciones, [e.target.name]: e.target.checked });
-  };
-  const handlePrivacidadChange = (e) => {
-    setPrivacidad({ ...privacidad, [e.target.name]: e.target.checked });
-  };
-
+  // Renderizado principal
   return (
     <div className="container py-4">
       <h2 className="fw-bold mb-1">Ajustes</h2>
@@ -97,97 +84,43 @@ const Ajustes = () => {
       <div className="row">
         <div className="col-md-3 mb-3">
           <div className="list-group">
-            <button className={`list-group-item list-group-item-action${tab === "personal" ? " active" : ""}`} onClick={() => setTab("personal")}> <i className="bi bi-person me-2"></i>Información Personal</button>
-            <button className={`list-group-item list-group-item-action${tab === "password" ? " active" : ""}`} onClick={() => setTab("password")}> <i className="bi bi-lock me-2"></i>Contraseña</button>
+            <button className={`list-group-item list-group-item-action ${tab === "personal" ? "active" : ""}`} onClick={() => setTab("personal")}>
+              <i className="bi bi-person me-2"></i>Información Personal
+            </button>
+            <button className={`list-group-item list-group-item-action ${tab === "password" ? "active" : ""}`} onClick={() => setTab("password")}>
+              <i className="bi bi-lock me-2"></i>Contraseña
+            </button>
           </div>
         </div>
         <div className="col-md-9">
           {tab === "personal" && (
-            <div className="card mb-4">
+            <div className="card">
               <div className="card-body">
                 <h5 className="card-title mb-4">Información Personal</h5>
                 <div className="row g-3">
-                  <div className="col-12">
-                    <label className="form-label">Nombre</label>
-                    <input className="form-control" name="nombre" value={form.nombre} onChange={handleFormChange} />
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label">Email</label>
-                    <input className="form-control" name="email" value={form.email} readOnly />
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label">Área</label>
-                    <input className="form-control" name="rol" value={form.rol || ""} readOnly />
-                  </div>
+                  <div className="col-md-6"><label className="form-label">Nombre de Usuario</label><input className="form-control" name="name" value={form.name || ''} onChange={handleFormChange} /></div>
+                  <div className="col-md-6"><label className="form-label">Email</label><input className="form-control" name="email" value={form.email || ''} readOnly disabled /></div>
+                  <div className="col-md-6"><label className="form-label">Nombre</label><input className="form-control" name="nombre" value={form.nombre || ''} onChange={handleFormChange} /></div>
+                  <div className="col-md-6"><label className="form-label">Apellido</label><input className="form-control" name="apellido" value={form.apellido || ''} onChange={handleFormChange} /></div>
+                  <div className="col-md-6"><label className="form-label">Documento</label><input className="form-control" name="documento" value={form.documento || ''} onChange={handleFormChange} /></div>
+                  <div className="col-md-6"><label className="form-label">Teléfono</label><input className="form-control" name="telefono" value={form.telefono || ''} onChange={handleFormChange} /></div>
+                  <div className="col-md-6"><label className="form-label">Domicilio</label><input className="form-control" name="domicilio" value={form.domicilio || ''} onChange={handleFormChange} /></div>
+                  <div className="col-md-6"><label className="form-label">Localidad</label><input className="form-control" name="localidad" value={form.localidad || ''} onChange={handleFormChange} /></div>
+                  <div className="col-md-6"><label className="form-label">Código Postal</label><input className="form-control" name="cp" value={form.cp || ''} onChange={handleFormChange} /></div>
+                  <div className="col-md-6"><label className="form-label">Rol / Sector</label><input className="form-control" name="area" value={form.area || ''} readOnly disabled /></div>
                 </div>
                 <button className="btn btn-primary mt-4" onClick={handleGuardarCambios}>Guardar cambios</button>
               </div>
             </div>
           )}
           {tab === "password" && (
-            <div className="card mb-4">
+            <div className="card">
               <div className="card-body">
                 <h5 className="card-title mb-4">Cambiar Contraseña</h5>
-                <div className="mb-3">
-                  <label className="form-label">Contraseña actual</label>
-                  <input type="password" className="form-control" name="actual" value={passwords.actual} onChange={handlePasswordChange} />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Nueva contraseña</label>
-                  <input type="password" className="form-control" name="nueva" value={passwords.nueva} onChange={handlePasswordChange} />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Repetir nueva contraseña</label>
-                  <input type="password" className="form-control" name="repetir" value={passwords.repetir} onChange={handlePasswordChange} />
-                </div>
+                <div className="mb-3"><label className="form-label">Contraseña actual</label><input type="password" name="actual" className="form-control" value={passwords.actual} onChange={handlePasswordChange} /></div>
+                <div className="mb-3"><label className="form-label">Nueva contraseña</label><input type="password" name="nueva" className="form-control" value={passwords.nueva} onChange={handlePasswordChange} /></div>
+                <div className="mb-3"><label className="form-label">Repetir nueva contraseña</label><input type="password" name="repetir" className="form-control" value={passwords.repetir} onChange={handlePasswordChange} /></div>
                 <button className="btn btn-primary" onClick={handlePasswordSubmit}>Actualizar contraseña</button>
-              </div>
-            </div>
-          )}
-          {tab === "notificaciones" && (
-            <div className="card mb-4">
-              <div className="card-body">
-                <h5 className="card-title mb-4">Notificaciones</h5>
-                <div className="form-check form-switch mb-2">
-                  <input className="form-check-input" type="checkbox" id="notif1" name="correo" checked={notificaciones.correo} onChange={handleNotifChange} />
-                  <label className="form-check-label" htmlFor="notif1">Recibir notificaciones por correo</label>
-                </div>
-                <div className="form-check form-switch mb-2">
-                  <input className="form-check-input" type="checkbox" id="notif2" name="sistema" checked={notificaciones.sistema} onChange={handleNotifChange} />
-                  <label className="form-check-label" htmlFor="notif2">Recibir notificaciones en el sistema</label>
-                </div>
-              </div>
-            </div>
-          )}
-          {tab === "tema" && (
-            <div className="card mb-4">
-              <div className="card-body">
-                <h5 className="card-title mb-4">Tema</h5>
-                <div className="mb-3">
-                  <label className="form-label">Selecciona el tema de la interfaz</label>
-                  <select className="form-select" value={tema} onChange={e => setTema(e.target.value)}>
-                    <option value="claro">Claro</option>
-                    <option value="oscuro">Oscuro</option>
-                    <option value="sistema">Usar el del sistema</option>
-                  </select>
-                </div>
-                <button className="btn btn-primary">Guardar tema</button>
-              </div>
-            </div>
-          )}
-          {tab === "privacidad" && (
-            <div className="card mb-4">
-              <div className="card-body">
-                <h5 className="card-title mb-4">Privacidad</h5>
-                <div className="form-check mb-2">
-                  <input className="form-check-input" type="checkbox" id="priv1" name="mostrarEmail" checked={privacidad.mostrarEmail} onChange={handlePrivacidadChange} />
-                  <label className="form-check-label" htmlFor="priv1">Mostrar mi correo electrónico a otros usuarios</label>
-                </div>
-                <div className="form-check mb-2">
-                  <input className="form-check-input" type="checkbox" id="priv2" name="mostrarTelefono" checked={privacidad.mostrarTelefono} onChange={handlePrivacidadChange} />
-                  <label className="form-check-label" htmlFor="priv2">Mostrar mi teléfono a otros usuarios</label>
-                </div>
-                <button className="btn btn-primary">Guardar privacidad</button>
               </div>
             </div>
           )}
