@@ -102,17 +102,19 @@ export const SideBar = ({ abierto, setAbierto }) => {
                                     Pases
                                 </Link>
                             </li> */}
-              <li>
-                <Link
-                  to="/menu-interno?vista=expedientes"
-                  className={`nav-link text-white ${
-                    vistaActual === "expedientes" ? "active" : ""
-                  }`}
-                >
-                  <i className="bi bi-table me-2"></i>
-                  Expedientes
-                </Link>
-              </li>
+              {(rol === "DIRECCION" || rol === "ABOGADOS" || rol === "ASESORIA_LEGAL") && (
+                <li>
+                  <Link
+                    to="/menu-interno?vista=expedientes"
+                    className={`nav-link text-white ${
+                      vistaActual === "expedientes" ? "active" : ""
+                    }`}
+                  >
+                    <i className="bi bi-table me-2"></i>
+                    Expedientes
+                  </Link>
+                </li>
+              )}
               {rol ==
                 "DIRECCION" && (
                   <li>
