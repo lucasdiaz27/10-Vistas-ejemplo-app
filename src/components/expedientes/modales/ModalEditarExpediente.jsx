@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
 import { useUsuarios } from '../../../hooks/useUsuarios';
 import { parseJwt } from '../../../utils/auth';
-import { showAccessDenied } from '../../../utils/accessDenied';
+import { showAccessDenied, verificarAcceso } from '../../../utils/accessDenied';
 
 // Componente reutilizable para seleccionar usuario
 function UsuarioSelect({
@@ -86,17 +86,10 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
-      const payload = parseJwt(token);
-      const rol = payload?.rol;
-      const authorities = payload?.authorities || [];
 
+      const token = localStorage.getItem('token');
       // Verificar permisos
-      const tienePermiso = rol === 'ADMIN' || authorities.includes('EDITAR_EXPEDIENTES');
-      if (!tienePermiso) {
-        showAccessDenied('No tienes permiso para editar expedientes.');
-        return;
-      }
+      verificarAcceso("DIRECCION")
 
       // filtrar valores vacíos y convertir a números si corresponde
       const usuariosAEnviar = (form.usuarios ?? [])
