@@ -20,6 +20,10 @@ import { useAudiencias } from "../../hooks/useAudiencias";
 import { usePases } from "../../hooks/usePases";
 import { ModalPdf } from "./modales/ModalPdf";
 import { useOrdenes } from "../../hooks/useOrdenes";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchExpedienteById } from "../../features/expediente/expedienteSlice";
+
+
 
 export default function DetalleExpediente() {
   const { id } = useParams();
@@ -37,8 +41,17 @@ export default function DetalleExpediente() {
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mostrarModalOrden, setMostrarModalOrden] = useState(false);
 
+// lo nuevo ed redux para el manejo de exp
+const dispatch = useDispatch();
+const { expediente, estado, error } = useSelector((state) => state.expediente);
+
+useEffect(() => {
+  dispatch(fetchExpedienteById(id));
+}, [dispatch, id]);
+const cargando = estado === "cargando";
+
   // Llama al hook de Expedientes
-  const { expediente, cargando, error, setExpediente } = useExpediente(id);
+  //const { expediente, cargando, error, setExpediente } = useExpediente(id);
   const { audiencias, guardarAudiencia, borrarAudiencia} = useAudiencias(id, setMensaje);
   const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes } = useOrdenes(id, setMensaje);
   const { pases, guardarPase, borrarPase } = usePases(id, setMensaje, fetchOrdenes);

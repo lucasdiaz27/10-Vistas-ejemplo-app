@@ -1,0 +1,1 @@
+// esto componenetes me hiuzo crearlos la ia (para que son ni idea)
