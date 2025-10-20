@@ -1,35 +1,69 @@
-export default function ModalVerPase({ onClose }) {
-  return (
-    <div className="modal fade show d-block" tabIndex="-1" role="dialog">
-      <div className="modal-dialog modal-lg" role="document">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Detalle del Pase</h5>
-            <button type="button" className="btn-close" onClick={onClose}></button>
-          </div>
-          <div className="modal-body">
-            <p><strong>Expediente:</strong> EXP-2023-00123</p>
-            <p><strong>Fecha:</strong> 15/05/2023</p>
-            <p><strong>Iniciador:</strong> Juan Pérez</p>
-            <p><strong>Asunto:</strong> Solicitud de materiales</p>
-            <p><strong>Origen:</strong> Administración</p>
-            <p><strong>Destino:</strong> Compras</p>
-            <p><strong>Folios:</strong> 12</p>
-            <p><strong>Estado:</strong> Completado</p>
-            <p><strong>Texto del Pase:</strong> Se solicita la compra de materiales de oficina...</p>
+// src/components/pases/modales/ModalVerPase.jsx
 
-            <hr />
-            <p className="fw-bold">Adjuntos</p>
-            <ul>
-              <li>Listado_materiales.pdf <button className="btn btn-sm btn-outline-primary ms-2"><i className="bi bi-download"></i></button></li>
-              <li>Presupuesto.xlsx <button className="btn btn-sm btn-outline-primary ms-2"><i className="bi bi-download"></i></button></li>
-            </ul>
-          </div>
-          <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onClose}>Cerrar</button>
-          </div>
+import React from 'react';
+// Podrías necesitar una función para descargar archivos desde tu apiDocumento
+// import { descargarDocumentoPase } from '../../../apis/apiDocumento';
+
+export default function ModalVerPase({ onClose, pase }) {
+    // Si no hay un pase para mostrar, no renderizamos nada para evitar errores
+    if (!pase) return null;
+
+    // Función placeholder para manejar la descarga de adjuntos
+    const handleDescargar = (documentoId, nombreArchivo) => {
+        console.log(`Descargando archivo con ID: ${documentoId}`);
+        // Aquí iría la lógica de descarga, por ejemplo:
+        // descargarDocumentoPase(documentoId, nombreArchivo)
+        //     .catch(err => alert("Error al descargar el archivo"));
+    };
+
+    return (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+            <div className="modal-dialog modal-lg" role="document">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title">Detalle del Pase</h5>
+                        <button type="button" className="btn-close" onClick={onClose}></button>
+                    </div>
+                    <div className="modal-body">
+                        <p><strong>Fecha de Acción:</strong> {pase.fechaAccion ? new Date(pase.fechaAccion).toLocaleString() : 'N/A'}</p>
+                        <p><strong>Asunto:</strong> {pase.asunto || 'N/A'}</p>
+                        <p><strong>Iniciador:</strong> {pase.nombreUsuario || 'N/A'}</p>
+                        <hr/>
+                        <p><strong>Área Origen:</strong> {pase.areaOrigen || 'N/A'}</p>
+                        <p><strong>Área Destino:</strong> {pase.areaDestino || 'N/A'}</p>
+                        <hr/>
+                        <p><strong>Descripción:</strong></p>
+                        <p style={{ whiteSpace: 'pre-wrap' }}>{pase.descripcion || 'Sin descripción.'}</p>
+                        <hr/>
+                        <p><strong>Cantidad de Folios:</strong> {pase.cantFolios || 0}</p>
+                        
+                        {/* Renderizado dinámico de adjuntos si existen */}
+                        {pase.documentos && pase.documentos.length > 0 && (
+                            <>
+                                <hr />
+                                <p className="fw-bold">Adjuntos</p>
+                                <ul>
+                                    {pase.documentos.map(doc => (
+                                        <li key={doc.id}>
+                                            {doc.nombre}
+                                            <button 
+                                                className="btn btn-sm btn-outline-primary ms-2"
+                                                onClick={() => handleDescargar(doc.id, doc.nombre)}
+                                                title="Descargar"
+                                            >
+                                                <i className="bi bi-download"></i>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>Cerrar</button>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

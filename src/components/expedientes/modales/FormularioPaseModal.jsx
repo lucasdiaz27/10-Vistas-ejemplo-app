@@ -1,42 +1,37 @@
-// FormularioPaseModal.jsx
-// Este componente gestiona el formulario para crear/editar pases, incluyendo la subida de PDF y el conteo de páginas
+// src/components/expedientes/modales/FormularioPaseModal.jsx
+
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
+import { jwtDecode } from 'jwt-decode';
+import { useDispatch } from 'react-redux';
+import { addNewPase, updateExistingPase, fetchPasesByExpId } from '../../../features/pases/pasesThunks';
+import Swal from 'sweetalert2';
 import { obtenerAreasEnum } from '../../../apis/pasesApi';
 import { contarPaginasPDF } from '../../../utils/contarPaginasPDF';
-import { jwtDecode } from 'jwt-decode';
 
-// Devuelve la fecha actual en formato ISO (YYYY-MM-DD)
+const initialStateForm = {
+    iniciador: '', asunto: '', areaOrigen: '', areaDestino: '',
+    cantFolios: '', descripcion: '', tipoDocumento: 'MEMO', file: null,
+};
 
-function getTodayISO() {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-}
-
-export default function FormularioPaseModal({ show, handleClose, expedienteId, usuarioId, modo = "crear", pase = null, onGuardar }) {
-
-    const [usuarioActual, setUsuarioActual] = useState(''); // Usuario actual decodificado del token
-
-    // Estado del formulario, incluye todos los campos requeridos
-    const [formData, setFormData] = useState({
-        iniciador: '',
-        asunto: '',
-        areaOrigen: '',
-        areaDestino: '',
-        cantFolios: '',
-        descripcion: '',
-        tipoDocumento: 'MEMO',
-        file: null,
-    });
-    const [areas, setAreas] = useState([]); // Áreas dinámicas desde backend
+export default function FormularioPaseModal({ show, handleClose, expedienteId, modo = "crear", paseInicial }) {
+    
+    const dispatch = useDispatch();
+    const [formData, setFormData] = useState(initialStateForm);
+    const [areas, setAreas] = useState([]);
+    const [usuarioActual, setUsuarioActual] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const tokenData = jwtDecode(token);
-        const usuarioActual = tokenData ? tokenData.name : 'Usuario Desconocido';
-        setUsuarioActual(usuarioActual);
-    })
-    // Cargar áreas desde backend al abrir el modal
+        if (show) {
+            const token = localStorage.getItem('token');
+            if (token) {
+                const tokenData = jwtDecode(token);
+                setUsuarioActual(tokenData ? tokenData.name : 'Usuario Desconocido');
+            }
+        }
+    }, [show]);
+
     useEffect(() => {
         const fetchAreas = async () => {
             const token = localStorage.getItem('token');
@@ -50,40 +45,29 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
         if (show) fetchAreas();
     }, [show]);
 
-    // Actualiza el formulario según el modo (crear/editar) y los datos del pase
     useEffect(() => {
-        if (modo === "editar" && pase) {
-            setFormData({
-                iniciador: pase.iniciador || '',
-                asunto: pase.asunto || '',
-                areaOrigen: pase.areaOrigen || '',
-                areaDestino: pase.areaDestino || '',
-                cantFolios: pase.cantFolios || '',
-                descripcion: pase.descripcion || '',
-                tipoDocumento: pase.tipoDocumento || 'MEMO', // Mantiene el valor si existe
-                file: null, // No se puede editar el archivo
-            });
-        } else if (show) {
-            setFormData({
-                iniciador: '',
-                asunto: '',
-                areaOrigen: '',
-                areaDestino: '',
-                cantFolios: '',
-                descripcion: '',
-                tipoDocumento: 'MEMO',
-                file: null,
-            });
+        if (show) {
+            if (modo === "editar" && paseInicial) {
+                setFormData({
+                    asunto: paseInicial.asunto ?? '',
+                    areaOrigen: paseInicial.areaOrigen ?? '',
+                    areaDestino: paseInicial.areaDestino ?? '',
+                    cantFolios: paseInicial.cantFolios ?? '',
+                    descripcion: paseInicial.descripcion ?? '',
+                    tipoDocumento: paseInicial.tipoDocumento ?? 'MEMO',
+                    file: null,
+                });
+            } else {
+                setFormData(initialStateForm);
+            }
         }
-    }, [modo, pase, show]);
+    }, [modo, paseInicial, show]);
 
-    // Maneja los cambios en los campos del formulario
     const handleChange = e => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // Maneja la subida de archivo PDF y cuenta las páginas
     const handleFileChange = async e => {
         const file = e.target.files[0];
         if (file) {
@@ -91,104 +75,129 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
                 const numPages = await contarPaginasPDF(file);
                 setFormData(prev => ({ ...prev, file, cantFolios: numPages }));
             } catch (err) {
-                setFormData(prev => ({ ...prev, file, cantFolios: '' }));
-                alert('No se pudo contar las páginas del PDF');
+                setFormData(prev => ({ ...prev, file: null, cantFolios: '' }));
+                Swal.fire('Error', 'No se pudo procesar el archivo PDF.', 'error');
             }
         } else {
             setFormData(prev => ({ ...prev, file: null, cantFolios: '' }));
         }
     };
 
-    // Envía el formulario al backend como form-data (pase y file)
     const handleSubmit = e => {
         e.preventDefault();
-        const formDataToSend = new FormData();
-        // El JSON del pase va como string bajo la key "pase"
-        const paseJson = JSON.stringify({
+        setIsSubmitting(true);
+
+        let userId = null;
+        const token = localStorage.getItem("token");
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                userId = decodedToken.jti;
+            } catch (error) {
+                console.error("Error al decodificar el token:", error);
+                Swal.fire('Error', 'Tu sesión no es válida. Por favor, volvé a iniciar sesión.', 'error');
+                setIsSubmitting(false);
+                return;
+            }
+        }
+
+        const paseJsonData = {
             asunto: formData.asunto,
-            cantFolios: Number(formData.cantFolios), // Asegura tipo Long
-            areaOrigen: formData.areaOrigen, // Debe coincidir con ENUM
-            areaDestino: formData.areaDestino, // Debe coincidir con ENUM
+            cantFolios: Number(formData.cantFolios),
+            areaOrigen: formData.areaOrigen,
+            areaDestino: formData.areaDestino,
             descripcion: formData.descripcion,
-            expedienteId: Number(expedienteId), // Asegura tipo Long
-            usuarioId: Number(usuarioId), // Asegura tipo Long
-            tipoDocumento: formData.tipoDocumento // Debe coincidir con ENUM
-        });
+            expedienteId: Number(expedienteId),
+            usuarioId: Number(userId),
+            tipoDocumento: formData.tipoDocumento
+        };
         
-        formDataToSend.append('pase', paseJson);
-        // El archivo PDF va bajo la key "file"
-        if (formData.file) formDataToSend.append('file', formData.file);
-        // if (formData.file) {
-        //     console.log('Archivo PDF:', formData.file.name, formData.file.size, formData.file.type);
-        // } else {
-        //     console.log('Sin archivo PDF');
-        // }
-        onGuardar(formDataToSend);
+        const action = modo === 'crear' 
+            ? addNewPase({ paseData: paseJsonData, file: formData.file }) 
+            : updateExistingPase({ id: paseInicial.id, paseData: paseJsonData, file: formData.file });
+
+        dispatch(action)
+            .unwrap()
+            .then(() => {
+                Swal.fire('¡Éxito!', `Pase ${modo === 'crear' ? 'creado' : 'actualizado'} correctamente.`, 'success');
+                handleClose();
+                dispatch(fetchPasesByExpId(expedienteId));
+            })
+            .catch((error) => {
+                Swal.fire('Error', `No se pudo guardar el pase: ${error.message || error}`, 'error');
+            })
+            .finally(() => {
+                setIsSubmitting(false);
+            });
     };
 
+    if (!show) return null;
+
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false}>
             <Modal.Header closeButton>
                 <Modal.Title>{modo === "editar" ? "Editar Pase" : "Nuevo Pase"}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form onSubmit={handleSubmit} encType="multipart/form-data">
-                    {/* Campo Iniciador */}
+                <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label>Iniciador</Form.Label>
-                        <Form.Control type="text" name="iniciador" value={usuarioActual} disabled onChange={handleChange} required />
+                        <Form.Control type="text" value={usuarioActual} disabled />
                     </Form.Group>
-                    {/* Campo Asunto */}
+                    
                     <Form.Group className="mb-3">
                         <Form.Label>Asunto</Form.Label>
-                        <Form.Control type="text" name="asunto" value={formData.asunto} onChange={handleChange} required />
+                        <Form.Control type="text" name="asunto" value={formData.asunto || ''} onChange={handleChange} required />
                     </Form.Group>
-                    {/* Campo Área Origen (select con opciones del backend) */}
+                    
                     <Form.Group className="mb-3">
                         <Form.Label>Área Origen</Form.Label>
-                        <Form.Select name="areaOrigen" value={formData.areaOrigen} onChange={handleChange} required>
+                        <Form.Select name="areaOrigen" value={formData.areaOrigen || ''} onChange={handleChange} required>
                             <option value="">Seleccionar área</option>
-                            {areas.map(area => (
-                                <option key={area} value={area}>{area}</option>
-                            ))}
+                            {areas.map(area => <option key={area} value={area}>{area}</option>)}
                         </Form.Select>
                     </Form.Group>
-                    {/* Campo Área Destino (select con opciones del backend) */}
+
                     <Form.Group className="mb-3">
                         <Form.Label>Área Destino</Form.Label>
-                        <Form.Select name="areaDestino" value={formData.areaDestino} onChange={handleChange} required>
+                        <Form.Select name="areaDestino" value={formData.areaDestino || ''} onChange={handleChange} required>
                             <option value="">Seleccionar área</option>
-                            {areas.map(area => (
-                                <option key={area} value={area}>{area}</option>
-                            ))}
+                            {areas.map(area => <option key={area} value={area}>{area}</option>)}
                         </Form.Select>
                     </Form.Group>
-                    {/* Campo para subir PDF y contar folios */}
+
                     <Form.Group className="mb-3">
-                        <Form.Label>Archivo PDF</Form.Label>
+                        <Form.Label>Archivo PDF (Opcional)</Form.Label>
                         <Form.Control type="file" accept="application/pdf" onChange={handleFileChange} />
+                        {formData.cantFolios && <Form.Text>{formData.cantFolios} página(s) detectada(s).</Form.Text>}
                     </Form.Group>
-                    {/* Campo Texto del Pase (Descripción) */}
+
                     <Form.Group className="mb-3">
                         <Form.Label>Texto del Pase</Form.Label>
-                        <Form.Control as="textarea" rows={3} name="descripcion" value={formData.descripcion} onChange={handleChange} required />
+                        <Form.Control as="textarea" rows={3} name="descripcion" value={formData.descripcion || ''} onChange={handleChange} required />
                     </Form.Group>
-                    {/* Campo Tipo de Documento (select) */}
+                    
                     <Form.Group className="mb-3">
                         <Form.Label>Tipo de Documento</Form.Label>
-                        <Form.Select name="tipoDocumento" value={formData.tipoDocumento} onChange={handleChange} required>
+                        <Form.Select name="tipoDocumento" value={formData.tipoDocumento || 'MEMO'} onChange={handleChange} required>
                             <option value="MEMO">MEMO</option>
                             <option value="RESOLUCIÓN">RESOLUCIÓN</option>
                             <option value="NOTA">NOTA</option>
                             <option value="PROVIDENCIA">PROVIDENCIA</option>
                         </Form.Select>
                     </Form.Group>
-                    {/* Botón de envío */}
-                    <Button variant="primary" type="submit">
-                        {modo === "editar" ? "Guardar Cambios" : "Guardar Pase"}
-                    </Button>
+
+                    <div className="d-flex justify-content-end">
+                        <Button variant="secondary" onClick={handleClose} disabled={isSubmitting} className="me-2">
+                            Cancelar
+                        </Button>
+                        <Button variant="primary" type="submit" disabled={isSubmitting}>
+                            {isSubmitting ? 'Guardando...' : (modo === "editar" ? "Guardar Cambios" : "Guardar Pase")}
+                        </Button>
+                    </div>
                 </Form>
             </Modal.Body>
         </Modal>
     );
 }
+
