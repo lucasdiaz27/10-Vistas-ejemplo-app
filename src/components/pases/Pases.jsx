@@ -2,9 +2,12 @@
 import { useState } from 'react';
 import ListaDePases from './ListaDePases';
 import VistaTarjetas from './VistaTarjetas';
-import ModalNuevoPase from "./modales/ModalNuevoPase";
+// import ModalNuevoPase from "./modales/ModalNuevoPase";
 import ModalVerPase from './modales/ModalVerPase';
-import ModalEditarPase from './modales/ModalEditarPase';
+// import ModalEditarPase from './modales/ModalEditarPase'; 
+
+/* Comento estos imports, porque no importan nada y sale error,
+ nose si es algo que hiceron lucas o maxi */
 
 export default function Pases() {
   const [vistaActiva, setVistaActiva] = useState('lista');

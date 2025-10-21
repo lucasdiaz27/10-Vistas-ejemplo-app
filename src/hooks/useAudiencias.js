@@ -1,45 +1,51 @@
-import { useState, useEffect } from "react";
-import { crearAudiencia, editarAudiencia, eliminarAudiencia, traerAudienciasPorExpediente } from "../apis/audienciasApi";
+// src/hooks/useAudiencias.js
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchAudiencias,
+  crearAudienciaThunk,
+  editarAudienciaThunk,
+  eliminarAudienciaThunk,
+  selectAudiencias,
+} from "../features/audiencias/audienciaSlice";
 
 export const useAudiencias = (expedienteId, setMensaje) => {
-  const [audiencias, setAudiencias] = useState([]);
-
-  const cargarAudiencias = async () => {
-    const token = localStorage.getItem("token");
-    const data = await traerAudienciasPorExpediente(expedienteId, token);
-    setAudiencias(data);
-  };
+  const dispatch = useDispatch();
+  const audiencias = useSelector(selectAudiencias);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (expedienteId) cargarAudiencias();
-  }, [expedienteId]);
+    if (expedienteId) {
+      dispatch(fetchAudiencias({ expedienteId, token }));
+    }
+  }, [expedienteId, dispatch, token]);
 
   const guardarAudiencia = async (audiencia, modo, idAudiencia) => {
-    const token = localStorage.getItem("token");
     try {
       if (modo === "crear") {
-        await crearAudiencia(audiencia, token);
+        await dispatch(crearAudienciaThunk({ audiencia, token })).unwrap();
         setMensaje("Audiencia creada correctamente");
       } else {
-        await editarAudiencia(idAudiencia, audiencia, token);
+        await dispatch(
+          editarAudienciaThunk({ id: idAudiencia, audiencia, token })
+        ).unwrap();
         setMensaje("Audiencia editada correctamente");
       }
-      await cargarAudiencias();
-    } catch {
+    } catch (error) {
       alert("Error al guardar la audiencia");
+      console.error(error);
     }
   };
 
   const borrarAudiencia = async (id) => {
-    const token = localStorage.getItem("token");
     try {
-      await eliminarAudiencia(id, token);
-      await cargarAudiencias();
+      await dispatch(eliminarAudienciaThunk({ id, token })).unwrap();
       setMensaje("Audiencia eliminada correctamente");
-    } catch {
+    } catch (error) {
       alert("Error al eliminar la audiencia");
+      console.error(error);
     }
   };
 
   return { audiencias, guardarAudiencia, borrarAudiencia };
-}
+};

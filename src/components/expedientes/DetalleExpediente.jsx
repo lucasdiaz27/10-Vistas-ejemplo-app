@@ -39,7 +39,7 @@ export default function DetalleExpediente() {
     const [archivos, setArchivos] = useState([]);
     const [pdfUrl, setPdfUrl] = useState(null);
     const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
-    
+
     // Lectura del estado de Redux para Expediente
     const { expediente, estado, error } = useSelector((state) => state.expediente);
     const cargando = estado === "cargando";
@@ -111,7 +111,7 @@ export default function DetalleExpediente() {
     if (cargando) return <div className="container mt-4">Cargando expediente...</div>;
     if (error) return <div className="alert alert-danger mt-4">{error}</div>;
     if (!expediente) return <div className="alert alert-warning mt-4">No se encontró el expediente.</div>;
-    
+
     return (
         <div className="container py-4">
             <div className="mb-3 d-flex gap-2">
@@ -125,14 +125,14 @@ export default function DetalleExpediente() {
                     {/* --- TARJETA DE INFORMACIÓN GENERAL --- */}
                     <div className="card mb-4">
                         <div className="card-body position-relative">
-                             <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
+                            <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
                                 <span><i className="bi bi-info-circle me-2"></i>Información General</span>
                                 <button className="btn btn-outline-primary btn-sm" onClick={() => setMostrarModalEditar(true)} title="Editar expediente">
                                     <i className="bi bi-pencil"></i>
                                 </button>
-                             </h5>
-                             <p><strong>Número de Expediente:</strong> {expediente.nro_exp ?? "-"}</p>
-                             <p><strong>Número de Orden:</strong> {expediente.id}</p>
+                            </h5>
+                            <p><strong>Número de Expediente:</strong> {expediente.nro_exp ?? "-"}</p>
+                            <p><strong>Número de Orden:</strong> {expediente.id}</p>
                         </div>
                     </div>
 
@@ -160,7 +160,11 @@ export default function DetalleExpediente() {
                                     />
                                 )}
                                 {tab === "audiencias" && (
-                                    <TablaAudiencias audiencias={audiencias} onNueva={handleNuevaAudiencia} onEditar={handleEditarAudiencia} onEliminar={handleEliminarAudiencia} personasInvolucradas={expediente.denuncia?.personas || []} />
+                                    <TablaAudiencias
+                                        expedienteId={expediente.id}
+                                        token={localStorage.getItem("token")}
+                                        personasInvolucradas={expediente.denuncia?.personas || []}
+                                    />
                                 )}
                                 {tab === "ordenes" && (
                                     <OrdenesTabla ordenes={ordenes} onDescargar={handleDescargarOrden} onVer={handleVerOrden} onEliminar={handleEliminarOrden} mostrarModalOrden={handlerModalOrden} />
@@ -186,7 +190,7 @@ export default function DetalleExpediente() {
             </div>
 
             {/* --- RENDERIZADO DE TODOS LOS MODALES --- */}
-            
+
             <FormularioPaseModal
                 show={modalPase.show && (modalPase.modo === 'crear' || modalPase.modo === 'editar')}
                 handleClose={handleCerrarModalPase}
@@ -196,17 +200,17 @@ export default function DetalleExpediente() {
             />
 
             {modalPase.show && modalPase.modo === 'ver' && (
-                <ModalVerPase 
+                <ModalVerPase
                     onClose={handleCerrarModalPase}
                     pase={modalPase.pase}
                 />
             )}
-            
-            <ModalAudiencia show={modalAudiencia.show} modo={modalAudiencia.modo} audiencia={modalAudiencia.audiencia} onGuardar={handleGuardarAudiencia} onClose={handleCerrarModal} expedienteId={expediente.id} personasInvolucradas={expediente.denuncia?.personas || []}/>
-            <ModalSubirOrden show={mostrarModalOrden} onClose={() => setMostrarModalOrden(false)} expedienteId={expediente.id} onSubmitOrden={handlerSubirOrden}/>
+
+            <ModalAudiencia show={modalAudiencia.show} modo={modalAudiencia.modo} audiencia={modalAudiencia.audiencia} onGuardar={handleGuardarAudiencia} onClose={handleCerrarModal} expedienteId={expediente.id} personasInvolucradas={expediente.denuncia?.personas || []} />
+            <ModalSubirOrden show={mostrarModalOrden} onClose={() => setMostrarModalOrden(false)} expedienteId={expediente.id} onSubmitOrden={handlerSubirOrden} />
             {mostrarModalEditar && <ModalEditarExpediente expediente={expediente} onClose={() => setMostrarModalEditar(false)} actualizarExpediente={() => dispatch(fetchExpedienteById(id))} />}
             {archivoSeleccionado && pdfUrl && <ModalPDF archivo={archivoSeleccionado} pdfUrl={pdfUrl} onClose={() => { setArchivoSeleccionado(null); setPdfUrl(null); }} />}
-            
+
         </div>
     );
 }
