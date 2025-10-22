@@ -1,17 +1,16 @@
 // src/components/pases/modales/ModalVerPase.jsx
 
 import React from 'react';
-// Podrías necesitar una función para descargar archivos desde tu apiDocumento
-// import { descargarDocumentoPase } from '../../../apis/apiDocumento';
+
 
 export default function ModalVerPase({ onClose, pase }) {
-    // Si no hay un pase para mostrar, no renderizamos nada para evitar errores
+    // si no hay pases para mostrar, mejor no se renderiza nada para evitar errores
     if (!pase) return null;
 
-    // Función placeholder para manejar la descarga de adjuntos
+    // funcion placeholder para manejar la descarga de adjuntos
     const handleDescargar = (documentoId, nombreArchivo) => {
         console.log(`Descargando archivo con ID: ${documentoId}`);
-        // Aquí iría la lógica de descarga, por ejemplo:
+        // aqui iria la logica de descarga, por ejemplo:
         // descargarDocumentoPase(documentoId, nombreArchivo)
         //     .catch(err => alert("Error al descargar el archivo"));
     };

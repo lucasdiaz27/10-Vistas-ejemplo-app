@@ -11,7 +11,7 @@ export const useUsuarios = () => {
             const token = localStorage.getItem("token");
             const data = await traerUsuarios(token);
             setUsuarios(data);
-            console.log(usuarios)
+            
         } catch (err) {
             console.error("Error al traer usuarios:", err);
             setError("Error al cargar usuarios");

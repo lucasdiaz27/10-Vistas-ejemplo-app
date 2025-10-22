@@ -88,12 +88,12 @@ export default function VistaUsuarios2() {
     }
   };
 
-  // Elimina un usuario
+  // elimina un usuario
   const handleEliminarUsuario = async (id) => {
     if (window.confirm('¿Seguro que deseas eliminar este usuario?')) {
       try {
         const token = localStorage.getItem('token');
-        console.log('Token para eliminar usuario:', token);
+        
         await eliminarUsuario(id, token);
         setUsuarios(usuarios.filter((u) => u.id !== id));
       } catch (error) {

@@ -29,9 +29,7 @@ export const Formulario = () => {
   } = useForm({
     resolver: zodResolver(denunciaSchema),
   });
-  // Mostrar en consola los datos en tiempo real
-  console.log("Datos en tiempo real:", watch());
-  //console.log(errors); // Esto es para ver los errores en consola. Si hay errores, se va a mostrar en consola los errores, si no hay, no aparece.
+
 
   const onSubmit = (data) => {
     try {
@@ -61,7 +59,7 @@ export const Formulario = () => {
         message: "No se pudo enviar el formulario.",
       });
       setFormularioEnviado(false);
-      console.log(error);
+      
     }
   };
   return (

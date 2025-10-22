@@ -1,147 +1,101 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 export default function ModalAudiencia({ show, modo, audiencia, onGuardar, onClose, expedienteId, personasInvolucradas }) {
-  console.log("Expediente ID recibido en ModalAudiencia:", expedienteId);
-
-  const [form, setForm] = useState({
-    fecha: "",
-    hora: "",
-    lugar: "",
-    personasIds: [],
-    nroExp: expedienteId ?? null
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    defaultValues: {
+      fecha: "",
+      hora: "",
+      lugar: "",
+      personasIds: [],
+      expedienteId: expedienteId ?? null,
+    }
   });
 
   useEffect(() => {
-    // Sincronizar expedienteId en el form cuando cambie
-    setForm(f => ({ ...f, nroExp: expedienteId ?? null }));
-
     if (modo === "editar" && audiencia) {
-      setForm({
-        fecha: audiencia.fecha || "",
+      reset({
+        fecha: audiencia.fecha ? audiencia.fecha.split("T")[0] : "",
         hora: audiencia.hora || "",
         lugar: audiencia.lugar || "",
-        personasIds: audiencia.personasIds || [],
-        nroExp: audiencia.nroExp ?? expedienteId ?? null
+        // convertir a strings para que los checkboxes con value={p.id} coincidan
+        personasIds: (audiencia.personasIds || []).map(id => String(id)),
+        expedienteId: audiencia.expedienteId ?? expedienteId ?? null,
       });
-    } else if (modo === "crear") {
-      setForm({
+    } else {
+      reset({
         fecha: "",
         hora: "",
         lugar: "",
         personasIds: [],
-        nroExp: expedienteId ?? null
+        expedienteId: expedienteId ?? null,
       });
     }
-  }, [show, modo, audiencia, expedienteId]);
+  }, [show, modo, audiencia, expedienteId, reset]);
 
   if (!show) return null;
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (name === "personasIds") {
-      const id = Number(value);
-      setForm(f => ({
-        ...f,
-        personasIds: checked
-          ? [...f.personasIds, id]
-          : f.personasIds.filter(pid => pid !== id)
-      }));
-    } else {
-      setForm(f => ({ ...f, [name]: value }));
-    }
-  };
-
-// ...existing code...
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Validación: si no tenemos expedienteId, no enviar
-    if (!form.nroExp && !expedienteId) {
-      alert("No se recibió el id del expediente. Reabrí la vista y volvé a intentar.");
-      console.warn("Intento de crear audiencia sin nroExp/expedienteId:", form);
-      return;
-    }
-
-    let fechaLocalDateTime = form.fecha;
-    if (form.fecha && form.hora) {
-      fechaLocalDateTime = form.fecha + 'T' + form.hora;
-    }
-
-    // normalizar id de expediente a número
-    const expedienteIdNum = Number(form.nroExp) || Number(expedienteId) || null;
-
-    // Enviar expedienteId (campo que espera el backend). 
-    // Además incluimos expediente: { id } por compatibilidad si fuera útil.
+  const onSubmit = (data) => {
+    // normalizar fecha+hora al formato que espera el backend
+    const fechaISO = data.fecha && data.hora ? `${data.fecha}T${data.hora}` : data.fecha;
     const payload = {
-      fecha: fechaLocalDateTime,
-      hora: form.hora,
-      lugar: form.lugar,
-      expedienteId: expedienteIdNum,
-      expediente: expedienteIdNum ? { id: expedienteIdNum } : undefined,
-      personasIds: form.personasIds
+      fecha: fechaISO,
+      hora: data.hora,
+      lugar: data.lugar,
+      expedienteId: Number(data.expedienteId) || Number(expedienteId),
+      personasIds: Array.isArray(data.personasIds) ? data.personasIds.map(Number) : [],
     };
-
-    // eliminar campos undefined
-    if (!payload.expediente) delete payload.expediente;
-
-    console.log("Payload a enviar a crearAudiencia:", payload);
-
     onGuardar(payload);
   };
-// ...existing code...
 
   return (
     <div className="modal fade show" style={{ display: "block", background: "rgba(0,0,0,0.2)" }}>
       <div className="modal-dialog">
-        <form className="modal-content" onSubmit={handleSubmit}>
+        <form className="modal-content" onSubmit={handleSubmit(onSubmit)}>
           <div className="modal-header">
-            <h5 className="modal-title">
-              {modo === "crear" ? "Nueva Audiencia" : "Editar Audiencia"}
-            </h5>
+            <h5 className="modal-title">{modo === "crear" ? "Nueva Audiencia" : "Editar Audiencia"}</h5>
             <button type="button" className="btn-close" onClick={onClose}></button>
           </div>
           <div className="modal-body">
             <div className="mb-2">
               <label className="form-label">Fecha</label>
-              <input type="date" className="form-control" name="fecha" value={form.fecha} onChange={handleChange} required />
+              <input type="date" className="form-control" {...register("fecha", { required: "La fecha es obligatoria" })} />
+              {errors.fecha && <p className="text-danger small mt-1">{errors.fecha.message}</p>}
             </div>
             <div className="mb-2">
               <label className="form-label">Hora</label>
-              <input type="time" className="form-control" name="hora" value={form.hora} onChange={handleChange} required />
+              <input type="time" className="form-control" {...register("hora", { required: "La hora es obligatoria" })} />
+              {errors.hora && <p className="text-danger small mt-1">{errors.hora.message}</p>}
             </div>
             <div className="mb-2">
               <label className="form-label">Lugar</label>
-              <input type="text" className="form-control" name="lugar" value={form.lugar} onChange={handleChange} required />
+              <input type="text" className="form-control" {...register("lugar", { required: "El lugar es obligatorio" })} />
+              {errors.lugar && <p className="text-danger small mt-1">{errors.lugar.message}</p>}
             </div>
             <div className="mb-2">
               <label className="form-label">Personas Involucradas</label>
               <div>
-                {personasInvolucradas && personasInvolucradas.map((p) => (
+                {personasInvolucradas && personasInvolucradas.map(p => (
                   <div key={p.id} className="form-check">
                     <input
                       className="form-check-input"
                       type="checkbox"
-                      name="personasIds"
-                      value={p.id}
+                      value={String(p.id)}
+                      {...register("personasIds", { validate: v => (v && v.length > 0) || "Seleccioná al menos una persona" })}
                       id={`persona-${p.id}`}
-                      checked={form.personasIds.includes(p.id)}
-                      onChange={handleChange}
                     />
                     <label className="form-check-label" htmlFor={`persona-${p.id}`}>
-                      {p.nombre} {p.apellido} (DNI: {p.documento})
+                      {p.nombre} {p.apellido || ""}
                     </label>
                   </div>
                 ))}
+                {errors.personasIds && <p className="text-danger small mt-1">{errors.personasIds.message}</p>}
               </div>
             </div>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
-              Cancelar
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Guardar
-            </button>
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn btn-primary">Guardar</button>
           </div>
         </form>
       </div>

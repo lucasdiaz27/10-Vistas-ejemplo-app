@@ -21,7 +21,7 @@ const pasesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // --- CASOS PARA OBTENER PASES ---
+            //  casos para obtener pases
             .addCase(fetchPasesByExpId.pending, (state) => {
                 state.status = 'loading';
             })
@@ -34,10 +34,9 @@ const pasesSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // --- CASOS PARA LAS ACCIONES CRUD ---
+            // casos para acciones del crud
             .addCase(addNewPase.fulfilled, (state, action) => {
-                // ✅ CAMBIO: Agregamos el console.log para "espiar" la respuesta de la API
-                console.log("PASE RECIBIDO DESDE LA API:", action.payload); 
+
 
                 state.pases.push(action.payload);
             })
