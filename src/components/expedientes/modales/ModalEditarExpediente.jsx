@@ -36,13 +36,13 @@ function UsuarioSelect({
       <select
         className="form-select"
         name={name}
-        value={value ?? ''}
+        value={value !== null && value !== undefined ? String(value) : ''}
         onChange={onChange}
       >
         <option value="">Seleccionar...</option>
         {opciones.map(usuario => (
-          <option key={usuario.id} value={usuario.id}>
-            {usuario.nombreUsuario} {usuario.rol ? `- ${usuario.rol}` : ''}
+          <option key={usuario.id} value={String(usuario.id)}>
+            { (usuario.nombre ?? usuario.name ?? usuario.nombreUsuario ?? usuario.email) } {usuario.rol ? `- ${usuario.rol}` : ''}
           </option>
         ))}
       </select>
@@ -52,18 +52,92 @@ function UsuarioSelect({
 
 export default function ModalEditarExpediente({ onClose, expediente, actualizarExpediente }) {
   // aseguramos que form siempre exista y que usuarios sea array
-  const [form, setForm] = useState(() => ({ ...(expediente || {}), usuarios: (expediente?.usuarios ?? []).slice() }));
+  const [form, setForm] = useState(() => ({
+    ...(expediente || {}),
+    usuarios: (expediente?.usuarios ?? []).map(u =>
+      typeof u === "object" ? u.id : u
+    ),
+  }));
+
   const { usuarios = [], fetchUsuarios } = useUsuarios() || {};
 
   // cuando llega un nuevo expediente por props, actualizar el form
   useEffect(() => {
-    setForm({ ...(expediente || {}), usuarios: (expediente?.usuarios ?? []).slice() });
+    setForm({
+      ...(expediente || {}),
+      usuarios: (expediente?.usuarios ?? []).map(u =>
+        typeof u === "object" ? u.id : u
+      ),
+    });
   }, [expediente]);
+
 
   // traer usuarios (si tu hook lo requiere)
   useEffect(() => {
     if (fetchUsuarios) fetchUsuarios();
   }, [fetchUsuarios]);
+
+  // Si al abrir el modal no tenemos usuarios en el expediente, traemos el expediente completo.
+  useEffect(() => {
+    let mounted = true;
+    const fetchFullIfNeeded = async () => {
+      if (!expediente?.id) return;
+
+      // si el expediente ya trae usuarios (objetos) no hace falta pedir
+      if (Array.isArray(expediente.usuarios) && expediente.usuarios.length > 0) {
+        console.log('full not needed - expediente.usuarios present:', expediente.usuarios);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const full = await traerExpedientePorId(expediente.id, token);
+
+        // Log completo para inspección (stringify evita objetos truncados)
+        console.log('fullExpediente fetched (string):', JSON.stringify(full));
+        console.log('usuariosHook before set:', usuarios);
+
+        if (!mounted || !full) return;
+
+        // Intentar varias claves donde el backend podría devolver los usuarios
+        let usuariosRaw = full?.usuarios ?? full?.usuariosIds ?? full?.usuarios_id ?? full?.usuariosAsignados ?? full?.usuariosAsignadosIds ?? [];
+
+        // Si viene como objeto con clave 'data' u otra envoltura
+        if ((!Array.isArray(usuariosRaw) || usuariosRaw.length === 0) && typeof full === 'object') {
+          for (const key of Object.keys(full)) {
+            const v = full[key];
+            if (Array.isArray(v) && v.length > 0 && (typeof v[0] === 'object' || typeof v[0] === 'number')) {
+              // heurística: si el primer elemento parece un usuario, asumimos que es la lista correcta
+              usuariosRaw = v;
+              break;
+            }
+          }
+        }
+
+        // Normalizar a array de ids
+        const usuariosIds = (Array.isArray(usuariosRaw) ? usuariosRaw.map(u => (u && typeof u === 'object' ? u.id : u)).filter(Boolean) : [])
+          .map(id => Number(id));
+
+        console.log('resolved usuariosIds:', usuariosIds);
+
+        // Si aún no encontramos ids, intentar usar expediente prop original (por si contiene objetos)
+        if (usuariosIds.length === 0 && Array.isArray(expediente?.usuarios) && expediente.usuarios.length > 0) {
+          const fallback = expediente.usuarios.map(u => (typeof u === 'object' ? u.id : u)).filter(Boolean).map(id => Number(id));
+          console.log('fallback from expediente.prop ->', fallback);
+          setForm(prev => ({ ...prev, ...full, usuarios: fallback }));
+        } else {
+          setForm(prev => ({ ...prev, ...full, usuarios: usuariosIds }));
+        }
+
+        console.log('setForm.usuarios ->', usuariosIds.length ? usuariosIds : '(used fallback)');
+      } catch (err) {
+        console.warn('No se pudo obtener expediente completo:', err);
+      }
+    };
+
+    fetchFullIfNeeded();
+    return () => { mounted = false; };
+  }, [expediente?.id, usuarios.length]); // reintentar cuando cambie expediente.id o cuando cambie la lista global de usuarios
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -127,11 +201,28 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
     }
   };
 
+  // Debug: ver qué trae el form y los usuarios antes de renderizar
+  console.log('DEBUG form.usuarios:', form.usuarios);
+  console.log('DEBUG usuarios (hook):', usuarios);
+  console.log('DEBUG expediente.usuarios:', expediente?.usuarios);
+
   // Helper: nombres de usuarios seleccionados para la cabecera
-  const usuariosNombres = (form.usuarios ?? [])
-    .filter(u => u !== "" && u !== null && u !== undefined)
-    .map(id => usuarios.find(u => Number(u.id) === Number(id))?.nombreUsuario)
-    .filter(Boolean);
+  const usuariosNombres = (
+    // Si el expediente ya trae usuarios como objetos, usarlos (más confiable al abrir modal)
+    (expediente?.usuarios && expediente.usuarios.length > 0)
+      ? (expediente.usuarios
+          .map(u => (typeof u === 'object' ? (u.nombre ?? u.name ?? u.nombreUsuario ?? u.email) : null))
+          .filter(Boolean)
+        )
+      // Si no, intentar resolver usando la lista global de usuarios
+      : (form.usuarios ?? [])
+          .filter(u => u !== "" && u !== null && u !== undefined)
+          .map(id => {
+            const u = usuarios.find(us => Number(us.id) === Number(id));
+            return u ? (u.nombre ?? u.name ?? u.nombreUsuario ?? u.email) : null;
+          })
+          .filter(Boolean)
+  );
 
   return (
     <div className="modal fade show d-block" tabIndex="-1" role="dialog">
@@ -200,24 +291,30 @@ export default function ModalEditarExpediente({ onClose, expediente, actualizarE
               {/* renderizar selects dinámicos */}
               {(form.usuarios ?? []).map((usuarioId, index) => (
                 <div key={index} className="d-flex align-items-center mb-2">
-                  <UsuarioSelect
-                    label={`Usuario ${index + 1}`}
-                    name={`usuario${index}`}
-                    value={usuarioId}
-                    onChange={handleChange}
-                    usuariosDisponibles={usuarios}
-                    usuariosSeleccionados={form.usuarios ?? []}
-                  />
+                  <div className="flex-grow-1">
+                    <UsuarioSelect
+                      label={`Usuario ${index + 1}`}
+                      name={`usuario${index}`}
+                      value={usuarioId}
+                      onChange={handleChange}
+                      usuariosDisponibles={usuarios}
+                      usuariosSeleccionados={form.usuarios ?? []}
+                    />
+                  </div>
                   <button
                     type="button"
-                    className="btn btn-danger ms-2"
+                    className="btn btn-danger d-flex align-items-center justify-content-center ms-2"
+                    style={{
+                      height: "37px",        // mismo alto que un form-control estándar
+                      marginTop: "13px"      // baja el botón para que quede alineado con el select
+                    }}
                     onClick={() => {
                       const nuevosUsuarios = [...(form.usuarios ?? [])];
                       nuevosUsuarios.splice(index, 1);
                       setForm(prev => ({ ...prev, usuarios: nuevosUsuarios }));
                     }}
                   >
-                    -
+                    −
                   </button>
                 </div>
               ))}
