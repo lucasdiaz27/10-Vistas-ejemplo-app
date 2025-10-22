@@ -12,5 +12,8 @@ export default defineConfig({
     rollupOptions: {
       external: ['pdfjs-dist/build/pdf.worker.entry']
     }
+  },
+  server: {
+    allowedHosts: ['homothetic-riotingly-leonora.ngrok-free.dev']
   }
 })
