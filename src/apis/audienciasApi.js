@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/audiencias";
+const BASE_URL = "http://100.83.50.21:8080/audiencias";
 
 // Traer audiencias por expediente
 export const traerAudienciasPorExpediente = async (expedienteId, token) => {

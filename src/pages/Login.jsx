@@ -24,7 +24,7 @@ const Login = () => {
                 password: data.contraseña,
             };
 
-            const response = await axios.post("http://localhost:8080/auth/login", payload);
+            const response = await axios.post("http://100.83.50.21:8080/auth/login", payload);
 
             localStorage.setItem("token", response.data.access_token);
             navigate("/menu-interno?vista=mesa-entrada");

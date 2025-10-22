@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/denuncia"
+const BASE_URL = "http://100.83.50.21:8080/denuncia"
 
 export const enviarDenuncia = async (data, files) => {
   const formData = new FormData();
@@ -59,7 +59,7 @@ export const actualizarEstadoDenuncia = async (id, nuevoEstado, motivoEstado, to
 // ale
 
 export const traerDocDenuncia = async (id, token) => {
-  const res = await axios.get(`http://localhost:8080/doc/traerPorDenuncia/${id}`, {
+  const res = await axios.get(`http://100.83.50.21:8080/doc/traerPorDenuncia/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

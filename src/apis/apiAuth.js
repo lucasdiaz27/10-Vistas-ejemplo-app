@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // La URL base para los endpoints de autenticación
-const AUTH_URL = "http://localhost:8080/auth";
+const AUTH_URL = "http://100.83.50.21:8080/auth";
 
 /**
  * Registra un nuevo usuario. Esta función NO envía token.
