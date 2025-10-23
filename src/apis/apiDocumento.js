@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://100.83.50.21:8080/doc";
+const BASE_URL = `${import.meta.env.VITE_BASE_URL}/doc`;
 
 export const traerArchivoPDF = async (id, token) => {
   const res = await axios.get(`${BASE_URL}/traerPorId/${id}`, {

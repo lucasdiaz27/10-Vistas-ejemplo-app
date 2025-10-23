@@ -2,7 +2,7 @@
 // API para consumir las órdenes de un expediente desde el backend
 import axios from "axios";
 
-const BASE_URL = "https://100.83.50.21:8080/doc";
+const BASE_URL = `${import.meta.env.VITE_BASE_URL}/doc`;
 
 // Trae las órdenes por expediente
 export const traerOrdenesPorExpediente = async (expedienteId, token) => {
