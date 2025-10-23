@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://100.83.50.21:8080/pases";
+const BASE_URL = "https://100.83.50.21:8080/pases";
 
 // Traer pases por expediente
 export const traerPasesPorExp = async (expedienteId, token) => {
@@ -50,7 +50,7 @@ export const eliminarPase = async (id, token) => {
 // Devuelve un array de strings con los valores del ENUM Area
 export const obtenerAreasEnum = async (token) => {
   // Ahora apunta al endpoint correcto del backend para el ENUM Area
-  const res = await axios.get("http://100.83.50.21:8080/api/areas", {
+  const res = await axios.get("https://100.83.50.21:8080/api/areas", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data; // Se espera un array tipo ["MESA_DE_ENTRADA", "ABOGADOS", ...]

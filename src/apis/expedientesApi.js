@@ -1,7 +1,7 @@
 import axios from "axios";
 import Swal from 'sweetalert2';
 
-const BASE_URL = "http://100.83.50.21:8080/expediente";
+const BASE_URL = "https://100.83.50.21:8080/expediente";
 
 export const traerExpedientes = async (token) => {
   const res = await axios.get(`${BASE_URL}/traerExpedientes`, {
@@ -55,7 +55,7 @@ export const validarYActualizarExpediente = async (id, nuevoEstado, callbackActu
 };
 
 export const crearExpedienteDesdeDenuncia = async (denunciaId, token) => {
-  const res = await axios.post(`http://100.83.50.21:8080/denuncia/actualizarEstado/${denunciaId}`, null, {
+  const res = await axios.post(`https://100.83.50.21:8080/denuncia/actualizarEstado/${denunciaId}`, null, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

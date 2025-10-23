@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://100.83.50.21:8080/usuarios";
+const API_URL = "https://100.83.50.21:8080/usuarios";
 
 // --- FUNCIONES PARA LA GESTIÓN DE USUARIOS (VISTA ADMIN) ---
 
