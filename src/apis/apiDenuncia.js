@@ -1,6 +1,6 @@
-import axios from "axios";
+import { authAxios as axios } from '../utils/auth';
 
-const BASE_URL = `${import.meta.env.VITE_BASE_URL}denuncia`
+const BASE_URL = "/denuncia"
 
 export const enviarDenuncia = async (data, files) => {
   const formData = new FormData();
