@@ -24,7 +24,7 @@ const Login = () => {
                 password: data.contraseña,
             };
 
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/auth/login`, payload);
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}auth/login`, payload);
 
             localStorage.setItem("token", response.data.access_token);
             navigate("/menu-interno?vista=mesa-entrada");

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // La URL base para los endpoints de autenticación
-const AUTH_URL = `${import.meta.env.VITE_BASE_URL}/auth`;
+const AUTH_URL = `${import.meta.env.VITE_BASE_URL}auth`;
 
 /**
  * Registra un nuevo usuario. Esta función NO envía token.

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = `${import.meta.env.VITE_BASE_URL}/audiencias`;
+const BASE_URL = `${import.meta.env.VITE_BASE_URL}audiencias`;
 
 // Traer audiencias por expediente
 export const traerAudienciasPorExpediente = async (expedienteId, token) => {

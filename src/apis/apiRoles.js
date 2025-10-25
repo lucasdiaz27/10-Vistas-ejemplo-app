@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = `${import.meta.env.VITE_BASE_URL}/rol`;
+const API_URL = `${import.meta.env.VITE_BASE_URL}rol`;
 
 export async function traerRoles(token) {
   const res = await axios.get(`${API_URL}/traerRol`, {
