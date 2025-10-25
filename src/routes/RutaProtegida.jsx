@@ -19,7 +19,7 @@ export default function ProtectedRoute() {
         const userRole =
             decoded?.rol || decoded?.role || decoded?.authorities?.[0] || null;
 
-        console.log("ROL DETECTADO:", userRole);
+        // console.log("ROL DETECTADO:", userRole);
 
         //se define  las rutas permitidas para cada rol
         const permisosPorRol = {

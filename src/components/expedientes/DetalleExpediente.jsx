@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { PDFViewer } from "@react-pdf/renderer";
+import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
 import ExpedientePDF from "./ExpedientePDF";
 import ModalEditarExpediente from "./modales/ModalEditarExpediente";
 import FormularioPaseModal from "./modales/FormularioPaseModal";
 import TablaAudiencias from "./TablaAudiencias";
 import ModalAudiencia from "./ModalAudiencia";
+import { ArchivosDenuncia } from "../detalle-denuncia/ArchivosDenuncia";
 import { ModalPDF } from "../detalle-denuncia/ModalPDF";
 import { traerDocDenuncia } from "../../apis/apiDenuncia";
 import { traerArchivoPDF } from "../../apis/apiDocumento";
@@ -31,14 +32,14 @@ export default function DetalleExpediente() {
   const [archivos, setArchivos] = useState([]);
 
   // Modales de los componentes
-  const [modalAudiencia, setModalAudiencia] = useState({ show: false, modo: null, audiencia: null });
-  const [modalPase, setModalPase] = useState({ show: false, modo: null, pase: null });
+  const [modalAudiencia, setModalAudiencia] = useState({show: false, modo: null, audiencia: null});
+  const [modalPase, setModalPase] = useState({show: false, modo: null, pase: null});
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mostrarModalOrden, setMostrarModalOrden] = useState(false);
 
   // Llama al hook de Expedientes
   const { expediente, cargando, error, setExpediente } = useExpediente(id);
-  const { audiencias, guardarAudiencia, borrarAudiencia } = useAudiencias(id, setMensaje);
+  const { audiencias, guardarAudiencia, borrarAudiencia} = useAudiencias(id, setMensaje);
   const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes } = useOrdenes(id, setMensaje);
   const { pases, guardarPase, borrarPase } = usePases(id, setMensaje, fetchOrdenes);
 
@@ -96,7 +97,7 @@ export default function DetalleExpediente() {
     setMostrarModalOrden(false);
   };
   const handlerModalOrden = () => {
-  // console.log("Abrir modal para subir orden");
+    console.log("Abrir modal para subir orden");
     setMostrarModalOrden(true);
   };
 
@@ -129,6 +130,10 @@ export default function DetalleExpediente() {
         No se encontró el expediente.
       </div>
     );
+
+  const denunciante = expediente.denuncia?.personas?.find(
+    (p) => (p.rol || "").toLowerCase() === "denunciante"
+  );
 
   return (
     <div className="container py-4">
@@ -175,7 +180,7 @@ export default function DetalleExpediente() {
 
       <div className="row g-4">
         <div className="col-lg-8">
-          <div className="card mb-4 h-100">
+          <div className="card mb-4">
             <div className="card-body position-relative">
               <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
                 <span>
@@ -277,32 +282,6 @@ export default function DetalleExpediente() {
               </div>
             </div>
           </div>
-        </div>
-        <div className="col-lg-4">
-          <div className="card mb-4 h-100">
-            <div className="card-body">
-              <h5 className="card-title mb-3">
-                <i className="bi bi-people me-2"></i>Personas Involucradas
-              </h5>
-              {expediente.denuncia?.personas?.map((persona) => (
-                <div key={persona.id} className="mb-2">
-                  <strong>
-                    {persona.rol
-                      ? persona.rol.charAt(0).toUpperCase() +
-                        persona.rol.slice(1)
-                      : "Sin rol"}
-                    :
-                  </strong>{" "}
-                  {persona.nombre} {persona.apellido} - DNI: {persona.documento}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="row g-4 mt-3">
-        <div className="col-12">
           {/* Selector de pestañas */}
           <div className="card mb-4">
             <div className="card-body pb-0">
@@ -371,8 +350,28 @@ export default function DetalleExpediente() {
             </div>
           </div>
         </div>
+        <div className="col-lg-4">
+          <div className="card mb-4">
+            <div className="card-body">
+              <h5 className="card-title mb-3">
+                <i className="bi bi-people me-2"></i>Personas Involucradas
+              </h5>
+              {expediente.denuncia?.personas?.map((persona) => (
+                <div key={persona.id} className="mb-2">
+                  <strong>
+                    {persona.rol
+                      ? persona.rol.charAt(0).toUpperCase() +
+                        persona.rol.slice(1)
+                      : "Sin rol"}
+                    :
+                  </strong>{" "}
+                  {persona.nombre} {persona.apellido} - DNI: {persona.documento}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-
       {/* Modal para crear/editar audiencia */}
       <ModalAudiencia
         show={modalAudiencia.show}
@@ -426,4 +425,3 @@ export default function DetalleExpediente() {
     </div>
   );
 }
-

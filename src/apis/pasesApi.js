@@ -1,10 +1,11 @@
-import axios from "axios";
+import { authAxios } from "../utils/auth";
 
-const BASE_URL = `${import.meta.env.VITE_BASE_URL}pases`;
+
+const BASE_URL = `/pases`;
 
 // Traer pases por expediente
 export const traerPasesPorExp = async (expedienteId, token) => {
-  const res = await axios.get(`${BASE_URL}/traerPasesPorExp/${expedienteId}`, {
+  const res = await authAxios.get(`${BASE_URL}/traerPasesPorExp/${expedienteId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -14,7 +15,7 @@ export const traerPasesPorExp = async (expedienteId, token) => {
 // Recibe un FormData con el JSON del pase y el archivo PDF
 export const crearPase = async (formData, token) => {
   // El backend espera form-data con 'pase' (JSON) y 'file' (PDF)
-  const res = await axios.post(`${BASE_URL}/crearPase`, formData, {
+  const res = await authAxios.post(`${BASE_URL}/crearPase`, formData, {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'multipart/form-data',
@@ -25,7 +26,7 @@ export const crearPase = async (formData, token) => {
 
 // Editar un pase existente
 export const editarPase = async (id, pase, token) => {
-  const res = await axios.put(
+  const res = await authAxios.put(
     `${BASE_URL}/editarPase/${id}`,
     pase,
     {
@@ -40,7 +41,7 @@ export const editarPase = async (id, pase, token) => {
 
 // Eliminar un pase
 export const eliminarPase = async (id, token) => {
-  const res = await axios.delete(`${BASE_URL}/borrarPase/${id}`, {
+  const res = await authAxios.delete(`${BASE_URL}/borrarPase/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -50,7 +51,7 @@ export const eliminarPase = async (id, token) => {
 // Devuelve un array de strings con los valores del ENUM Area
 export const obtenerAreasEnum = async (token) => {
   // Ahora apunta al endpoint correcto del backend para el ENUM Area
-  const res = await axios.get("/api/areas", {
+  const res = await authAxios.get("/api/areas", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data; // Se espera un array tipo ["MESA_DE_ENTRADA", "ABOGADOS", ...]

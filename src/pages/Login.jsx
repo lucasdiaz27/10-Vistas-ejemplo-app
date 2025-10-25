@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../validations/loginSchema';
 import { useNavigate } from 'react-router-dom';
-import { authAxios as axios } from '../utils/auth';
+import { authAxios } from '../utils/auth';
 
 
 const Login = () => {
@@ -25,7 +25,7 @@ const Login = () => {
                 password: data.contraseña,
             };
 
-            const response = await axios.post("/auth/login", payload);
+            const response = await authAxios.post("/auth/login", payload);
             console.log('Login exitoso:', response.data);
 
             // Verificar el tiempo de expiración del token

@@ -1,5 +1,5 @@
 // utils/auth.js
-import axios from './authInterceptor';
+import customAxiosInstance from './authInterceptor';
 
 // decodifica un JWT y retorna el payload como objeto JS
 export function parseJwt(token) {
@@ -58,5 +58,5 @@ export function isTokenExpired(token) {
   return Date.now() >= expiry;
 }
 
-// instancia de axios configurada con el interceptor
-export const authAxios = axios;
+// instancia de axios configurada con el interceptor de autenticación
+export const authAxios = customAxiosInstance;
