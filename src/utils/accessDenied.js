@@ -1,17 +1,26 @@
 import Swal from 'sweetalert2';
 import { parseJwt } from './auth';
 
-export function showAccessDenied(message = 'No tienes permiso para acceder a esta sección.') {
-    Swal.fire({
-        icon: 'warning',
-        title: 'Acceso Denegado',
-        text: message,
+export const showAlert = ({ title, text, icon = 'info', confirmButtonText = 'Confirmar' }) => {
+  return Swal.fire({
+        title,
+        text,
+        icon,
+        confirmButtonText,
         customClass: {
             title: 'swal2-title-modern',
             popup: 'swal2-popup-modern',
         },
-        confirmButtonText: 'Aceptar',
-    });
+        buttonsStyling: false,
+  })
+}
+
+export function showAccessDenied(message = 'No tienes permiso para acceder a esta sección.') {
+    showAlert({
+        icon: 'warning',
+        title: 'Acceso Denegado',
+        text: message
+    })
 }
 
 export function showAccessDeniedToast(message = 'Sin permiso para realizar esta acción.') {
