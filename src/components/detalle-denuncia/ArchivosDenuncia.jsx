@@ -22,7 +22,7 @@ export const ArchivosDenuncia = ({id, onVerArchivo}) => {
           {archivos.map((archivo, idx) => (
             <li className="list-group-item d-flex align-items-center" key={idx}>
               <i className="bi bi-file-earmark me-2"></i>
-              <span className="me-auto">{archivo.nombre}</span>
+              <span className="me-auto">{archivo.nombreVisible}</span>
               <button
                 className="btn btn-outline-primary btn-sm mr-2"
                 onClick={() => onVerArchivo(archivo)}

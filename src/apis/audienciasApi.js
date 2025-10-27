@@ -1,10 +1,10 @@
-import axios from "axios";
+import { authAxios } from "../utils/auth";
 
-const BASE_URL = "http://localhost:8080/audiencias";
+const BASE_URL = `/audiencias`;
 
 // Traer audiencias por expediente
 export const traerAudienciasPorExpediente = async (expedienteId, token) => {
-  const res = await axios.get(`${BASE_URL}/traeAudiPorExp/${expedienteId}`, {
+  const res = await authAxios.get(`${BASE_URL}/traeAudiPorExp/${expedienteId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -14,7 +14,7 @@ export const traerAudienciasPorExpediente = async (expedienteId, token) => {
 
 // Crear una nueva audiencia
 export const crearAudiencia = async (audiencia, token) => {
-  const res = await axios.post(`${BASE_URL}/creaAudiencia`, audiencia, {
+  const res = await authAxios.post(`${BASE_URL}/creaAudiencia`, audiencia, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -24,7 +24,7 @@ export const crearAudiencia = async (audiencia, token) => {
 
 // Editar una audiencia existente
 export const editarAudiencia = async (id, audiencia, token) => {
-  const res = await axios.put(`${BASE_URL}/editarAudi/${id}`, audiencia, {
+  const res = await authAxios.put(`${BASE_URL}/editarAudi/${id}`, audiencia, {
     headers: {
       Authorization: `Bearer ${token}`,
     }
@@ -34,7 +34,7 @@ export const editarAudiencia = async (id, audiencia, token) => {
 
 // Eliminar una audiencia
 export const eliminarAudiencia = async (id, token) => {
-  const res = await axios.delete(`${BASE_URL}/borrarAudiencia/${id}`, {
+  const res = await authAxios.delete(`${BASE_URL}/borrarAudiencia/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     }

@@ -1,9 +1,9 @@
-import axios from "axios";
+import { authAxios } from "../utils/auth";
 
-const API_URL = "http://localhost:8080/rol";
+const API_URL = `/rol`;
 
 export async function traerRoles(token) {
-  const res = await axios.get(`${API_URL}/traerRol`, {
+  const res = await authAxios.get(`${API_URL}/traerRol`, {
     headers: {
       ...(token && { Authorization: `Bearer ${token}` }),
     },

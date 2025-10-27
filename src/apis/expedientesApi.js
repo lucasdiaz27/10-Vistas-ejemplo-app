@@ -1,18 +1,15 @@
-import axios from "axios";
-import Swal from 'sweetalert2';
 
-const BASE_URL = "http://localhost:8080/expediente";
+import Swal from 'sweetalert2';
+import { authAxios } from '../utils/auth';
+
+const BASE_URL = "/expediente";
 
 export const traerExpedientes = async (token) => {
-  const res = await axios.get(`${BASE_URL}/traerExpedientes`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const res = await authAxios.get(`${BASE_URL}/traerExpedientes`);
   return res.data;
 };
 export const traerExpedientePorId = async (id, token) => {
-  const res = await axios.get(`${BASE_URL}/traerExpedientePorId/${id}`, {
+  const res = await authAxios.get(`${BASE_URL}/traerExpedientePorId/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -55,7 +52,7 @@ export const validarYActualizarExpediente = async (id, nuevoEstado, callbackActu
 };
 
 export const crearExpedienteDesdeDenuncia = async (denunciaId, token) => {
-  const res = await axios.post(`http://localhost:8080/denuncia/actualizarEstado/${denunciaId}`, null, {
+  const res = await authAxios.post(`/denuncia/actualizarEstado/${denunciaId}`, null, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -64,7 +61,7 @@ export const crearExpedienteDesdeDenuncia = async (denunciaId, token) => {
 };
 
 export const actualizarExpediente = async (id, expedienteActualizado, token) => {
-  const res = await axios.put(`${BASE_URL}/${id}`, expedienteActualizado, {
+  const res = await authAxios.put(`${BASE_URL}/${id}`, expedienteActualizado, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -81,7 +78,7 @@ export const existeExpedienteParaDenuncia = async (denunciaId, token) => {
 };
 
 export const editarExpediente = async (id, expedienteUpdateDTO, token) => {
-  const res = await axios.put(
+  const res = await authAxios.put(
     `${BASE_URL}/editarExpediente/${id}`,
     expedienteUpdateDTO,
     {
@@ -94,7 +91,7 @@ export const editarExpediente = async (id, expedienteUpdateDTO, token) => {
 };
 
 export const traerPorUsuario = async (token) => {
-  const res = await axios.get(`${BASE_URL}/traerPorUsuario`, {
+  const res = await authAxios.get(`${BASE_URL}/traerPorUsuario`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

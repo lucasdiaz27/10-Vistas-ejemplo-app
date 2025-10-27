@@ -1,25 +1,26 @@
-import axios from "axios";
+import { authAxios } from "../utils/auth";
 
-const API_URL = "http://localhost:8080/usuarios";
+
+const API_URL = `/usuarios`;
 
 // --- FUNCIONES PARA LA GESTIÓN DE USUARIOS (VISTA ADMIN) ---
 
 export async function traerUsuarios(token) {
-  const res = await axios.get(`${API_URL}/traerUsuarios`, {
+  const res = await authAxios.get(`${API_URL}/traerUsuarios`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 }
 
 export async function traerUsuarioPorId(usuarioId, token) {
-  const res = await axios.get(`${API_URL}/${usuarioId}`, {
+  const res = await authAxios.get(`${API_URL}/${usuarioId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 }
 
 export async function actualizarUsuario(usuarioId, datosUsuario, token) {
-  const res = await axios.put(`${API_URL}/${usuarioId}`, datosUsuario, {
+  const res = await authAxios.put(`${API_URL}/${usuarioId}`, datosUsuario, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
@@ -29,7 +30,7 @@ export async function actualizarUsuario(usuarioId, datosUsuario, token) {
 }
 
 export async function eliminarUsuario(usuarioId, token) {
-  const res = await axios.delete(`${API_URL}/borrar/${usuarioId}`, {
+  const res = await authAxios.delete(`${API_URL}/borrar/${usuarioId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -38,14 +39,14 @@ export async function eliminarUsuario(usuarioId, token) {
 // --- FUNCIONES PARA EL PERFIL DEL USUARIO LOGUEADO (VISTA AJUSTES) ---
 
 export const obtenerPerfilUsuario = async (token) => {
-  const response = await axios.get(`${API_URL}/perfilUsuario`, {
+  const response = await authAxios.get(`${API_URL}/perfilUsuario`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return response.data;
 };
 
 export const actualizarPerfilUsuario = async (datosPerfil, token) => {
-  const response = await axios.put(
+  const response = await authAxios.put(
     `${API_URL}/actualizarNombre`,
     datosPerfil,
     {
@@ -59,7 +60,7 @@ export const actualizarPerfilUsuario = async (datosPerfil, token) => {
 };
 
 export const cambiarPassword = async (passwords, token) => {
-  const response = await axios.put(
+  const response = await authAxios.put(
     `${API_URL}/cambiarPassword`,
     passwords,
     {

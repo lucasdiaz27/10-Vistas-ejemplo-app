@@ -20,13 +20,17 @@ export const DescDetalle = ({denuncia}) => {
               </span>
             ))}
           </div>
-          <div>
+          <div className="mb-3">
             <div className="fw-bold">Motivo</div>
             {denuncia.motivo?.map((m, idx) => (
               <span key={idx} className="badge bg-secondary me-2">
                 {m}
               </span>
             ))}
+          </div>
+          <div className="d-flex gap-2">
+            <div className="fw-bold">Desea ser notificado por correo:</div>
+            <span>{denuncia.notificar ? "Si" : "No"}</span>
           </div>
         </div>
       </div>
