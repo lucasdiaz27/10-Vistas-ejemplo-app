@@ -1,17 +1,17 @@
 import React from "react";
 import { InputsDelegado } from "./InputsDelegado";
 
-export const FormPersona = ({ tipoPersona, register, errors, index }) => {
+export const FormPersona = ({ tipoPersona, register, errors, index, optional = false }) => {
   return (
     <>
       <div className="mb-4">
         <div className="bg-white p-4 rounded shadow">
-          <h5>Datos del {tipoPersona}:</h5>
+          <h5>Datos del {tipoPersona}{optional ? ' (opcional)' : ''}:</h5>
 
           <div className="mb-3">
-            <label htmlFor={`personas[${index}].persona.nombre`} className="form-label">
-              Nombre o razón social
-            </label>
+                <label htmlFor={`personas[${index}].persona.nombre`} className="form-label">
+                  Nombre o razón social{!optional && <span style={{color:'red', marginLeft:'4px'}}>*</span>}
+                </label>
             <input
               type="text"
               className="form-control"
@@ -26,9 +26,9 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor={`personas[${index}].persona.apellido`} className="form-label">
-              Apellido
-            </label>
+                <label htmlFor={`personas[${index}].persona.apellido`} className="form-label">
+                  Apellido{!optional && <span style={{color:'red', marginLeft:'4px'}}>*</span>}
+                </label>
             <input
               type="text"
               className="form-control"
@@ -43,9 +43,9 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor={`personas[${index}].persona.documento`} className="form-label">
-              DNI/CUIT
-            </label>
+                <label htmlFor={`personas[${index}].persona.documento`} className="form-label">
+                  DNI/CUIT{!optional && <span style={{color:'red', marginLeft:'4px'}}>*</span>}
+                </label>
             <input
               type="number"
               className="form-control"
@@ -66,9 +66,9 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor={`personas[${index}].persona.domicilio`} className="form-label">
-              Domicilio
-            </label>
+                <label htmlFor={`personas[${index}].persona.domicilio`} className="form-label">
+                  Domicilio{!optional && <span style={{color:'red', marginLeft:'4px'}}>*</span>}
+                </label>
             <input
               type="text"
               className="form-control"
@@ -83,9 +83,9 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor={`personas[${index}].persona.localidad`} className="form-label">
-              Localidad
-            </label>
+                <label htmlFor={`personas[${index}].persona.localidad`} className="form-label">
+                  Localidad{!optional && <span style={{color:'red', marginLeft:'4px'}}>*</span>}
+                </label>
             <input
               type="text"
               className="form-control"
@@ -100,9 +100,9 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor={`personas[${index}].persona.cp`} className="form-label">
-              Código postal
-            </label>
+                <label htmlFor={`personas[${index}].persona.cp`} className="form-label">
+                  Código postal{!optional && <span style={{color:'red', marginLeft:'4px'}}>*</span>}
+                </label>
             <input
               type="text"
               className="form-control"
@@ -118,9 +118,9 @@ export const FormPersona = ({ tipoPersona, register, errors, index }) => {
             )}
           </div>
           <div className="mb-3">
-            <label htmlFor={`personas[${index}].persona.telefono`} className="form-label">
-              Teléfono
-            </label>
+                <label htmlFor={`personas[${index}].persona.telefono`} className="form-label">
+                  Teléfono{!optional && <span style={{color:'red', marginLeft:'4px'}}>*</span>}
+                </label>
             <input
               type="number"
               className="form-control"

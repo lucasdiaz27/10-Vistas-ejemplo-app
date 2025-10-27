@@ -79,7 +79,7 @@ export const Formulario = () => {
 
             <div className="row">
               <div className={"col-12 col-md-6"}>
-                <FormPersona register={register} errors={errors} tipoPersona={"Técnico"} index={2} />
+                <FormPersona register={register} errors={errors} tipoPersona={"Técnico"} index={2} optional={true} />
               </div>
               <div className={"col-12 col-md-6"}>
                 <FormObjeto errors={errors} register={register} />
@@ -138,8 +138,9 @@ export const Formulario = () => {
                 <div className="text-center">
                   <button
                     type="submit"
-                    className="btn btn-success mt-2"
+                    className={`btn mt-2 ${!watch("aceptarTerminos") ? "btn-secondary" : "btn-success"}`}
                     disabled={!watch("aceptarTerminos") || isSubmitting}
+                    style={!watch("aceptarTerminos") ? { cursor: "not-allowed" } : {}}
                   >
                     {isSubmitting ? 'Enviando...' : 'Enviar formulario'}
                   </button>
