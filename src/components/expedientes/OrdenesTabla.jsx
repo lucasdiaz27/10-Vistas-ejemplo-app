@@ -37,7 +37,7 @@ export default function OrdenesTabla({ ordenes, onDescargar, onVer, onEliminar, 
                 {/* Tipo de documento (ENUM o string) */}
                 <td>{orden.tipoDocumento || '-'}</td>
                 {/* Número de documento */}
-                <td>{orden.nroDocumento || '-'}</td>
+                <td>{orden.nombreVisible || '-'}</td>
                 {/* Referencia asociada */}
                 <td>{orden.referencia || '-'}</td>
                 {/* Fecha de asociación, formateada si es necesario */}

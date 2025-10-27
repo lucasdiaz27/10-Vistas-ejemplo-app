@@ -59,7 +59,7 @@ export const actualizarEstadoDenuncia = async (id, nuevoEstado, motivoEstado, to
 // ale
 
 export const traerDocDenuncia = async (id, token) => {
-  const res = await axiosInstance.get(`/doc/traerPorDenuncia/${id}`, {
+  const res = await authAxios.get(`/doc/traerPorDenuncia/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -68,7 +68,7 @@ export const traerDocDenuncia = async (id, token) => {
 }
 
 export const mandarCorreo = async (id, observacion, token) => {
-  return axiosInstance.post(`${BASE_URL}/mandarCorreo/${id}`, 
+  return authAxios.post(`${BASE_URL}/mandarCorreo/${id}`, 
     observacion, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ export const mandarCorreo = async (id, observacion, token) => {
 }
 
 export const traerHistorialDenuncia = async (nroExp, token) => {
-  const res = await axiosInstance.get(`${BASE_URL}/historial/${nroExp}`, {
+  const res = await authAxios.get(`${BASE_URL}/historial/${nroExp}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -86,7 +86,7 @@ export const traerHistorialDenuncia = async (nroExp, token) => {
 };
 
 export const traerDenunciaPorUsuario = async (token) => {
-  const res = await axiosInstance.get(`${BASE_URL}/traerDenunciasPorUsuario`, {
+  const res = await authAxios.get(`${BASE_URL}/traerDenunciasPorUsuario`, {
     headers: {
       Authorization: `Bearer ${token}`
     },
