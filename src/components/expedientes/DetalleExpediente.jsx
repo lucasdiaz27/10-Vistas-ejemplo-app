@@ -1,5 +1,3 @@
-// DetalleExpediente.jsx
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
@@ -134,6 +132,30 @@ export default function DetalleExpediente() {
   const denunciante = expediente.denuncia?.personas?.find(
     (p) => (p.rol || "").toLowerCase() === "denunciante"
   );
+  
+  // --- 🎨 AQUÍ LA MODIFICACIÓN CON TUS ESTADOS REALES ---
+  const getEstadoVariant = (estado) => {
+    if (!estado) return "secondary"; // Color por defecto
+    const estadoLower = estado.toLowerCase();
+
+    // Estados de tu imagen
+    if (estadoLower.includes("finalizado")) return "success";
+    if (estadoLower.includes("rechazado")) return "danger";
+    if (estadoLower.includes("en inspección")) return "warning";
+    if (estadoLower.includes("en dirección")) return "info";
+    if (estadoLower.includes("en subdirección")) return "info";
+    if (estadoLower.includes("asesoría legal")) return "primary";
+    if (estadoLower.includes("admitido")) return "primary";
+    if (estadoLower.includes("en espera")) return "secondary";
+    
+    return "dark"; // Color para estados no definidos
+  };
+  // --- FIN DE LA MODIFICACIÓN ---
+
+  // 1. Guardamos el estado y el color en variables
+  const estadoActual = expediente.denuncia?.estado;
+  const alertVariant = getEstadoVariant(estadoActual);
+
 
   return (
     <div className="container py-4">
@@ -181,6 +203,19 @@ export default function DetalleExpediente() {
                   <i className="bi bi-pencil"></i>
                 </button>
               </h5>
+
+              {estadoActual && (
+                <div className={`alert alert-${alertVariant} d-flex align-items-center`} role="alert">
+                  <i className="bi bi-info-circle-fill me-3" style={{ fontSize: "1.5rem" }}></i>
+                  <div>
+                    <h5 className="alert-heading mb-0" style={{ fontWeight: 600 }}>
+                      Actualmente en:
+                    </h5>
+                    <span className="fs-5">{estadoActual}</span>
+                  </div>
+                </div>
+              )}
+              
 
               <p>
                 <strong>Número de Expediente:</strong>{" "}
@@ -244,27 +279,6 @@ export default function DetalleExpediente() {
                   ) : (
                     <span className="text-muted">-</span>
                   )}
-                </div>
-              </div>
-              <div className="mb-2">
-                <div style={{ fontWeight: 500, fontSize: "1em", marginBottom: 2 }}>
-                  <strong>Estado:</strong>
-                </div>
-                <div>
-                  <span
-                    className="badge d-inline-flex gap-2 align-items-center"
-                    style={{
-                      backgroundColor: "#e2e3e5",
-                      color: "#383d41",
-                      fontWeight: 500,
-                      fontSize: "1em",
-                      borderRadius: "0.5rem",
-                      padding: "0.5em 1em",
-                      verticalAlign: "middle",
-                    }}>
-                    <i className="bi bi-info-circle"></i>
-                    {expediente.denuncia?.estado}
-                  </span>
                 </div>
               </div>
             </div>
