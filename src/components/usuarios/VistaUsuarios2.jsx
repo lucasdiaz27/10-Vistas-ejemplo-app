@@ -58,7 +58,12 @@ export default function VistaUsuarios2() {
             const token = localStorage.getItem('token');
             const datosCompletosUsuario = await traerUsuarioPorId(usuario.id, token);
             // Añadimos el ID que se pierde en el PerfilDTO del backend
-            setUsuarioSeleccionado({ ...datosCompletosUsuario, id: usuario.id });
+            // CÓDIGO CORREGIDO
+              setUsuarioSeleccionado({
+              ...datosCompletosUsuario, // 1. Trae los datos del PerfilDTO (nombre, apellido, etc.)
+              id: usuario.id,           // 2. Asegura el ID del usuario de la tabla
+              rol: usuario.rol          // 3. (LA CLAVE) Asegura el ROL del usuario de la tabla
+              });
             setModal('editar');
         } catch (error) {
             Swal.fire({
