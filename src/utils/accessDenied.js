@@ -34,6 +34,20 @@ export function showAccessDeniedToast(message = 'Sin permiso para realizar esta 
     });
 }
 
+export function showSuccessAlert(message) {
+    Swal.fire({
+        icon: 'success',
+        title: message,
+        showConfirmButton: false,
+        timer: 2000,
+        position: 'top',
+        background: '#fff',
+        customClass: {
+            popup: 'animated fadeInDown'
+        }
+    });
+}
+
 export const verificarAcceso = (nombreRol) => {
     const token = localStorage.getItem('token');
     const payload = parseJwt(token);

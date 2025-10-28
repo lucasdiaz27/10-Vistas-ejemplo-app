@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { FormPersona } from "../components/formulario-denuncia/FormPersona";
 import { FormObjeto } from "../components/formulario-denuncia/FormObjeto";
 import { useForm } from "react-hook-form";
+import * as bootstrap from 'bootstrap';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { denunciaSchema } from "../validations/denunciaSchma";
 import { enviarDenuncia } from "../apis/apiDenuncia";
@@ -17,6 +18,25 @@ export const Formulario = () => {
   const fileInputRef = useRef();
   const [isWebchatOpen, setIsWebchatOpen] = useState(false);
   const toggleWebchat = () => setIsWebchatOpen((prevState) => !prevState);
+
+  // inicializar tooltips de Bootstrap
+  useEffect(() => {
+    // inicializar todos los tooltips
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(tooltip => {
+      new bootstrap.Tooltip(tooltip);
+    });
+
+    // cleanup al desmontar
+    return () => {
+      tooltips.forEach(tooltip => {
+        const instance = bootstrap.Tooltip.getInstance(tooltip);
+        if (instance) {
+          instance.dispose();
+        }
+      });
+    };
+  }, []);
 
   const {
     register,
@@ -138,9 +158,12 @@ export const Formulario = () => {
                 <div className="text-center">
                   <button
                     type="submit"
-                    className={`btn mt-2 ${!watch("aceptarTerminos") ? "btn-secondary" : "btn-success"}`}
+                    className={`btn mt-2 ${!watch("aceptarTerminos") ? "btn-secondary opacity-50" : "btn-success"}`}
                     disabled={!watch("aceptarTerminos") || isSubmitting}
                     style={!watch("aceptarTerminos") ? { cursor: "not-allowed" } : {}}
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title={!watch("aceptarTerminos") ? "Debe aceptar los términos y condiciones para continuar" : ""}
                   >
                     {isSubmitting ? 'Enviando...' : 'Enviar formulario'}
                   </button>

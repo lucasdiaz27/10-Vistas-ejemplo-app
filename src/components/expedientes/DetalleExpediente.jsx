@@ -138,19 +138,6 @@ export default function DetalleExpediente() {
   return (
     <div className="container py-4">
       <div className="mb-3 d-flex gap-2">
-        {mensaje && (
-          <div
-            className="alert alert-success alert-dismissible fade show"
-            role="alert"
-          >
-            {mensaje}
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setMensaje("")}
-            ></button>
-          </div>
-        )}
         <button
           className="btn btn-outline-secondary me-2"
           onClick={() => navigate(-1)}

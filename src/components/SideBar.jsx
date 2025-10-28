@@ -34,6 +34,13 @@ export const SideBar = ({ abierto, setAbierto }) => {
     }
   }
 
+  // manejador para clics en el overlay
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setAbierto(false);
+    }
+  };
+
   return (
     <>
       <button
@@ -50,11 +57,23 @@ export const SideBar = ({ abierto, setAbierto }) => {
         <i className="bi bi-list"></i>
       </button>
 
+      {/* overlay que solo aparece cuando el sidebar está abierto */}
+      {abierto && (
+        <div
+          onClick={handleOverlayClick}
+          className="position-fixed top-0 start-0 w-100 h-100"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            zIndex: 1050
+          }}
+        />
+      )}
+
       <div
         className={`sidebar bg-dark text-white p-3 position-fixed top-0 start-0 h-100 ${
           abierto ? "sidebar-open" : "sidebar-closed"
         }`}
-        style={{ width: "280px", transition: "transform 0.3s ease" }}
+        style={{ width: "280px", transition: "transform 0.3s ease", zIndex: 1051 }}
       >
         <button
           className="btn btn-outline-light position-fixed top-0 start-0 m-2 z-3"

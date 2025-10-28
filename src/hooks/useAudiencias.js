@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { crearAudiencia, editarAudiencia, eliminarAudiencia, traerAudienciasPorExpediente } from "../apis/audienciasApi";
+import { showSuccessAlert, showAlert } from "../utils/accessDenied";
 
 export const useAudiencias = (expedienteId, setMensaje) => {
   const [audiencias, setAudiencias] = useState([]);
@@ -19,14 +20,18 @@ export const useAudiencias = (expedienteId, setMensaje) => {
     try {
       if (modo === "crear") {
         await crearAudiencia(audiencia, token);
-        setMensaje("Audiencia creada correctamente");
+        showSuccessAlert('¡Audiencia creada exitosamente! ');
       } else {
         await editarAudiencia(idAudiencia, audiencia, token);
-        setMensaje("Audiencia editada correctamente");
+        showSuccessAlert('¡Audiencia actualizada exitosamente! ');
       }
       await cargarAudiencias();
     } catch {
-      alert("Error al guardar la audiencia");
+      showAlert({
+        title: 'Error',
+        text: 'No se pudo guardar la audiencia',
+        icon: 'error'
+      });
     }
   };
 
@@ -35,9 +40,13 @@ export const useAudiencias = (expedienteId, setMensaje) => {
     try {
       await eliminarAudiencia(id, token);
       await cargarAudiencias();
-      setMensaje("Audiencia eliminada correctamente");
+      showSuccessAlert('¡Audiencia eliminada correctamente! ');
     } catch {
-      alert("Error al eliminar la audiencia");
+      showAlert({
+        title: 'Error',
+        text: 'No se pudo eliminar la audiencia',
+        icon: 'error'
+      });
     }
   };
 
