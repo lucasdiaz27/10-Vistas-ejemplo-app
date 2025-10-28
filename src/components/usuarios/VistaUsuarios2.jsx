@@ -60,9 +60,9 @@ export default function VistaUsuarios2() {
             // Añadimos el ID que se pierde en el PerfilDTO del backend
             // CÓDIGO CORREGIDO
               setUsuarioSeleccionado({
-              ...datosCompletosUsuario, // 1. Trae los datos del PerfilDTO (nombre, apellido, etc.)
-              id: usuario.id,           // 2. Asegura el ID del usuario de la tabla
-              rol: usuario.rol          // 3. (LA CLAVE) Asegura el ROL del usuario de la tabla
+              ...datosCompletosUsuario, 
+              id: usuario.id,           
+              rol: usuario.rol          
               });
             setModal('editar');
         } catch (error) {
