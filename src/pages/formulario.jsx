@@ -49,6 +49,9 @@ export const Formulario = () => {
   });
 
   const onSubmit = async (data) => {
+    if (!watch("aceptarTerminos")) {
+      return; // No permitir el envío si los términos no están aceptados
+    }
     setIsSubmitting(true);
     try {
       const rolesPorIndice = ["denunciante", "denunciado", "tecnico"];
@@ -159,7 +162,6 @@ export const Formulario = () => {
                   <button
                     type="submit"
                     className={`btn mt-2 ${!watch("aceptarTerminos") ? "btn-secondary opacity-50" : "btn-success"}`}
-                    disabled={!watch("aceptarTerminos") || isSubmitting}
                     style={!watch("aceptarTerminos") ? { cursor: "not-allowed" } : {}}
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
