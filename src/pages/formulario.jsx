@@ -37,7 +37,6 @@ export const Formulario = () => {
       });
     };
   }, []);
-
   const {
     register,
     handleSubmit,
@@ -47,6 +46,9 @@ export const Formulario = () => {
     resolver: zodResolver(denunciaSchema),
     mode: 'onChange', // Para que la validación sea en tiempo real
   });
+  useEffect(() => {
+    console.log("Form errors:", errors);
+  }, [errors]);
 
   const onSubmit = async (data) => {
     console.log(data)
