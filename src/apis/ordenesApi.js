@@ -30,3 +30,24 @@ export const agregarOrden = async (formData, token) => {
   });
   return res.data;
 }
+
+// --- 🚀 NUEVA FUNCIÓN AÑADIDA ---
+// Asumo que tu OrdenCreateDTO (el que usas para crear) también sirve para actualizar
+// y que el endpoint es similar a los otros.
+export const actualizarOrden = async (ordenId, ordenData, token) => {
+  try {
+    // Usamos el BASE_URL y un endpoint consistente con tu backend
+    const response = await authAxios.put(`${BASE_URL}/actualizarOrden/${ordenId}`, ordenData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+        // No se necesita 'Content-Type': 'multipart/form-data' porque no enviamos archivo
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar la orden:', error.response || error);
+    throw error.response?.data || new Error('Error al actualizar la orden');
+  }
+};
+// --- FIN DE LA MODIFICACIÓN ---
+
