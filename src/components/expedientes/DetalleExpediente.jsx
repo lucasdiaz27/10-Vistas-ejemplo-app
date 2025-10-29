@@ -185,15 +185,8 @@ export default function DetalleExpediente() {
         </div>
       )}
 
-      {/* --- ESTRUCTURA DE FILAS --- */}
-      
-      {/* Fila 1: Información General y Personas Involucradas */}
-      {/* --- 🚀 CAMBIO: Se añade 'mb-4' a la Fila 1 --- */}
       <div className="row g-4 mb-4">
-        
-        {/* Columna Izquierda: Información General */}
         <div className="col-lg-8">
-          {/* --- 🚀 CAMBIO: Se quita 'mb-4' de la tarjeta interna --- */}
           <div className="card h-100">
             <div className="card-body position-relative">
               <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
@@ -287,10 +280,7 @@ export default function DetalleExpediente() {
             </div>
           </div>
         </div>
-        
-        {/* Columna Derecha: Personas Involucradas */}
         <div className="col-lg-4">
-          {/* --- 🚀 CAMBIO: Se quita 'mb-4' de la tarjeta interna --- */}
           <div className="card h-100">
             <div className="card-body">
               <h5 className="card-title mb-3">
@@ -312,11 +302,12 @@ export default function DetalleExpediente() {
           </div>
         </div>
       </div>
+      {/* --- FIN DE LA FILA 1 --- */}
 
-      {/* Fila 2: Selector de Pestañas (AHORA FULL-WIDTH) */}
+      {/* --- NUEVA ESTRUCTURA PARA Pases, Audiencias y Órdenes --- */}
       <div className="row g-4">
         <div className="col-12"> 
-          <div className="card mb-4"> {/* Mantenemos mb-4 aquí para espacio al final de la página */}
+          <div className="card mb-4"> 
             <div className="card-body pb-0">
               <div className="d-flex align-items-center mb-3">
                 <button

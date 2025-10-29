@@ -37,10 +37,6 @@ function ModalEditarOrden({ show, onClose, onGuardar, orden }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Pasamos los datos actualizados al padre (DetalleExpediente)
-    // y también el ID de la orden que estamos editando.
-    // El formData incluye el tipoDocumento y referencia originales,
-    // pero el nombreVisible actualizado.
     onGuardar(orden.id, formData);
   };
 
