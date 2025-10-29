@@ -49,6 +49,7 @@ export const Formulario = () => {
   });
 
   const onSubmit = async (data) => {
+    console.log(data)
     if (!watch("aceptarTerminos")) {
       return; // No permitir el envío si los términos no están aceptados
     }
