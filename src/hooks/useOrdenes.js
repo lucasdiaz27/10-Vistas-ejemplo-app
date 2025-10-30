@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-// 1. IMPORTAMOS LA NUEVA FUNCIÓN
-import { 
-  agregarOrden, 
-  eliminarOrden, 
+
+import {
+  agregarOrden,
+  eliminarOrden,
   traerOrdenesPorExpediente,
-  actualizarOrden 
+  actualizarOrden
 } from "../apis/ordenesApi";
 import { traerArchivoPDF } from "../apis/apiDocumento";
 import { eliminarPase } from "../apis/pasesApi";
@@ -17,11 +17,27 @@ export const useOrdenes = (id, setMensaje) => {
     const token = localStorage.getItem("token");
     try {
       const data = await traerOrdenesPorExpediente(id, token);
-      setOrdenes(data);
+
+    
+      const dataLimpia = data.map(orden => {
+        if (orden.nombreVisible &&
+          orden.nombreVisible.startsWith('"') &&
+          orden.nombreVisible.endsWith('"')) {
+          return {
+            ...orden,
+            nombreVisible: orden.nombreVisible.substring(1, orden.nombreVisible.length - 1)
+          };
+        }
+        return orden;
+      });
+     
+
+      setOrdenes(dataLimpia); 
     } catch {
       setOrdenes([]);
     }
   };
+
   useEffect(() => {
     fetchOrdenes();
   }, [id]);
@@ -31,10 +47,10 @@ export const useOrdenes = (id, setMensaje) => {
     try {
       await agregarOrden(ordenData, token);
       setMensaje("Orden agregada correctamente");
-      Swal.fire('¡Éxito!', 'Orden agregada correctamente.', 'success'); // Usamos Swal
+      Swal.fire('¡Éxito!', 'Orden agregada correctamente.', 'success'); 
       await fetchOrdenes(); // Recargamos
     } catch {
-      Swal.fire('Error', 'Error al agregar la orden.', 'error'); // Usamos Swal
+      Swal.fire('Error', 'Error al agregar la orden.', 'error'); 
     }
   };
 
@@ -86,7 +102,7 @@ export const useOrdenes = (id, setMensaje) => {
 
     try {
       // TODO: implementar eliminarOrden en ordenesApi.js
-      if (orden.referencia == "Pase" ) {
+      if (orden.referencia == "Pase") {
         eliminarPase(orden.id_pase);
       } else if (orden.referencia == "Usuario Externo") {
         Swal.fire('Acción denegada', 'No se puede eliminar un documento de usuario externo.', 'error'); // Usamos Swal
@@ -94,22 +110,21 @@ export const useOrdenes = (id, setMensaje) => {
       }
       const token = localStorage.getItem("token");
       await eliminarOrden(orden.id, token);
-      Swal.fire('¡Eliminado!', 'La orden ha sido eliminada.', 'success'); // Usamos Swal
+      Swal.fire('¡Eliminado!', 'La orden ha sido eliminada.', 'success'); 
       await fetchOrdenes(); // Recargamos
     } catch (err) {
-      Swal.fire('Error', 'No se pudo eliminar el documento.', 'error'); // Usamos Swal
+      Swal.fire('Error', 'No se pudo eliminar el documento.', 'error'); 
     }
   }
 
   // 4. EXPORTAMOS LA NUEVA FUNCIÓN
-  return { 
-    ordenes, 
-    descargarOrden, 
-    subirOrden, 
-    borrarOrden, 
-    setOrdenes, 
+  return {
+    ordenes,
+    descargarOrden,
+    subirOrden,
+    borrarOrden,
+    setOrdenes,
     fetchOrdenes,
-    actualizarOrden: handleActualizarOrden // La nueva función
+    actualizarOrden: handleActualizarOrden
   };
 };
-

@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-// Modal para EDITAR una orden, simplificado al MÁXIMO por Ale.
+// Modal para EDITAR una orden
 function ModalEditarOrden({ show, onClose, onGuardar, orden }) {
+
   const [formData, setFormData] = useState({
     tipoDocumento: '',
     nombreVisible: '',
     referencia: '',
   });
 
-  // Cuando la 'orden' que pasamos como prop cambia (al abrir el modal),
-  // llenamos el formulario con sus datos.
   useEffect(() => {
     if (orden) {
       setFormData({
         tipoDocumento: orden.tipoDocumento || '',
-        nombreVisible: orden.nombreVisible || '', // Este es el "Nombre Documento"
+        nombreVisible: orden.nombreVisible || '', 
         referencia: orden.referencia || '',
       });
     } else {
@@ -37,7 +36,7 @@ function ModalEditarOrden({ show, onClose, onGuardar, orden }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onGuardar(orden.id, formData);
+    onGuardar(orden.id, formData.nombreVisible);
   };
 
   if (!show) {
@@ -54,8 +53,8 @@ function ModalEditarOrden({ show, onClose, onGuardar, orden }) {
               <button type="button" className="btn-close" onClick={onClose}></button>
             </div>
             <div className="modal-body">
-              
-              {/* Único campo visible: "Nombre Documento" */}
+
+        
               <div className="mb-3">
                 <label htmlFor="nombreVisible" className="form-label">Nombre Documento</label>
                 <input
@@ -65,9 +64,8 @@ function ModalEditarOrden({ show, onClose, onGuardar, orden }) {
                   name="nombreVisible"
                   value={formData.nombreVisible}
                   onChange={handleChange}
-                  // --- 🚀 AQUÍ ESTÁ EL CAMBIO ---
                   placeholder="Escribe para cambiar el nombre de documento"
-                  required 
+                  required
                 />
               </div>
 
@@ -84,4 +82,3 @@ function ModalEditarOrden({ show, onClose, onGuardar, orden }) {
 }
 
 export default ModalEditarOrden;
-

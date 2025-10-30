@@ -1,11 +1,7 @@
-// ordenesApi.js
-// API para consumir las órdenes de un expediente desde el backend
-
 import { authAxios } from "../utils/auth";
 
 const BASE_URL = `/doc`;
 
-// Trae las órdenes por expediente
 export const traerOrdenesPorExpediente = async (expedienteId, token) => {
   const res = await authAxios.get(`${BASE_URL}/traerOrdenesPorExpediente/${expedienteId}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -15,7 +11,7 @@ export const traerOrdenesPorExpediente = async (expedienteId, token) => {
 
 export const eliminarOrden = async (id, token) => {
   const del = await authAxios.delete(`${BASE_URL}/eliminarDoc/${id}`, {
-    headers: {Authorization: `Bearer ${token}`},
+    headers: { Authorization: `Bearer ${token}` },
   })
   return del.data;
 }
@@ -31,16 +27,14 @@ export const agregarOrden = async (formData, token) => {
   return res.data;
 }
 
-// --- 🚀 NUEVA FUNCIÓN AÑADIDA ---
-// Asumo que tu OrdenCreateDTO (el que usas para crear) también sirve para actualizar
-// y que el endpoint es similar a los otros.
-export const actualizarOrden = async (ordenId, ordenData, token) => {
+
+export const actualizarOrden = async (ordenId, nuevoNombre, token) => {
   try {
-    // Usamos el BASE_URL y un endpoint consistente con tu backend
-    const response = await authAxios.put(`${BASE_URL}/actualizarOrden/${ordenId}`, ordenData, {
+    
+    const response = await authAxios.put(`${BASE_URL}/editarNombre/${ordenId}`, nuevoNombre, {
       headers: {
-        Authorization: `Bearer ${token}`
-        // No se necesita 'Content-Type': 'multipart/form-data' porque no enviamos archivo
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
     });
     return response.data;
@@ -49,5 +43,3 @@ export const actualizarOrden = async (ordenId, ordenData, token) => {
     throw error.response?.data || new Error('Error al actualizar la orden');
   }
 };
-// --- FIN DE LA MODIFICACIÓN ---
-
