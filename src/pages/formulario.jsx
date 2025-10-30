@@ -2,19 +2,25 @@ import { useRef, useState, useEffect } from "react";
 import { FormPersona } from "../components/formulario-denuncia/FormPersona";
 import { FormObjeto } from "../components/formulario-denuncia/FormObjeto";
 import { useForm } from "react-hook-form";
-import * as bootstrap from 'bootstrap';
+import * as bootstrap from "bootstrap";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { denunciaSchema } from "../validations/denunciaSchma";
 import { enviarDenuncia } from "../apis/apiDenuncia";
 import { Fab, Webchat } from "@botpress/webchat";
+import { showAlert } from "../utils/accessDenied";
 
 export const Formulario = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [archivoError, setArchivoError] = useState("Debe subir al menos un archivo PDF.");
   const [toast, setToast] = useState({
     show: false,
     success: true,
     message: "",
   });
+  const validarArchivos = (files) => {
+    return Array.from(files).some(file => file.type === "application/pdf");
+  };
+
   const fileInputRef = useRef();
   const [isWebchatOpen, setIsWebchatOpen] = useState(false);
   const toggleWebchat = () => setIsWebchatOpen((prevState) => !prevState);
@@ -23,13 +29,13 @@ export const Formulario = () => {
   useEffect(() => {
     // inicializar todos los tooltips
     const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltips.forEach(tooltip => {
+    tooltips.forEach((tooltip) => {
       new bootstrap.Tooltip(tooltip);
     });
 
     // cleanup al desmontar
     return () => {
-      tooltips.forEach(tooltip => {
+      tooltips.forEach((tooltip) => {
         const instance = bootstrap.Tooltip.getInstance(tooltip);
         if (instance) {
           instance.dispose();
@@ -37,6 +43,13 @@ export const Formulario = () => {
       });
     };
   }, []);
+
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    if (validarArchivos(files)) {
+      setArchivoError("");
+    }
+  }
   const {
     register,
     handleSubmit,
@@ -44,14 +57,14 @@ export const Formulario = () => {
     watch,
   } = useForm({
     resolver: zodResolver(denunciaSchema),
-    mode: 'onChange', // Para que la validación sea en tiempo real
+    mode: "onChange", // Para que la validación sea en tiempo real
   });
   useEffect(() => {
     console.log("Form errors:", errors);
   }, [errors]);
 
   const onSubmit = async (data) => {
-    console.log(data)
+    console.log(data);
     if (!watch("aceptarTerminos")) {
       return; // No permitir el envío si los términos no están aceptados
     }
@@ -65,9 +78,12 @@ export const Formulario = () => {
         dniDelegado: p.dniDelegado ?? "",
         rol: p.rol && p.rol !== "" ? p.rol : rolesPorIndice[idx] || "",
       }));
-      
+
       const dataFinal = { ...data, personas: personasNormalizadas };
       const files = fileInputRef.current?.files;
+      if (!validarArchivos(files)) {
+        showAlert({title: Error, text: "Selecciona al menos un archivo PDF con imágenes", icon: "error"})
+      }
       await enviarDenuncia(dataFinal, files);
 
       setToast({
@@ -81,7 +97,7 @@ export const Formulario = () => {
         success: false,
         message: "No se pudo enviar el formulario.",
       });
-  // console.log(error);
+      // console.log(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -92,24 +108,48 @@ export const Formulario = () => {
       <div className="bg-light min-vh-100 py-5">
         <div className="container ">
           <h2 className="text-center mb-4">Formulario de Expedientes</h2>
-          <p className="text-center">Completar Formulario con los siguientes datos:</p>
+          <p className="text-center">
+            Completar Formulario con los siguientes datos:
+          </p>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="row">
               <div className="col-12 col-md-6">
-                <FormPersona register={register} errors={errors} tipoPersona={"Denunciante"} index={0} />
+                <FormPersona
+                  register={register}
+                  errors={errors}
+                  tipoPersona={"Denunciante"}
+                  index={0}
+                />
               </div>
               <div className={"col-12 col-md-6"}>
-                <FormPersona register={register} errors={errors} tipoPersona={"Denunciado"} index={1} />
+                <FormPersona
+                  register={register}
+                  errors={errors}
+                  tipoPersona={"Denunciado"}
+                  index={1}
+                />
               </div>
             </div>
 
             <div className="row">
               <div className={"col-12 col-md-6"}>
-                <FormPersona register={register} errors={errors} tipoPersona={"Técnico"} index={2} optional={true} />
+                <FormPersona
+                  register={register}
+                  errors={errors}
+                  tipoPersona={"Técnico"}
+                  index={2}
+                  optional={true}
+                />
               </div>
               <div className={"col-12 col-md-6"}>
                 <FormObjeto errors={errors} register={register} />
-                <label className="form-label" htmlFor="descripcion">Descripción</label>
+                <label className="form-label" htmlFor="descripcion">
+                  {" "}
+                  <h5>
+                    Descripción{" "}
+                    <span style={{ color: "red", marginLeft: "4px" }}>*</span>
+                  </h5>
+                </label>
                 <textarea
                   id="descripcion"
                   className="form-control"
@@ -117,6 +157,9 @@ export const Formulario = () => {
                   rows={5}
                   placeholder="Descripción de la denuncia"
                 />
+                {errors.descripcion?.message && (
+                  <p className="text-danger">{errors.descripcion.message}</p>
+                )}
                 <div className="form-check mt-3">
                   <input
                     className="form-check-input"
@@ -130,7 +173,7 @@ export const Formulario = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="row">
               <div className="col-12 col-md-6">
                 <label className="form-label">Envía tus archivos aquí</label>
@@ -140,7 +183,9 @@ export const Formulario = () => {
                   id="formFileMultiple"
                   multiple
                   ref={fileInputRef}
+                  onChange={handleFileChange}
                 />
+                {archivoError && <p className="text-danger">{archivoError}</p> }
               </div>
             </div>
 
@@ -155,22 +200,33 @@ export const Formulario = () => {
                     {...register("aceptarTerminos")}
                   />
                   <label htmlFor="aceptarTerminos" className="form-check-label">
-                    Acepto los <a href="/PaginaTerminos" target="_blank" rel="noopener noreferrer">Términos y Condiciones</a>
+                    Acepto los{" "}
+                    <a
+                      href="/PaginaTerminos"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Términos y Condiciones
+                    </a>
                   </label>
-                  {errors.aceptarTerminos && (
-                    <p className="text-danger small mt-1">{errors.aceptarTerminos.message}</p>
-                  )}
                 </div>
                 <div className="text-center">
                   <button
                     type="submit"
-                    className={`btn mt-2 ${!watch("aceptarTerminos") ? "btn-secondary opacity-50" : "btn-success"}`}
-                    style={!watch("aceptarTerminos") ? { cursor: "not-allowed" } : {}}
+                    className={`btn mt-2 ${
+                      !watch("aceptarTerminos")
+                        ? "btn-secondary opacity-50"
+                        : "btn-success"
+                    }`}
+                    style={
+                      !watch("aceptarTerminos") ? { cursor: "not-allowed" } : {}
+                    }
                     data-bs-toggle="tooltip"
                     data-bs-placement="top"
-                    data-bs-title={!watch("aceptarTerminos") ? "Debe aceptar los términos y condiciones para continuar" : ""}
-                  >
-                    {isSubmitting ? 'Enviando...' : 'Enviar formulario'}
+                    { ... (!watch("aceptarTerminos") && {
+                      'data-bs-title': 'Debe aceptar los términos y condiciones para continuar'
+                    })}>
+                    {isSubmitting ? "Enviando..." : "Enviar formulario"}
                   </button>
                 </div>
               </div>
@@ -200,8 +256,13 @@ export const Formulario = () => {
       <Webchat
         clientId="339c584f-b9f4-4eb3-8af2-40f859ece33c"
         style={{
-          width: "400px", height: "600px", display: isWebchatOpen ? "flex" : "none",
-          position: "fixed", zIndex: "999", bottom: "90px", right: "20px",
+          width: "400px",
+          height: "600px",
+          display: isWebchatOpen ? "flex" : "none",
+          position: "fixed",
+          zIndex: "999",
+          bottom: "90px",
+          right: "20px",
         }}
       />
       <Fab
@@ -209,11 +270,13 @@ export const Formulario = () => {
         title="Asistente SITE"
         botName="Asistente SITE"
         style={{
-          position: "fixed", width: "80px", height: "80px",
-          bottom: "20px", right: "20px",
+          position: "fixed",
+          width: "80px",
+          height: "80px",
+          bottom: "20px",
+          right: "20px",
         }}
       />
     </>
   );
 };
-

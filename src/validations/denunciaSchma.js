@@ -13,7 +13,6 @@ const personaSchema = z.object({
     (val) => (typeof val === "string" && val.trim() === "" ? undefined : val),
     z.string().email({ message: "El email debe ser válido" }).optional()
   ),
-  fax: z.string().optional(),
 });
 
 // 🧾 Persona + delegado

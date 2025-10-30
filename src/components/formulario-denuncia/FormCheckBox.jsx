@@ -28,7 +28,7 @@ export const FormCheckBox = ({ register, errors }) => {
   return (
     <>
       <div className="bg-white rounded shadow p-2 mb-4">
-  <h5>Objeto del reclamo <span style={{color:'red', marginLeft:'4px'}}>*</span></h5>
+        <h5>Objeto del reclamo <span style={{color:'red', marginLeft:'4px'}}>*</span></h5>
         {objeto.map((element, index) => (
           <div className="form-check" key={index}>
             <input
