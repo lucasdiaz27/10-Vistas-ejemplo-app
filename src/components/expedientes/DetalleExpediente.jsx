@@ -1,5 +1,3 @@
-// DetalleExpediente.jsx
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
@@ -13,8 +11,10 @@ import { ModalPDF } from "../detalle-denuncia/ModalPDF";
 import { traerDocDenuncia } from "../../apis/apiDenuncia";
 import { traerArchivoPDF } from "../../apis/apiDocumento";
 import TablaPases from "./TablaPases";
-import OrdenesTabla from "./OrdenesTabla"; // Importa la tabla de órdenes
+import OrdenesTabla from "./OrdenesTabla";
 import ModalSubirOrden from "./modales/ModalSubirOrden";
+import ModalEditarOrden from "./modales/ModalEditarOrden";
+import Swal from "sweetalert2";
 import { useExpediente } from "../../hooks/useExpediente";
 import { useAudiencias } from "../../hooks/useAudiencias";
 import { usePases } from "../../hooks/usePases";
@@ -31,16 +31,15 @@ export default function DetalleExpediente() {
   const [mostrarPDF, setMostrarPDF] = useState(false);
   const [archivos, setArchivos] = useState([]);
 
-  // Modales de los componentes
   const [modalAudiencia, setModalAudiencia] = useState({show: false, modo: null, audiencia: null});
   const [modalPase, setModalPase] = useState({show: false, modo: null, pase: null});
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mostrarModalOrden, setMostrarModalOrden] = useState(false);
+  const [modalEditarOrden, setModalEditarOrden] = useState({ show: false, orden: null });
 
-  // Llama al hook de Expedientes
   const { expediente, cargando, error, setExpediente } = useExpediente(id);
   const { audiencias, guardarAudiencia, borrarAudiencia} = useAudiencias(id, setMensaje);
-  const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes } = useOrdenes(id, setMensaje);
+  const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes, actualizarOrden } = useOrdenes(id, setMensaje);
   const { pases, guardarPase, borrarPase } = usePases(id, setMensaje, fetchOrdenes);
 
   useEffect(() => {
@@ -52,7 +51,7 @@ export default function DetalleExpediente() {
     }
   }, [expediente]);
 
-  // Abren los modales según lo que sea --- Para cerrar también
+  // (Handlers de Audiencia y Pases sin cambios)
   const handleNuevaAudiencia = () => {
     setModalAudiencia({ show: true, modo: "crear", audiencia: null });
   };
@@ -73,8 +72,6 @@ export default function DetalleExpediente() {
   const handleEliminarAudiencia = async (id) => {
     await borrarAudiencia(id);
   };
-
-  // --- Handlers para los pases, después la lógica de negocio se maneja en el hook ---
   const handleNuevoPase = () => {
     setModalPase({ show: true, modo: "crear", pase: null });
   };
@@ -91,7 +88,7 @@ export default function DetalleExpediente() {
     await guardarPase(paseData, modalPase);
   };
 
-  // Handlers para la tabla de órdenes
+  // --- Handlers para la tabla de órdenes ---
   const handlerSubirOrden = async (ordenData) => {
     await subirOrden(ordenData);
     setMostrarModalOrden(false);
@@ -100,26 +97,32 @@ export default function DetalleExpediente() {
     console.log("Abrir modal para subir orden");
     setMostrarModalOrden(true);
   };
-
   const handleDescargarOrden = async (orden) => {
     await descargarOrden(orden);
   };
   const handleVerOrden = async (orden) => {
     try {
       const token = localStorage.getItem("token");
-      const blob = await traerArchivoPDF(orden.id, token); // Ajusta el método si es necesario
+      const blob = await traerArchivoPDF(orden.id, token);
       const url = URL.createObjectURL(blob);
-
       setPdfUrl(url);
       setArchivoSeleccionado(orden.id);
     } catch (err) {
-      alert("No se pudo visualizar el documento");
+      Swal.fire("Error", "No se pudo visualizar el documento", "error");
     }
   };
   const handleEliminarOrden = async (orden) => {
-    if (!window.confirm("¿Seguro que desea eliminar este documento?")) return;
     await borrarOrden(orden);
   };
+  const handleEditarOrdenClick = (orden) => {
+    setModalEditarOrden({ show: true, orden: orden });
+  };
+  const handleGuardarOrdenEditada = async (ordenId, formData) => {
+    await actualizarOrden(ordenId, formData); 
+    setModalEditarOrden({ show: false, orden: null }); 
+  };
+  // --- Fin Handlers Órdenes ---
+
 
   if (cargando)
     return <div className="container mt-4">Cargando expediente...</div>;
@@ -134,6 +137,24 @@ export default function DetalleExpediente() {
   const denunciante = expediente.denuncia?.personas?.find(
     (p) => (p.rol || "").toLowerCase() === "denunciante"
   );
+  
+  const getEstadoVariant = (estado) => {
+    if (!estado) return "secondary"; 
+    const estadoLower = estado.toLowerCase();
+    if (estadoLower.includes("finalizado")) return "success";
+    if (estadoLower.includes("rechazado")) return "danger";
+    if (estadoLower.includes("en inspección")) return "warning";
+    if (estadoLower.includes("en dirección")) return "info";
+    if (estadoLower.includes("en subdirección")) return "info";
+    if (estadoLower.includes("asesoría legal")) return "primary";
+    if (estadoLower.includes("admitido")) return "primary";
+    if (estadoLower.includes("en espera")) return "secondary";
+    return "dark"; 
+  };
+
+  const estadoActual = expediente.denuncia?.estado;
+  const alertVariant = getEstadoVariant(estadoActual);
+
 
   return (
     <div className="container py-4">
@@ -144,7 +165,6 @@ export default function DetalleExpediente() {
         >
           <i className="bi bi-arrow-left"></i> Volver
         </button>
-
         <ModalPdf />
       </div>
 
@@ -165,9 +185,9 @@ export default function DetalleExpediente() {
         </div>
       )}
 
-      <div className="row g-4">
+      <div className="row g-4 mb-4">
         <div className="col-lg-8">
-          <div className="card mb-4">
+          <div className="card h-100">
             <div className="card-body position-relative">
               <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
                 <span>
@@ -214,8 +234,7 @@ export default function DetalleExpediente() {
                     .join(" - ")}
                 </span>
               </div>
-              {/* Motivo en chips celestes, título arriba y chips debajo */}
-              <div className="mb-2">
+              <div className="mb-2 mt-2">
                 <div
                   style={{ fontWeight: 500, fontSize: "1em", marginBottom: 2 }}
                 >
@@ -246,31 +265,49 @@ export default function DetalleExpediente() {
                   )}
                 </div>
               </div>
-              <div className="mb-2">
-                <div style={{ fontWeight: 500, fontSize: "1em", marginBottom: 2 }}>
-                  <strong>Estado:</strong>
+
+              {estadoActual && (
+                <div className={`alert alert-${alertVariant} d-flex align-items-center mt-3`} role="alert">
+                  <i className="bi bi-info-circle-fill me-3" style={{ fontSize: "1.5rem" }}></i>
+                  <div>
+                    <h5 className="alert-heading mb-0" style={{ fontWeight: 600 }}>
+                      Actualmente en:
+                    </h5>
+                    <span className="fs-5">{estadoActual}</span>
+                  </div>
                 </div>
-                <div>
-                  <span
-                    className="badge d-inline-flex gap-2 align-items-center"
-                    style={{
-                      backgroundColor: "#e2e3e5",
-                      color: "#383d41",
-                      fontWeight: 500,
-                      fontSize: "1em",
-                      borderRadius: "0.5rem",
-                      padding: "0.5em 1em",
-                      verticalAlign: "middle",
-                    }}>
-                    <i className="bi bi-info-circle"></i>
-                    {expediente.denuncia?.estado}
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
-          {/* Selector de pestañas */}
-          <div className="card mb-4">
+        </div>
+        <div className="col-lg-4">
+          <div className="card h-100">
+            <div className="card-body">
+              <h5 className="card-title mb-3">
+                <i className="bi bi-people me-2"></i>Personas Involucradas
+              </h5>
+              {expediente.denuncia?.personas?.map((persona) => (
+                <div key={persona.id} className="mb-2">
+                  <strong>
+                    {persona.rol
+                      ? persona.rol.charAt(0).toUpperCase() +
+                        persona.rol.slice(1)
+                      : "Sin rol"}
+                    :
+                  </strong>{" "}
+                  {persona.nombre} {persona.apellido} - DNI: {persona.documento}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* --- FIN DE LA FILA 1 --- */}
+
+      {/* --- NUEVA ESTRUCTURA PARA Pases, Audiencias y Órdenes --- */}
+      <div className="row g-4">
+        <div className="col-12"> 
+          <div className="card mb-4"> 
             <div className="card-body pb-0">
               <div className="d-flex align-items-center mb-3">
                 <button
@@ -294,7 +331,6 @@ export default function DetalleExpediente() {
                 >
                   <i className="bi bi-calendar-event me-2"></i>Audiencias
                 </button>
-                {/* Nueva sección: Órdenes */}
                 <button
                   className={`btn btn-link px-3 py-2 ${
                     tab === "ordenes"
@@ -324,11 +360,11 @@ export default function DetalleExpediente() {
                     personasInvolucradas={expediente.denuncia?.personas || []}
                   />
                 ) : (
-                  // Sección Órdenes: tabla ocupa todo el ancho
                   <OrdenesTabla
                     ordenes={ordenes}
                     onDescargar={handleDescargarOrden}
                     onVer={handleVerOrden}
+                    onEditar={handleEditarOrdenClick}
                     onEliminar={handleEliminarOrden}
                     mostrarModalOrden={handlerModalOrden}
                   />
@@ -337,36 +373,26 @@ export default function DetalleExpediente() {
             </div>
           </div>
         </div>
-        <div className="col-lg-4">
-          <div className="card mb-4">
-            <div className="card-body">
-              <h5 className="card-title mb-3">
-                <i className="bi bi-people me-2"></i>Personas Involucradas
-              </h5>
-              {expediente.denuncia?.personas?.map((persona) => (
-                <div key={persona.id} className="mb-2">
-                  <strong>
-                    {persona.rol
-                      ? persona.rol.charAt(0).toUpperCase() +
-                        persona.rol.slice(1)
-                      : "Sin rol"}
-                    :
-                  </strong>{" "}
-                  {persona.nombre} {persona.apellido} - DNI: {persona.documento}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
-      {/* Modal para crear/editar audiencia */}
+      {/* --- FIN DE LA NUEVA ESTRUCTURA --- */}
+
+
+      {/* --- Modales (sin cambios) --- */}
+      {modalEditarOrden.show && (
+        <ModalEditarOrden
+          show={modalEditarOrden.show}
+          onClose={() => setModalEditarOrden({ show: false, orden: null })}
+          onGuardar={handleGuardarOrdenEditada}
+          orden={modalEditarOrden.orden}
+        />
+      )}
       <ModalAudiencia
         show={modalAudiencia.show}
         modo={modalAudiencia.modo}
         audiencia={modalAudiencia.audiencia}
         onGuardar={handleGuardarAudiencia}
         onClose={handleCerrarModal}
-        expedienteId={expediente.id} // id real del expediente, no nro_exp
+        expedienteId={expediente.id} 
         personasInvolucradas={expediente.denuncia?.personas || []}
       />
       <ModalSubirOrden
@@ -375,7 +401,6 @@ export default function DetalleExpediente() {
         expedienteId={expediente.id}
         onSubmitOrden={handlerSubirOrden}
       />
-      {/* Modal para crear/editar pase */}
       <FormularioPaseModal
         show={modalPase.show}
         handleClose={() =>
@@ -395,10 +420,9 @@ export default function DetalleExpediente() {
         <ModalEditarExpediente
           expediente={expediente}
           onClose={() => setMostrarModalEditar(false)}
-          actualizarExpediente={setExpediente} // si lo necesitás para refrescar luego de editar
+          actualizarExpediente={setExpediente} 
         />
       )}
-
       {archivoSeleccionado && pdfUrl && (
         <ModalPDF
           archivo={archivoSeleccionado}
@@ -412,3 +436,4 @@ export default function DetalleExpediente() {
     </div>
   );
 }
+

@@ -38,9 +38,8 @@ export function showSuccessAlert(message) {
     Swal.fire({
         icon: 'success',
         title: message,
-        showConfirmButton: false,
+        showConfirmButton: true,
         timer: 2000,
-        position: 'top',
         background: '#fff',
         customClass: {
             popup: 'animated fadeInDown'

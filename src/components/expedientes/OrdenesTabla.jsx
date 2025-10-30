@@ -1,27 +1,26 @@
 // OrdenesTabla.jsx
-// Tabla para mostrar las órdenes asociadas al expediente, replica la estructura de la imagen ordenes-2.png
-// Campos: Orden, Tipo de Documento, Número Documento, Referencia, Fecha de Asociación, Acciones
-// El diseño sigue el estilo general del sistema y ocupa todo el ancho disponible
 import React from "react";
 
-export default function OrdenesTabla({ ordenes, onDescargar, onVer, onEliminar, mostrarModalOrden }) {
+// 1. Añadimos la nueva prop "onEditar"
+export default function OrdenesTabla({ ordenes, onDescargar, onVer, onEditar, onEliminar, mostrarModalOrden }) {
   return (
     <div className="table-responsive" style={{ width: '100%' }}>
-      {/* Tabla de órdenes, estructura y diseño similar a la imagen proporcionada */}
+      {/* Botón de Agregar Orden (sin cambios) */}
       <div className="d-flex justify-content-end mb-2">
         <button className="btn btn-primary" onClick={mostrarModalOrden}>
           <i className="bi bi-plus-circle me-1"></i> Agregar Orden
         </button>
       </div>
+
       <table className="table table-bordered table-hover align-middle" style={{ minWidth: '100%' }}>
         <thead className="table-light">
           <tr>
             <th>Orden</th>
             <th>Tipo de Documento</th>
-            <th>Número Documento</th>
+            <th>Nombre Documento</th>
             <th>Referencia</th>
             <th>Fecha de Asociación</th>
-            <th>Acciones</th>
+            <th className="text-center">Acciones</th> {/* Centramos el título de acciones */}
           </tr>
         </thead>
         <tbody>
@@ -32,31 +31,38 @@ export default function OrdenesTabla({ ordenes, onDescargar, onVer, onEliminar, 
           ) : (
             ordenes.map((orden, idx) => (
               <tr key={orden.orden || idx}>
-                {/* Id de la orden */}
                 <td>{orden.id || '-'}</td>
-                {/* Tipo de documento (ENUM o string) */}
                 <td>{orden.tipoDocumento || '-'}</td>
-                {/* Número de documento */}
                 <td>{orden.nombreVisible || '-'}</td>
-                {/* Referencia asociada */}
                 <td>{orden.referencia || '-'}</td>
-                {/* Fecha de asociación, formateada si es necesario */}
                 <td>{orden.fechaCreacion ? new Date(orden.fechaCreacion).toLocaleString() : '-'}</td>
-                {/* Acciones: descargar, ver */}
-                <td>
-                  <div className="d-flex justify-content-between">
+                
+                {/* 2. Modificamos la celda de Acciones */}
+                <td className="text-center">
+                  {/* Usamos un btn-group para agrupar los botones */}
+                  <div className="btn-group btn-group-sm" role="group" aria-label="Acciones de orden">
 
-                  {/* Descargar documento */}
-                  <button className="btn btn-sm btn-outline-success me-2" title="Descargar" onClick={() => onDescargar(orden)}>
-                    <i className="bi bi-download"></i>
-                  </button>
-                  {/* Visualizar documento */}
-                  <button className="btn btn-sm btn-outline-info me-2" title="Visualizar" onClick={() => onVer(orden)}>
-                    <i className="bi bi-eye"></i>
-                  </button>
-                  <button className="btn btn-sm btn-outline-danger " title="Eliminar" onClick={() => onEliminar(orden)}>
-                    <i className="bi bi-x-circle"></i>
-                  </button>
+                    {/* Descargar documento */}
+                    <button type="button" className="btn btn-outline-success" title="Descargar" onClick={() => onDescargar(orden)}>
+                      <i className="bi bi-download"></i>
+                    </button>
+
+                    {/* Visualizar documento */}
+                    <button type="button" className="btn btn-outline-info" title="Visualizar" onClick={() => onVer(orden)}>
+                      <i className="bi bi-eye"></i>
+                    </button>
+
+                    {/* --- 🚀 NUEVO BOTÓN DE EDITAR --- */}
+                    <button type="button" className="btn btn-outline-primary" title="Editar" onClick={() => onEditar(orden)}>
+                      <i className="bi bi-pencil-fill"></i>
+                    </button>
+                    {/* --- FIN NUEVO BOTÓN --- */}
+
+                    {/* Eliminar documento */}
+                    <button type="button" className="btn btn-outline-danger" title="Eliminar" onClick={() => onEliminar(orden)}>
+                      <i className="bi bi-x-circle"></i>
+                    </button>
+                    
                   </div>
                 </td>
               </tr>

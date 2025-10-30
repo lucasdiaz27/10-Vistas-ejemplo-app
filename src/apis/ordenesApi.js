@@ -1,11 +1,7 @@
-// ordenesApi.js
-// API para consumir las órdenes de un expediente desde el backend
-
 import { authAxios } from "../utils/auth";
 
 const BASE_URL = `/doc`;
 
-// Trae las órdenes por expediente
 export const traerOrdenesPorExpediente = async (expedienteId, token) => {
   const res = await authAxios.get(`${BASE_URL}/traerOrdenesPorExpediente/${expedienteId}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -15,7 +11,7 @@ export const traerOrdenesPorExpediente = async (expedienteId, token) => {
 
 export const eliminarOrden = async (id, token) => {
   const del = await authAxios.delete(`${BASE_URL}/eliminarDoc/${id}`, {
-    headers: {Authorization: `Bearer ${token}`},
+    headers: { Authorization: `Bearer ${token}` },
   })
   return del.data;
 }
@@ -30,3 +26,20 @@ export const agregarOrden = async (formData, token) => {
   });
   return res.data;
 }
+
+
+export const actualizarOrden = async (ordenId, nuevoNombre, token) => {
+  try {
+    
+    const response = await authAxios.put(`${BASE_URL}/editarNombre/${ordenId}`, nuevoNombre, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar la orden:', error.response || error);
+    throw error.response?.data || new Error('Error al actualizar la orden');
+  }
+};
