@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { store } from './store/store.js'; 
 import SiteApp from './SiteApp';
 import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,8 +11,11 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import './swal2-custom.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <SiteApp />
+    <Provider store={store}>
+      <SiteApp />
+    </Provider>
   </React.StrictMode>
 );

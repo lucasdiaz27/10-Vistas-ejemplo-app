@@ -1,42 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 
-// Modal para EDITAR una orden
+
 function ModalEditarOrden({ show, onClose, onGuardar, orden }) {
 
-  const [formData, setFormData] = useState({
-    tipoDocumento: '',
-    nombreVisible: '',
-    referencia: '',
-  });
-
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
   useEffect(() => {
-    if (orden) {
-      setFormData({
-        tipoDocumento: orden.tipoDocumento || '',
-        nombreVisible: orden.nombreVisible || '', 
-        referencia: orden.referencia || '',
-      });
-    } else {
-      // Reseteamos por si acaso
-      setFormData({
-        tipoDocumento: '',
-        nombreVisible: '',
-        referencia: '',
+    if (show && orden) {
+      reset({
+        nombreVisible: orden.nombreVisible || ''
       });
     }
-  }, [orden]); // Este efecto depende de la 'orden'
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onGuardar(orden.id, formData.nombreVisible);
+  }, [orden, show, reset]); 
+  const onSubmit = (data) => {
+    // 'data' es un objeto: { nombreVisible: "nuevo nombre" }
+    onGuardar(orden.id, data.nombreVisible);
   };
 
   if (!show) {
@@ -47,28 +25,33 @@ function ModalEditarOrden({ show, onClose, onGuardar, orden }) {
     <div className="modal fade show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog modal-dialog-centered" role="document">
         <div className="modal-content">
-          <form onSubmit={handleSubmit}>
+          
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="modal-header">
               <h5 className="modal-title">Editar Orden</h5>
               <button type="button" className="btn-close" onClick={onClose}></button>
             </div>
             <div className="modal-body">
-
-        
               <div className="mb-3">
                 <label htmlFor="nombreVisible" className="form-label">Nombre Documento</label>
+                
+               
                 <input
                   type="text"
-                  className="form-control"
-                  id="nombreVisible"
-                  name="nombreVisible"
-                  value={formData.nombreVisible}
-                  onChange={handleChange}
+                  className={`form-control ${errors.nombreVisible ? 'is-invalid' : ''}`} // Styling de error
                   placeholder="Escribe para cambiar el nombre de documento"
-                  required
+                  
+                
+                  {...register("nombreVisible", { required: "El nombre del documento es obligatorio" })}
                 />
+                
+                
+                {errors.nombreVisible && (
+                  <div className="invalid-feedback">
+                    {errors.nombreVisible.message}
+                  </div>
+                )}
               </div>
-
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>Cancelar</button>

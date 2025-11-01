@@ -17,7 +17,7 @@ import ModalEditarOrden from "./modales/ModalEditarOrden";
 import Swal from "sweetalert2";
 import { useExpediente } from "../../hooks/useExpediente";
 import { useAudiencias } from "../../hooks/useAudiencias";
-import { usePases } from "../../hooks/usePases";
+ 
 import { ModalPdf } from "./modales/ModalPdf";
 import { useOrdenes } from "../../hooks/useOrdenes";
 
@@ -32,6 +32,7 @@ export default function DetalleExpediente() {
   const [archivos, setArchivos] = useState([]);
 
   const [modalAudiencia, setModalAudiencia] = useState({show: false, modo: null, audiencia: null});
+  // Este estado local se mantiene, ¡es correcto!
   const [modalPase, setModalPase] = useState({show: false, modo: null, pase: null});
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [mostrarModalOrden, setMostrarModalOrden] = useState(false);
@@ -40,7 +41,8 @@ export default function DetalleExpediente() {
   const { expediente, cargando, error, setExpediente } = useExpediente(id);
   const { audiencias, guardarAudiencia, borrarAudiencia} = useAudiencias(id, setMensaje);
   const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes, actualizarOrden } = useOrdenes(id, setMensaje);
-  const { pases, guardarPase, borrarPase } = usePases(id, setMensaje, fetchOrdenes);
+
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -51,7 +53,7 @@ export default function DetalleExpediente() {
     }
   }, [expediente]);
 
-  // (Handlers de Audiencia y Pases sin cambios)
+
   const handleNuevaAudiencia = () => {
     setModalAudiencia({ show: true, modo: "crear", audiencia: null });
   };
@@ -72,27 +74,21 @@ export default function DetalleExpediente() {
   const handleEliminarAudiencia = async (id) => {
     await borrarAudiencia(id);
   };
+
+
   const handleNuevoPase = () => {
     setModalPase({ show: true, modo: "crear", pase: null });
   };
   const handleEditarPase = (pase) => {
     setModalPase({ show: true, modo: "editar", pase });
   };
-  const handleEliminarPase = async (id) => {
-    const token = localStorage.getItem("token");
-    if (!window.confirm("¿Seguro que desea eliminar este pase?")) return;
-    await borrarPase(id, token);
-  };
-  const handleGuardarPase = async (paseData) => {
-    setModalPase({ show: false, modo: null, pase: null });
-    await guardarPase(paseData, modalPase);
-  };
 
-  // --- Handlers para la tabla de órdenes ---
+
   const handlerSubirOrden = async (ordenData) => {
     await subirOrden(ordenData);
     setMostrarModalOrden(false);
   };
+  
   const handlerModalOrden = () => {
     console.log("Abrir modal para subir orden");
     setMostrarModalOrden(true);
@@ -121,7 +117,7 @@ export default function DetalleExpediente() {
     await actualizarOrden(ordenId, formData); 
     setModalEditarOrden({ show: false, orden: null }); 
   };
-  // --- Fin Handlers Órdenes ---
+
 
 
   if (cargando)
@@ -158,6 +154,7 @@ export default function DetalleExpediente() {
 
   return (
     <div className="container py-4">
+      {/* ... (Botón Volver y lógica de PDF sin cambios) ... */}
       <div className="mb-3 d-flex gap-2">
         <button
           className="btn btn-outline-secondary me-2"
@@ -169,6 +166,7 @@ export default function DetalleExpediente() {
       </div>
 
       {mostrarPDF && (
+        // ... (Tu JSX de PDFViewer) ...
         <div className="mb-4">
           <h5>Previsualización del PDF:</h5>
           <PDFViewer width="100%" height={500}>
@@ -185,10 +183,12 @@ export default function DetalleExpediente() {
         </div>
       )}
 
+      
       <div className="row g-4 mb-4">
         <div className="col-lg-8">
           <div className="card h-100">
             <div className="card-body position-relative">
+              {/* ... (Contenido de Card 'Información General') ... */}
               <h5 className="card-title mb-3 d-flex justify-content-between align-items-center">
                 <span>
                   <i className="bi bi-info-circle me-2"></i>Información General
@@ -201,7 +201,7 @@ export default function DetalleExpediente() {
                   <i className="bi bi-pencil"></i>
                 </button>
               </h5>
-
+              {/* ... (Resto de 'p' tags) ... */}
               <p>
                 <strong>Número de Expediente:</strong>{" "}
                 {expediente.nro_exp ?? "-"}
@@ -265,7 +265,6 @@ export default function DetalleExpediente() {
                   )}
                 </div>
               </div>
-
               {estadoActual && (
                 <div className={`alert alert-${alertVariant} d-flex align-items-center mt-3`} role="alert">
                   <i className="bi bi-info-circle-fill me-3" style={{ fontSize: "1.5rem" }}></i>
@@ -283,6 +282,7 @@ export default function DetalleExpediente() {
         <div className="col-lg-4">
           <div className="card h-100">
             <div className="card-body">
+              {/* ... (Contenido de Card 'Personas Involucradas') ... */}
               <h5 className="card-title mb-3">
                 <i className="bi bi-people me-2"></i>Personas Involucradas
               </h5>
@@ -304,12 +304,14 @@ export default function DetalleExpediente() {
       </div>
       {/* --- FIN DE LA FILA 1 --- */}
 
-      {/* --- NUEVA ESTRUCTURA PARA Pases, Audiencias y Órdenes --- */}
+
+      {/* --- ESTRUCTURA DE TABS (Sin cambios) --- */}
       <div className="row g-4">
         <div className="col-12"> 
           <div className="card mb-4"> 
             <div className="card-body pb-0">
               <div className="d-flex align-items-center mb-3">
+                {/* ... (Botones de Tabs Pases/Audiencias/Órdenes) ... */}
                 <button
                   className={`btn btn-link px-3 py-2 ${
                     tab === "pases" ? "fw-bold text-primary" : "text-secondary"
@@ -345,11 +347,13 @@ export default function DetalleExpediente() {
               </div>
               <div style={{ width: "100%" }}>
                 {tab === "pases" ? (
+                  // 4. --- TablaPases MODIFICADA ---
                   <TablaPases
-                    pases={pases}
-                    onEditar={handleEditarPase}
-                    onEliminar={handleEliminarPase}
-                    onNuevo={handleNuevoPase}
+                    // pases={pases} (Eliminado)
+                    // onEliminar={handleEliminarPase} (Eliminado)
+                    onEditar={handleEditarPase} // Se mantiene
+                    onNuevo={handleNuevoPase}   // Se mantiene
+                    expedienteId={id}           // Añadido
                   />
                 ) : tab === "audiencias" ? (
                   <TablaAudiencias
@@ -374,10 +378,11 @@ export default function DetalleExpediente() {
           </div>
         </div>
       </div>
-      {/* --- FIN DE LA NUEVA ESTRUCTURA --- */}
+      {/* --- FIN DE LA ESTRUCTURA DE TABS --- */}
 
 
-      {/* --- Modales (sin cambios) --- */}
+      {/* --- Modales --- */}
+      {/* ... (Modales de Órdenes y Audiencias sin cambios) ... */}
       {modalEditarOrden.show && (
         <ModalEditarOrden
           show={modalEditarOrden.show}
@@ -401,6 +406,8 @@ export default function DetalleExpediente() {
         expedienteId={expediente.id}
         onSubmitOrden={handlerSubirOrden}
       />
+
+      {/* 5. --- FormularioPaseModal MODIFICADO --- */}
       <FormularioPaseModal
         show={modalPase.show}
         handleClose={() =>
@@ -414,8 +421,10 @@ export default function DetalleExpediente() {
         }
         modo={modalPase.modo}
         pase={modalPase.pase}
-        onGuardar={handleGuardarPase}
+        // onGuardar={handleGuardarPase} (Eliminado)
       />
+      
+      {/* ... (Resto de modales sin cambios) ... */}
       {mostrarModalEditar && (
         <ModalEditarExpediente
           expediente={expediente}
@@ -436,4 +445,3 @@ export default function DetalleExpediente() {
     </div>
   );
 }
-
