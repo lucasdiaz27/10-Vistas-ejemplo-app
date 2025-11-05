@@ -113,7 +113,6 @@ export const traerPorUsuario = async (token) => {
 // ale
 
 export const traerEstadoExpediente = async (nroExp) => { //expediente/traerEstados/
-  console.log(`${BASE_URL}/traerEstados/${nroExp}`)
   const res = await authAxios.get(`${BASE_URL}/traerEstados/${nroExp}`);
   console.log("Respuesta",res)
   return res.data;
