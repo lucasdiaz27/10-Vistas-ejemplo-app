@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { validarYActualizarExpediente } from "../apis/expedientesApi";
+import "bootstrap-icons/font/bootstrap-icons.css";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   traerDenunciaPorId,
@@ -30,6 +31,10 @@ export const DetalleDenuncia = () => {
   const [motivoCambio, setMotivoCambio] = useState("");
   const [showMotivo, setShowMotivo] = useState(false);
   const [tab, setTab] = useState("Denunciante");
+
+  const handleVolver = () => {
+    navigate("/menu-interno?vista=mesa-entrada");
+  };
   const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [showCorreoModal, setShowCorreoModal] = useState(false);
@@ -240,7 +245,17 @@ export const DetalleDenuncia = () => {
 
   return (
     <div className="container py-4">
-      <h3 className="mb-4">Detalle de Denuncia #{denuncia.id}</h3>
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <div className="d-flex align-items-center gap-3">
+          <h3 className="mb-0">Detalle de Denuncia #{denuncia.id}</h3>
+          <button 
+            className="btn btn-outline-primary"
+            onClick={handleVolver}
+          >
+            <i className="bi bi-arrow-left"></i> Volver a Mesa de Entrada
+          </button>
+        </div>
+      </div>
       <div className="row g-4">
         {/* Información General y Estado */}
         <div className="col-lg-8">
