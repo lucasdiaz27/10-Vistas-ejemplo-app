@@ -14,7 +14,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@popperjs/core": "^2.11.8",
     "@react-pdf/renderer": "^4.3.0",
-    "@reduxjs/toolkit": "^2.9.2",
+    "@reduxjs/toolkit": "^2.10.1",
     "axios": "^1.9.0",
     "bootstrap": "^5.3.7",
     "jwt-decode": "^4.0.0",

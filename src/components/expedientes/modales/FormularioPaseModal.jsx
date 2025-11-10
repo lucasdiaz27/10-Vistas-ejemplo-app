@@ -14,49 +14,46 @@ import { contarPaginasPDF } from '../../../utils/contarPaginasPDF';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
 
-export default function FormularioPaseModal({ show, handleClose, expedienteId, usuarioId, modo = "crear", pase = null }) {
+
+export default function FormularioPaseModal({ show, handleClose, expedienteId, usuarioId, modo = "crear", pase = null, onPaseGuardado }) {
 
   const dispatch = useDispatch();
   const { areas, status: pasesStatus, error: pasesError } = useSelector(state => state.pases);
 
- 
+  
   const { 
-    register,         // Para "registrar" los inputs
-    handleSubmit,     // Para manejar el 'onSubmit' del form
-    formState: { errors }, // Para mostrar los errores de validación
-    reset,            // Para limpiar o llenar el formulario
-    watch,            // Para "observar" el valor de un campo (para el PDF)
-    setValue          // Para setear el valor de un campo (para 'cantFolios')
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+    setValue
   } = useForm();
   
-
   const [usuarioActual, setUsuarioActual] = useState('');
 
- 
+  // (useEffect para el token - sin cambios)
   useEffect(() => {
     const token = localStorage.getItem('token');
     const tokenData = jwtDecode(token);
     const usuario = tokenData ? tokenData.name : 'Usuario Desconocido';
     setUsuarioActual(usuario);
     
-  
     if (modo === 'crear') {
       setValue('iniciador', usuario);
     }
   }, [show, modo, setValue]); 
 
-  //  --- useEffect para cargar Áreas y resetear el Form ---
+  // (useEffect para cargar Áreas y resetear el Form - sin cambios)
   useEffect(() => {
     if (show) {
       dispatch(fetchAreasEnum());
       
       if (modo === "editar" && pase) {
-        // 'reset(pase)' llena el formulario con los datos del pase
         reset(pase);
       } else {
-        // 'reset()' limpia el formulario a sus valores por defecto
         reset({
-          iniciador: usuarioActual, // Pre-llenamos el iniciador
+          iniciador: usuarioActual,
           asunto: '',
           areaOrigen: '',
           areaDestino: '',
@@ -69,19 +66,16 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
     }
   }, [modo, pase, show, dispatch, reset, usuarioActual]);
 
- 
-
-  //Lógica de conteo de páginas (usando 'watch') ---
-  const fileInput = watch("file"); // "Observamos" el campo 'file'
+  
+  // (Lógica de conteo de páginas - sin cambios)
+  const fileInput = watch("file");
 
   useEffect(() => {
-    // Si el usuario selecciona un archivo...
     if (fileInput && fileInput.length > 0) {
       const file = fileInput[0];
       const countPages = async () => {
         try {
           const numPages = await contarPaginasPDF(file);
-          // Seteamos el valor del campo 'cantFolios'
           setValue("cantFolios", numPages);
         } catch (err) {
           setValue("cantFolios", '');
@@ -90,14 +84,12 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
       };
       countPages();
     } else if (modo === 'crear') {
-      // Si se quita el archivo, limpiamos los folios (solo en modo crear)
       setValue("cantFolios", '');
     }
   }, [fileInput, setValue, modo]); 
   
+  // (onSubmit - Aquí está el segundo cambio)
   const onSubmit = async (data) => {
-    // 'data' es el objeto {asunto: "...", areaOrigen: "..."}
-    // ¡Ya no necesitamos 'e.preventDefault()' !
     
     try {
       if (modo === "crear") {
@@ -114,7 +106,6 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
         });
         formDataToSend.append('pase', paseJson);
         
-        // 'data.file' es un FileList, tomamos el primero
         if (data.file && data.file[0]) { 
           formDataToSend.append('file', data.file[0]);
         }
@@ -123,22 +114,29 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
         Swal.fire('¡Éxito!', 'Pase creado correctamente.', 'success');
 
       } else {
-        // En modo "editar", 'data' ya tiene todo lo que necesitamos
         const paseJson = {
-          ...data, // Pasamos todos los datos del formulario
+          ...data,
           expedienteId: Number(expedienteId),
           usuarioId: Number(usuarioId),
           cantFolios: Number(data.cantFolios),
         };
-        // No necesitamos 'file' en modo edición
         delete paseJson.file; 
 
         await dispatch(updateExistingPase({ id: pase.id, paseData: paseJson })).unwrap();
         Swal.fire('¡Actualizado!', 'Pase modificado correctamente.', 'success');
       }
 
-      // Lógica Post-Submit (se mantiene igual)
+      // --- Lógica Post-Submit ---
+      
+      // a) Refrescar Pases (Redux)
       dispatch(fetchPasesByExpId(expedienteId));
+      
+      // b) 🚀 CAMBIO 2: Refrescar Órdenes (Hook)
+      if (onPaseGuardado) {
+        onPaseGuardado();
+      }
+
+      // c) Cerrar modal
       handleClose();
 
     } catch (error) {
@@ -154,15 +152,12 @@ export default function FormularioPaseModal({ show, handleClose, expedienteId, u
         <Modal.Title>{modo === "editar" ? "Editar Pase" : "Nuevo Pase"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* --- Conectamos handleSubmit(onSubmit) al <Form> --- */}
+        {/* --- Formulario (sin cambios) --- */}
         <Form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
           
-          {/*  --- Conectamos los campos con 'register' y 'errors' --- */}
-
           {/* Campo Iniciador */}
           <Form.Group className="mb-3">
             <Form.Label>Iniciador</Form.Label>
-            {/* Sigue 'disabled' y con 'value' porque lo carga el token */}
             <Form.Control 
               type="text" 
               value={usuarioActual} 

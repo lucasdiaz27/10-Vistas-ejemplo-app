@@ -240,6 +240,18 @@ export const DetalleDenuncia = () => {
 
   return (
     <div className="container py-4">
+
+      {/* --- 🚀 BOTÓN DE VOLVER AÑADIDO --- */}
+      <div className="mb-3">
+        <button 
+          className="btn btn-outline-secondary" 
+          onClick={() => navigate(-1)} // Usa la función 'navigate' ya importada
+        >
+          <i className="bi bi-arrow-left me-1"></i> Volver
+        </button>
+      </div>
+      {/* --- FIN DEL BOTÓN --- */}
+
       <h3 className="mb-4">Detalle de Denuncia #{denuncia.id}</h3>
       <div className="row g-4">
         {/* Información General y Estado */}
@@ -321,6 +333,7 @@ export const DetalleDenuncia = () => {
   );
 };
 
+// ... (tu función 'validarCambioEstado' se mantiene igual)
 // funcion para validar si el cambio de estado es permitido segun el historial
 // se puede personalizar la logica segun las reglas de negocio
 function validarCambioEstado(historial, estadoActual, estadoNuevo) {
@@ -341,7 +354,7 @@ function validarCambioEstado(historial, estadoActual, estadoNuevo) {
   return transiciones.includes(estadoNuevo); // Chequea si ese estado nuevo está permitido según las transiciones definidas. Es decir, si el estado nuevo está en la lista de transiciones permitidas del estado actual, entonces es un cambio válido.
   // ejemplo: permitir solo ciertos saltos de estado
   // const transicionesPermitidas = {
-  //   'PENDIENTE': ['EN PROCESO', 'RECHAZADO'],
+  //    'PENDIENTE': ['EN PROCESO', 'RECHAZADO'],
   //   'EN PROCESO': ['RECHAZADO', 'NO ADMITIDO'],
   //   // agregar mas reglas segun negocio
   // };
