@@ -5,9 +5,11 @@ import { DocumentoPDF } from "./DocumentoPDF";
 import "react-quill/dist/quill.snow.css";
 
 const textosPredeterminados = {
-  dictamen: "Texto predeterminado para Dictamen...",
-  nota: "Texto predeterminado para Nota...",
-  otro: "Otro texto predeterminado...",
+  dictamen: "Texto predeterminado para Dictamen legal...",
+  providencia: "Texto predeterminado para Providencia simple...",
+  decreto: "Texto predeterminado para Decreto...",
+  imputacion: "Texto predeterminado para Imputacion...",
+  multa: "Texto predeterminado para Multa...",
 };
 
 export const PaginaModal = ({ handleSubmit, show, onClose }) => {
@@ -66,9 +68,11 @@ export const PaginaModal = ({ handleSubmit, show, onClose }) => {
                   required
                 >
                   <option value="">Seleccionar...</option>
-                  <option value="dictamen">Dictamen</option>
-                  <option value="nota">Nota</option>
-                  <option value="otro">Otro</option>
+                  <option value="dictamen">Dictamen Legal</option>
+                  <option value="providencia">Providencia simple</option>
+                  <option value="decreto">Decreto</option>
+                  <option value="imputacion">Imputacion</option>
+                  <option value="multa">Multa</option>
                 </select>
               </div>
               <div className="mb-3">

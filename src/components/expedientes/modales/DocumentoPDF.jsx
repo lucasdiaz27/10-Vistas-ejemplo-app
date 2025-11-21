@@ -88,8 +88,11 @@ export const DocumentoPDF = ({ tipo, contenido }) => {
         {/* titulo dinamico segun tipo de documento */}
         <View style={styles.title}>
           <Text>
-            {tipo === 'dictamen' ? 'DICTAMEN' : 
-             tipo === 'nota' ? 'NOTA' : 
+            {tipo === 'dictamen' ? 'DICTAMEN LEGAL' : 
+             tipo === 'providencia' ? 'PROVIDENCIA SIMPLE' : 
+             tipo === 'decreto' ? 'DECRETO' :
+             tipo === 'imputacion' ? 'IMPUTACION' :
+             tipo === 'multa' ? 'MULTA' :
              'DOCUMENTO'}
           </Text>
         </View>
