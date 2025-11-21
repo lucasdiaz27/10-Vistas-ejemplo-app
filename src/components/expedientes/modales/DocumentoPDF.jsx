@@ -1,6 +1,48 @@
 // importaciones necesarias para crear pdfs
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 
+// Función para procesar HTML básico a componentes de react-pdf
+const parseHTML = (html) => {
+  const elements = [];
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  const processNode = (node, index = 0) => {
+    if (node.nodeType === 3) { // Nodo de texto
+      const text = node.textContent.trim();
+      if (text) {
+        return <Text key={index}>{text}</Text>;
+      }
+      return null;
+    }
+    
+    if (node.nodeType === 1) { // Nodo de elemento
+      const tag = node.tagName.toLowerCase();
+      const children = Array.from(node.childNodes).map(processNode).filter(Boolean);
+      
+      switch (tag) {
+        case 'p':
+          return <View key={index} style={{ marginBottom: 10 }}>{children}</View>;
+        case 'strong':
+        case 'b':
+          return <Text key={index} style={{ fontWeight: 'bold' }}>{children}</Text>;
+        case 'i':
+        case 'em':
+          return <Text key={index} style={{ fontStyle: 'italic' }}>{children}</Text>;
+        case 'br':
+          return <Text key={index}>{'\n'}</Text>;
+        case 'span':
+          return <Text key={index}>{children}</Text>;
+        default:
+          return children;
+      }
+    }
+    return null;
+  };
+  
+  return Array.from(doc.body.childNodes).map(processNode).filter(Boolean);
+};
+
 // definicion de estilos para el documento pdf
 const styles = StyleSheet.create({
   // estilo general de la pagina
@@ -99,7 +141,7 @@ export const DocumentoPDF = ({ tipo, contenido }) => {
 
         {/* contenido principal del documento */}
         <View style={styles.content}>
-          <Text>{contenido}</Text>
+          {parseHTML(contenido)}
         </View>
 
         {/* bloque de firma con datos del usuario */}
