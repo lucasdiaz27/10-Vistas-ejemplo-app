@@ -1,119 +1,186 @@
 // importaciones necesarias para crear pdfs
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 // definicion de estilos para el documento pdf
 const styles = StyleSheet.create({
   // estilo general de la pagina
   page: {
-    padding: 50,          // margen interior
-    fontSize: 12,         // tamaño base de fuente
-    lineHeight: 1.5,      // interlineado
+    padding: 50,
+    fontSize: 12,
+    lineHeight: 1.5,
   },
-  // estilo del encabezado del documento
-  header: {
-    marginBottom: 20,     // espacio inferior
-    textAlign: 'center',  // centrado
-    borderBottom: '1px solid black', // linea separadora
-    paddingTop: 10
+
+  /* =====================
+     ENCABEZADO
+     ===================== */
+  headerContainer: {
+    height: 80,            // reserva espacio para logo + texto
+    marginBottom: 10,
+    position: 'relative',  // permite posicionamiento absoluto interno
   },
-  // estilo del bloque de firma
-  signature: {
-    marginTop: 50,        // espacio superior
-    borderTop: '1px solid #000', // linea separadora
-    paddingTop: 10,       // espacio sobre la linea
-    fontSize: 10,         // tamaño de texto mas pequeño
-    textAlign: 'left',    // alineado a la izquierda
-    marginLeft: 50,       // margen izquierdo para alinear con el contenido
+
+  headerLogo: {
+    width: 70,
+    height: 70,
+    position: 'absolute',
+    left: 0,               // SIEMPRE alineado a la izquierda
+    top: 0,
   },
-  // estilo para cada linea de datos de la firma
-  signatureData: {
-    marginBottom: 3,      // espacio entre lineas
+
+  headerAbsoluteCenter: {
+    position: 'absolute',
+    left: 0,
+    right: 0,              // ocupa todo el ancho de la hoja
+    top: 15,
+    alignItems: 'center',  // centra el texto horizontalmente
   },
-  // estilo del titulo del documento
-  title: {
-    fontSize: 16,         // tamaño de fuente mas grande
-    marginBottom: 10,     // espacio inferior
-    fontWeight: 'bold'    // texto en negrita
+
+  headerText: {
+    fontSize: 12,
+    fontWeight: 'bold',
   },
-  // estilo del contenido principal
-  content: {
-    marginTop: 20,        // espacio superior
-    marginBottom: 20,     // espacio inferior
+
+  headerSubtext: {
+    fontSize: 11,
   },
-  // estilo del pie de pagina
-  footer: {
-    position: 'absolute', // posicion fija
-    bottom: 30,          // distancia desde abajo
-    left: 50,            // margen izquierdo
-    right: 50,           // margen derecho
-    textAlign: 'center', // centrado
-    borderTop: '1px solid black', // linea separadora
-    paddingTop: 10       // espacio sobre la linea
+
+  headerLine: {
+    borderBottom: '1px solid black',
+    marginTop: 5,
+    marginBottom: 15,
   },
-  // estilo para la fecha
+
+  /* =====================
+     FECHA
+     ===================== */
   date: {
-    marginBottom: 20,     // espacio inferior
-    textAlign: 'right'    // alineado a la derecha
-  }
+    marginBottom: 20,
+    textAlign: 'right',
+  },
+
+  /* =====================
+     TITULO
+     ===================== */
+  title: {
+    fontSize: 16,
+    marginBottom: 10,
+    fontWeight: 'bold',
+  },
+
+  /* =====================
+     CONTENIDO
+     ===================== */
+  content: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+
+  /* =====================
+     FIRMA
+     ===================== */
+  signature: {
+    marginTop: 50,
+    borderTop: '1px solid #000',
+    paddingTop: 10,
+    fontSize: 10,
+    textAlign: 'left',
+    marginLeft: 50,
+  },
+  signatureData: {
+    marginBottom: 3,
+  },
+
+  /* =====================
+     FOOTER
+     ===================== */
+  footer: {
+    position: 'absolute',
+    bottom: 30,
+    left: 50,
+    right: 50,
+    textAlign: 'center',
+    paddingTop: 10,
+    borderTop: '1px solid black', // línea del footer
+  },
+  footerText: {
+    fontSize: 10,
+    textAlign: 'center',
+  },
 });
 
 // componente principal para generar documentos pdf
 export const DocumentoPDF = ({ tipo, contenido }) => {
   // datos estaticos temporales para la firma
   const datosEstaticos = {
-    nombre: "Juan Pérez",      // nombre del firmante
-    area: "Departamento Legal", // area del firmante
-    cargo: "Abogado",          // cargo del firmante
+    nombre: "Juan Pérez",
+    area: "Departamento Legal",
+    cargo: "Abogado",
   };
-  
-  // obtencion de fecha y hora actual
+
+  // fecha y hora actual
   const fecha = new Date();
-  const fechaFormateada = fecha.toLocaleDateString('es-AR');  // formato dd/mm/yyyy
-  const horaFormateada = fecha.toLocaleTimeString('es-AR');   // formato hh:mm:ss
-  
+  const fechaFormateada = fecha.toLocaleDateString('es-AR');
+  const horaFormateada = fecha.toLocaleTimeString('es-AR');
+
   return (
-    <Document> 
+    <Document>
       <Page size="A4" style={styles.page}>
-        {/* seccion de encabezado institucional */}
-        <View style={styles.header}>
-          <Text>Defensoría del Pueblo</Text>
-          <Text>Sistema de Gestión de Expedientes</Text>
+
+        {/* =====================
+            ENCABEZADO
+           ===================== */}
+        <View style={styles.headerContainer}>
+          <Image src="/Logo.png" style={styles.headerLogo} />
+
+          {/* Texto centrado global */}
+          <View style={styles.headerAbsoluteCenter}>
+            <Text style={styles.headerText}>Dirección General de Comercio</Text>
+            <Text style={styles.headerSubtext}>Santiago del Estero</Text>
+          </View>
         </View>
 
-        {/* seccion de fecha del documento */}
+        {/* LINEA SEPARADORA */}
+        <View style={styles.headerLine} />
+
+        {/* FECHA */}
         <View style={styles.date}>
           <Text>{fechaFormateada}</Text>
         </View>
 
-        {/* titulo dinamico segun tipo de documento */}
+        {/* TITULO SEGÚN TIPO */}
         <View style={styles.title}>
           <Text>
-            {tipo === 'dictamen' ? 'DICTAMEN LEGAL' : 
-             tipo === 'providencia' ? 'PROVIDENCIA SIMPLE' : 
-             tipo === 'decreto' ? 'DECRETO' :
-             tipo === 'imputacion' ? 'IMPUTACION' :
-             tipo === 'multa' ? 'MULTA' :
-             'DOCUMENTO'}
+            {tipo === 'dictamen' ? 'DICTAMEN LEGAL' :
+            tipo === 'providencia' ? 'PROVIDENCIA SIMPLE' :
+            tipo === 'decreto' ? 'DECRETO' :
+            tipo === 'imputacion' ? 'IMPUTACIÓN' :
+            tipo === 'multa' ? 'MULTA' :
+            'DOCUMENTO'}
           </Text>
         </View>
 
-        {/* contenido principal del documento */}
+        {/* CONTENIDO PRINCIPAL */}
         <View style={styles.content}>
           <Text>{contenido}</Text>
         </View>
 
-        {/* bloque de firma con datos del usuario */}
+        {/* FIRMA */}
         <View style={styles.signature}>
           <Text style={styles.signatureData}>{datosEstaticos.nombre}</Text>
           <Text style={styles.signatureData}>{datosEstaticos.area}</Text>
           <Text style={styles.signatureData}>{datosEstaticos.cargo}</Text>
-          <Text style={styles.signatureData}>{`${fechaFormateada} ${horaFormateada}`}</Text>
+          <Text style={styles.signatureData}>
+            {`${fechaFormateada} ${horaFormateada}`}
+          </Text>
         </View>
 
-        {/* pie de pagina institucional */}
+        {/* FOOTER */}
         <View style={styles.footer}>
-          <Text>Defensoría del Pueblo - Documento generado automáticamente</Text>
+          <Text style={styles.footerText}>
+            Defensoría del Pueblo - Documento generado automáticamente
+          </Text>
         </View>
+
       </Page>
     </Document>
   );
