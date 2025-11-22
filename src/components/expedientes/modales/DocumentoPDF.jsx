@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   /* FIRMA HORIZONTAL */
   signatureRow: {
     fontSize: 10,
-    textAlign: 'center',
+    textAlign: 'Left',
     marginTop: 10,
     marginBottom: 5,
   },
@@ -176,7 +176,7 @@ export const DocumentoPDF = ({ tipo, contenido }) => {
           </Text>
 
           <Text style={styles.footerText}>
-            Defensoría del Pueblo - Documento generado automáticamente
+            Documento generado automáticamente
           </Text>
         </View>
 
