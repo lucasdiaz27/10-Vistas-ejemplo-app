@@ -43,6 +43,20 @@ const personaOpcionalSchema = z
     return todosVacios ? undefined : persona;
   });
 
+// 🏢 Esquema para el denunciado (empresa / nombre de fantasía)
+const denunciadoPersonaSchema = z.object({
+  persona: z.object({
+    razonSocial: z.string().min(1, "La razón social o nombre de fantasía es requerida"),
+    propietario: z.string().optional(),
+    documento: z.string().optional(),
+    telefono: z.string().optional(),
+    email: z.preprocess(
+      (val) => (typeof val === "string" && val.trim() === "" ? undefined : val),
+      z.string().email({ message: "El email debe ser válido" }).optional()
+    ),
+  }),
+});
+
 // 👷‍♂️ Técnico: solo valida si hay datos
 const tecnicoSchema = z
   .object({
@@ -84,7 +98,7 @@ export const denunciaSchema = z.object({
   descripcion: z.string().min(1, { message: "La descripción es requerida" }),
   personas: z.tuple([
     personaConDelegadoSchema.extend({ persona: personaSchema }), // denunciante
-    personaConDelegadoSchema.extend({ persona: personaSchema }), // denunciado
+    denunciadoPersonaSchema, // denunciado 
     tecnicoSchema.optional(), // técnico opcional
   ]),
   notificar: z.boolean().optional(),
