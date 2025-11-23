@@ -27,10 +27,8 @@ export const agregarOrden = async (formData, token) => {
   return res.data;
 }
 
-
 export const actualizarOrden = async (ordenId, nuevoNombre, token) => {
   try {
-    
     const response = await authAxios.put(`${BASE_URL}/editarNombre/${ordenId}`, nuevoNombre, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -42,4 +40,13 @@ export const actualizarOrden = async (ordenId, nuevoNombre, token) => {
     console.error('Error al actualizar la orden:', error.response || error);
     throw error.response?.data || new Error('Error al actualizar la orden');
   }
+};
+
+// NUEVA FUNCIÓN PARA DESCARGAR EL ZIP 
+export const descargarZipOrdenes = async (expedienteId, token) => {
+  const res = await authAxios.get(`${BASE_URL}/descargarZip/${expedienteId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    responseType: 'blob', // ¡CRUCIAL! Indica que esperamos un archivo binario
+  });
+  return res.data; // Devuelve el Blob del ZIP
 };
