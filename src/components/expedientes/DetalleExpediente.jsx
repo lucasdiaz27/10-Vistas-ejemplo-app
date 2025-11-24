@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
 import ExpedientePDF from "./ExpedientePDF";
 import ModalEditarExpediente from "./modales/ModalEditarExpediente";
-import FormularioPaseModal from "./modales/FormularioPaseModal";
+import FormularioPaseModal from "./modales/FormularioPaseModal"; 
 import TablaAudiencias from "./TablaAudiencias";
 import ModalAudiencia from "./ModalAudiencia";
 import { ArchivosDenuncia } from "../detalle-denuncia/ArchivosDenuncia";
@@ -17,7 +17,7 @@ import ModalEditarOrden from "./modales/ModalEditarOrden";
 import Swal from "sweetalert2";
 import { useExpediente } from "../../hooks/useExpediente";
 import { useAudiencias } from "../../hooks/useAudiencias";
-import { usePases } from "../../hooks/usePases";
+import { usePases } from "../../hooks/usePases"; 
 import { ModalPdf } from "./modales/ModalPdf";
 import { useOrdenes } from "../../hooks/useOrdenes";
 
@@ -39,7 +39,11 @@ export default function DetalleExpediente() {
 
   const { expediente, cargando, error, setExpediente } = useExpediente(id);
   const { audiencias, guardarAudiencia, borrarAudiencia} = useAudiencias(id, setMensaje);
-  const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes, actualizarOrden } = useOrdenes(id, setMensaje);
+  
+  
+  const { ordenes, descargarOrden, subirOrden, borrarOrden, fetchOrdenes, actualizarOrden, descargarTodoZip } = useOrdenes(id, setMensaje);
+
+  
   const { pases, guardarPase, borrarPase } = usePases(id, setMensaje, fetchOrdenes);
 
   useEffect(() => {
@@ -51,7 +55,7 @@ export default function DetalleExpediente() {
     }
   }, [expediente]);
 
-  // (Handlers de Audiencia y Pases sin cambios)
+  // Handlers...
   const handleNuevaAudiencia = () => {
     setModalAudiencia({ show: true, modo: "crear", audiencia: null });
   };
@@ -72,6 +76,8 @@ export default function DetalleExpediente() {
   const handleEliminarAudiencia = async (id) => {
     await borrarAudiencia(id);
   };
+
+  // Handlers Pases 
   const handleNuevoPase = () => {
     setModalPase({ show: true, modo: "crear", pase: null });
   };
@@ -85,10 +91,11 @@ export default function DetalleExpediente() {
   };
   const handleGuardarPase = async (paseData) => {
     setModalPase({ show: false, modo: null, pase: null });
+    // Si FormularioPaseModal en esta rama devuelve formData, lo pasamos directo
     await guardarPase(paseData, modalPase);
   };
 
-  // --- Handlers para la tabla de órdenes ---
+  // Handlers Órdenes
   const handlerSubirOrden = async (ordenData) => {
     await subirOrden(ordenData);
     setMostrarModalOrden(false);
@@ -121,7 +128,6 @@ export default function DetalleExpediente() {
     await actualizarOrden(ordenId, formData); 
     setModalEditarOrden({ show: false, orden: null }); 
   };
-  // --- Fin Handlers Órdenes ---
 
 
   if (cargando)
@@ -201,7 +207,6 @@ export default function DetalleExpediente() {
                   <i className="bi bi-pencil"></i>
                 </button>
               </h5>
-
               <p>
                 <strong>Número de Expediente:</strong>{" "}
                 {expediente.nro_exp ?? "-"}
@@ -265,7 +270,6 @@ export default function DetalleExpediente() {
                   )}
                 </div>
               </div>
-
               {estadoActual && (
                 <div className={`alert alert-${alertVariant} d-flex align-items-center mt-3`} role="alert">
                   <i className="bi bi-info-circle-fill me-3" style={{ fontSize: "1.5rem" }}></i>
@@ -302,9 +306,7 @@ export default function DetalleExpediente() {
           </div>
         </div>
       </div>
-      {/* --- FIN DE LA FILA 1 --- */}
 
-      {/* --- NUEVA ESTRUCTURA PARA Pases, Audiencias y Órdenes --- */}
       <div className="row g-4">
         <div className="col-12"> 
           <div className="card mb-4"> 
@@ -345,10 +347,11 @@ export default function DetalleExpediente() {
               </div>
               <div style={{ width: "100%" }}>
                 {tab === "pases" ? (
+                  // 4. USAMOS LA TABLA CON PROPS MANUALES 
                   <TablaPases
-                    pases={pases}
+                    pases={pases} // Pasamos el array manual
                     onEditar={handleEditarPase}
-                    onEliminar={handleEliminarPase}
+                    onEliminar={handleEliminarPase} // Pasamos el handler manual
                     onNuevo={handleNuevoPase}
                   />
                 ) : tab === "audiencias" ? (
@@ -360,6 +363,7 @@ export default function DetalleExpediente() {
                     personasInvolucradas={expediente.denuncia?.personas || []}
                   />
                 ) : (
+                  // 5. CONECTAMOS EL BOTÓN ZIP AQUÍ
                   <OrdenesTabla
                     ordenes={ordenes}
                     onDescargar={handleDescargarOrden}
@@ -367,6 +371,7 @@ export default function DetalleExpediente() {
                     onEditar={handleEditarOrdenClick}
                     onEliminar={handleEliminarOrden}
                     mostrarModalOrden={handlerModalOrden}
+                    onDescargarZip={descargarTodoZip} // <-- ¡ESTO ES LO NUEVO!
                   />
                 )}
               </div>
@@ -374,10 +379,7 @@ export default function DetalleExpediente() {
           </div>
         </div>
       </div>
-      {/* --- FIN DE LA NUEVA ESTRUCTURA --- */}
 
-
-      {/* --- Modales (sin cambios) --- */}
       {modalEditarOrden.show && (
         <ModalEditarOrden
           show={modalEditarOrden.show}
@@ -401,6 +403,8 @@ export default function DetalleExpediente() {
         expedienteId={expediente.id}
         onSubmitOrden={handlerSubirOrden}
       />
+
+      {/* 6. FORMULARIO PASE */}
       <FormularioPaseModal
         show={modalPase.show}
         handleClose={() =>
@@ -414,8 +418,9 @@ export default function DetalleExpediente() {
         }
         modo={modalPase.modo}
         pase={modalPase.pase}
-        onGuardar={handleGuardarPase}
+        onGuardar={handleGuardarPase} // Pasamos el handler viejo
       />
+      
       {mostrarModalEditar && (
         <ModalEditarExpediente
           expediente={expediente}
@@ -436,4 +441,3 @@ export default function DetalleExpediente() {
     </div>
   );
 }
-

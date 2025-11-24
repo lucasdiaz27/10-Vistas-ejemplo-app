@@ -4,11 +4,12 @@ import {
   agregarOrden,
   eliminarOrden,
   traerOrdenesPorExpediente,
-  actualizarOrden
+  actualizarOrden,
+  descargarZipOrdenes 
 } from "../apis/ordenesApi";
 import { traerArchivoPDF } from "../apis/apiDocumento";
 import { eliminarPase } from "../apis/pasesApi";
-import Swal from "sweetalert2"; // Importamos Swal para alertas más bonitas
+import Swal from "sweetalert2"; 
 
 export const useOrdenes = (id, setMensaje) => {
   const [ordenes, setOrdenes] = useState([]);
@@ -18,7 +19,6 @@ export const useOrdenes = (id, setMensaje) => {
     try {
       const data = await traerOrdenesPorExpediente(id, token);
 
-    
       const dataLimpia = data.map(orden => {
         if (orden.nombreVisible &&
           orden.nombreVisible.startsWith('"') &&
@@ -30,7 +30,6 @@ export const useOrdenes = (id, setMensaje) => {
         }
         return orden;
       });
-     
 
       setOrdenes(dataLimpia); 
     } catch {
@@ -54,7 +53,6 @@ export const useOrdenes = (id, setMensaje) => {
     }
   };
 
-  // --- 2. NUEVA FUNCIÓN PARA MANEJAR LA ACTUALIZACIÓN ---
   const handleActualizarOrden = async (ordenId, data) => {
     const token = localStorage.getItem("token");
     try {
@@ -65,7 +63,6 @@ export const useOrdenes = (id, setMensaje) => {
       Swal.fire('Error', 'No se pudo actualizar la orden.', 'error');
     }
   };
-  // --- FIN DE LA MODIFICACIÓN ---
 
   const descargarOrden = async (orden) => {
     try {
@@ -79,12 +76,53 @@ export const useOrdenes = (id, setMensaje) => {
       link.click();
       document.body.removeChild(link);
     } catch (err) {
-      Swal.fire('Error', 'No se pudo descargar el documento.', 'error'); // Usamos Swal
+      Swal.fire('Error', 'No se pudo descargar el documento.', 'error'); 
+    }
+  };
+
+  // NUEVA FUNCIÓN: DESCARGAR ZIP COMPLETO
+  const descargarTodoZip = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      
+      // Feedback visual de carga
+      Swal.fire({
+        title: 'Generando ZIP...',
+        text: 'Comprimiendo documentos, por favor espere.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // 1. Llamamos a la API (esperamos el Blob)
+      const blob = await descargarZipOrdenes(id, token);
+      
+      // 2. Creamos un link temporal para forzar la descarga
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Expediente_${id}_Documentos.zip`); // Nombre del archivo
+      document.body.appendChild(link);
+      link.click();
+      
+      // 3. Limpieza
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      // Cerramos el loading
+      Swal.close();
+      
+      // Mensaje opcional de éxito (a veces la descarga es suficiente feedback)
+      // Swal.fire('Descarga iniciada', 'El archivo ZIP se está descargando.', 'success');
+
+    } catch (err) {
+      console.error(err);
+      Swal.fire('Error', 'No se pudo descargar el ZIP. Verifique que existan documentos.', 'error');
     }
   };
 
   const borrarOrden = async (orden) => {
-    // 3. MEJORA: Usamos Swal para confirmar
     const result = await Swal.fire({
       title: '¿Estás seguro?',
       text: `¿Deseas eliminar la orden "${orden.nombreVisible || orden.id}"?`,
@@ -101,12 +139,11 @@ export const useOrdenes = (id, setMensaje) => {
     }
 
     try {
-      // TODO: implementar eliminarOrden en ordenesApi.js
       if (orden.referencia == "Pase") {
         eliminarPase(orden.id_pase);
       } else if (orden.referencia == "Usuario Externo") {
-        Swal.fire('Acción denegada', 'No se puede eliminar un documento de usuario externo.', 'error'); // Usamos Swal
-        return; // Detenemos la ejecución
+        Swal.fire('Acción denegada', 'No se puede eliminar un documento de usuario externo.', 'error'); 
+        return; 
       }
       const token = localStorage.getItem("token");
       await eliminarOrden(orden.id, token);
@@ -117,7 +154,6 @@ export const useOrdenes = (id, setMensaje) => {
     }
   }
 
-  // 4. EXPORTAMOS LA NUEVA FUNCIÓN
   return {
     ordenes,
     descargarOrden,
@@ -125,6 +161,7 @@ export const useOrdenes = (id, setMensaje) => {
     borrarOrden,
     setOrdenes,
     fetchOrdenes,
-    actualizarOrden: handleActualizarOrden
+    actualizarOrden: handleActualizarOrden,
+    descargarTodoZip 
   };
 };
