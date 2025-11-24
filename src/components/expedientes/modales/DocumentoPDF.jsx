@@ -135,7 +135,7 @@ export const DocumentoPDF = ({ tipo, contenido }) => {
   const datosEstaticos = {
     nombre: tokenPayload?.nombre || tokenPayload?.name || "Usuario Desconocido",
     area: tokenPayload?.rol || tokenPayload?.role || "Sin rol asignado",
-    
+  
   };
 
   const fecha = new Date();
@@ -178,7 +178,7 @@ export const DocumentoPDF = ({ tipo, contenido }) => {
         <View style={styles.footer}>
           {/* FIRMA EN HORIZONTAL */}
           <Text style={styles.signatureRow}>
-            {`${datosEstaticos.nombre} – ${datosEstaticos.area} – ${datosEstaticos.cargo} – ${fechaFormateada} ${horaFormateada}`}
+            {`${datosEstaticos.nombre} – ${datosEstaticos.area} – ${fechaFormateada} ${horaFormateada}`}
           </Text>
 
           <Text style={styles.footerText}>
