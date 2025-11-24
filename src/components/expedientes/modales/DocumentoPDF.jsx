@@ -1,5 +1,6 @@
 // importaciones necesarias para crear pdfs
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { parseJwt, getAccessToken } from '../../../utils/auth';
 
 // Función para procesar HTML básico a componentes de react-pdf
 const parseHTML = (html) => {
@@ -126,10 +127,15 @@ const styles = StyleSheet.create({
 });
 
 export const DocumentoPDF = ({ tipo, contenido }) => {
+  // Obtener datos del usuario desde el token
+  const token = getAccessToken();
+  const tokenPayload = parseJwt(token);
+  
+  // Datos del usuario del token, con valores por defecto si no están disponibles
   const datosEstaticos = {
-    nombre: "Juan Pérez",
-    area: "Departamento Legal",
-    cargo: "Abogado",
+    nombre: tokenPayload?.nombre || tokenPayload?.name || "Usuario Desconocido",
+    area: tokenPayload?.rol || tokenPayload?.role || "Sin rol asignado",
+    
   };
 
   const fecha = new Date();
