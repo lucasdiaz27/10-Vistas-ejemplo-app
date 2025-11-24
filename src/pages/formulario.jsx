@@ -8,6 +8,7 @@ import { denunciaSchema } from "../validations/denunciaSchma";
 import { enviarDenuncia } from "../apis/apiDenuncia";
 import { Fab, Webchat } from "@botpress/webchat";
 import { showAlert } from "../utils/accessDenied";
+import { FormDenunciante } from "../components/formulario-denuncia/FormDenunciante";
 
 export const Formulario = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,7 +115,7 @@ export const Formulario = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="row">
               <div className="col-12 col-md-6">
-                <FormPersona
+                <FormDenunciante
                   register={register}
                   errors={errors}
                   tipoPersona={"Denunciante"}
