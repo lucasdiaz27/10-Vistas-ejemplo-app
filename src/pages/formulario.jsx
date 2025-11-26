@@ -80,7 +80,22 @@ export const Formulario = () => {
         rol: p.rol && p.rol !== "" ? p.rol : rolesPorIndice[idx] || "",
       }));
 
-      const dataFinal = { ...data, personas: personasNormalizadas };
+      // Compatibilidad: si el denunciado usa "razonSocial", mapearlo a "nombre"
+      // para que el JSON enviado al backend mantenga la misma forma que antes.
+      if (personasNormalizadas[1] && personasNormalizadas[1].persona) {
+        const personaDenunciado = personasNormalizadas[1].persona;
+        if (personaDenunciado.razonSocial && !personaDenunciado.nombre) {
+          personaDenunciado.nombre = personaDenunciado.razonSocial;
+          // mantener apellido como cadena vacía si no existe (estructura anterior)
+          personaDenunciado.apellido = personaDenunciado.apellido ?? "";
+          // opcional: eliminar "razonSocial" si no se desea enviarlo
+          delete personaDenunciado.razonSocial;
+        }
+      }
+
+  const dataFinal = { ...data, personas: personasNormalizadas };
+  // Para depuración: loguear el JSON final que se enviará al backend
+  console.log("Data final a enviar:", dataFinal);
       const files = fileInputRef.current?.files;
       if (!validarArchivos(files)) {
         showAlert({title: Error, text: "Selecciona al menos un archivo PDF con imágenes", icon: "error"})
