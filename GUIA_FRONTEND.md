@@ -1,6 +1,6 @@
 # Guía de Implementación Frontend - Seguridad del Backend
 
-## Para: Leonardo y Maximiliano (Equipo Frontend)
+## Para: Leonel y Maximiliano (Equipo Frontend)
 
 Esta guía contiene **TODOS los endpoints de seguridad** que el frontend debe integrar, con ejemplos de código listos para implementar.
 

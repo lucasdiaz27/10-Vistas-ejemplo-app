@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../validations/loginSchema';
 import { useNavigate } from 'react-router-dom';
 import { authAxios } from '../utils/auth';
+import { Link } from "react-router-dom";
+
 
 
 const Login = () => {
@@ -59,6 +61,14 @@ const Login = () => {
                         {errors.contraseña && <div className="text-danger">{errors.contraseña.message}</div>}
                     </div>
                     <button type="submit" className="btn btn-outline-light">INGRESAR</button>
+                    <div className="mt-3 text-center">
+    {/*<span className="text-light">¿No tenés cuenta? </span> */}
+    
+    <Link to="/registro" className="text-info">
+        Registo
+    </Link>
+</div>
+
                 </form>
             </div>
         </div>

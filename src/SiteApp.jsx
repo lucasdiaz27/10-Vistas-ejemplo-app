@@ -29,6 +29,7 @@ import { InternalLayout } from "./routes/InternalLayout";
 import { PaginaModal } from "./components/expedientes/modales/PaginaModal";
 import { ModalPdf } from "./components/expedientes/modales/ModalPdf";
 import PaginaTerminos from "./pages/PaginaTerminos";
+import Registro from "./pages/Registro";
 
 function SiteApp() {
   return (
@@ -49,6 +50,7 @@ function SiteApp() {
           <Route path="/formularioPersona" element={<FormPersona />} />
           <Route path="/consulta" element={<Consulta />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
           <Route path="/PaginaTerminos" element={<PaginaTerminos />} />
         </Route>
 

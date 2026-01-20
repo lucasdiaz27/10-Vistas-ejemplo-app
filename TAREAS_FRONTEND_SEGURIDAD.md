@@ -1,7 +1,7 @@
 # 📋 Tareas Frontend - Nuevas Features de Seguridad del Backend
 
 **Fecha:** 9 de enero de 2026  
-**Para:** Leonardo y Maximiliano  
+**Para:** Leonel y Maximiliano  
 **Basado en:** Nueva implementación de seguridad del backend
 
 ---
@@ -19,7 +19,7 @@ El backend acaba de implementar **5 capas de seguridad**:
 - Página de **Registro** (Leo)
 - Manejo de error **429 (Rate Limiting)** (Ambos)
 - **CRUD de Expedientes** (Maxi)
-- **Gestión de Usuario** (Leo o Maxi)
+- **Gestión de Usuario** (Leo)
 - **Panel de Auditoría** (Maxi - solo si hay ADMIN)
 - **APIs faltantes** (Ambos)
 

@@ -1,10 +1,26 @@
 // src/pages/Ajustes.jsx (VERSIÓN FINAL Y COMPLETA)
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { obtenerPerfilUsuario, actualizarPerfilUsuario, cambiarPassword } from "../apis/apiUsuarios";
 
 const Ajustes = () => {
+
+  const navigate = useNavigate();
+
+  const handleAuthError = (err) => {
+    const status = err?.response?.status;
+    if (status === 401 || status === 403) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken"); // si en tu app existe
+      Swal.fire("Sesión expirada", "Volvé a iniciar sesión.", "info");
+      navigate("/login");
+      return true;
+    }
+    return false;
+  };
+
   // Estados para manejar la UI, carga y errores
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -17,17 +33,27 @@ const Ajustes = () => {
     const cargarPerfil = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) throw new Error("Token no encontrado. Por favor, inicie sesión de nuevo.");
+
+        if (!token) {
+          Swal.fire("Sesión expirada", "Volvé a iniciar sesión.", "info");
+          navigate("/login");
+          return;
+        }
+
         const data = await obtenerPerfilUsuario(token);
         setForm(data);
+
       } catch (err) {
-        setError(err.message);
+        if (handleAuthError(err)) return;
+        setError(err.response?.data || err.message);
       } finally {
         setCargando(false);
       }
     };
+
     cargarPerfil();
   }, []);
+
 
   // Funciones para manejar los cambios y envíos de los formularios
   const handleFormChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,20 +62,52 @@ const Ajustes = () => {
   const handleGuardarCambios = async () => {
     try {
       const token = localStorage.getItem("token");
-      const { email, area, ...datosParaActualizar } = form;
+
+      if (!token) {
+        Swal.fire("Sesión expirada", "Volvé a iniciar sesión.", "info");
+        navigate("/login");
+        return;
+      }
+
+      // Validación mínima
+      if (!form.nombre?.trim() || !form.apellido?.trim()) {
+        Swal.fire("Error", "Nombre y apellido no pueden estar vacíos.", "error");
+        return;
+      }
+
+      // Enviar SOLO lo que corresponde a "actualizarNombre"
+      const datosParaActualizar = {
+        nombre: form.nombre,
+        apellido: form.apellido,
+        // si backend lo usa:
+        // name: form.name,
+      };
+
       const mensaje = await actualizarPerfilUsuario(datosParaActualizar, token);
       Swal.fire("¡Éxito!", mensaje, "success");
     } catch (err) {
+      if (handleAuthError(err)) return;
       Swal.fire("Error", err.response?.data || "No se pudieron guardar los cambios.", "error");
     }
   };
 
+
   const handlePasswordSubmit = async () => {
+    if (!passwords.actual || !passwords.nueva || !passwords.repetir) {
+      Swal.fire("Error", "Completá todos los campos.", "error");
+      return;
+    }
+
+    if (passwords.nueva.length < 8) {
+      Swal.fire("Error", "La nueva contraseña debe tener al menos 8 caracteres.", "error");
+      return;
+    }
+
     if (passwords.nueva !== passwords.repetir) {
       Swal.fire("Error", "Las nuevas contraseñas no coinciden.", "error");
       return;
     }
-    // Lógica de SweetAlert para confirmar
+
     Swal.fire({
       title: "¿Estás seguro?",
       text: "Esta acción cambiará tu contraseña.",
@@ -58,18 +116,27 @@ const Ajustes = () => {
       confirmButtonText: "Sí, cambiar",
       cancelButtonText: "Cancelar",
     }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const token = localStorage.getItem("token");
-          const msg = await cambiarPassword(passwords, token);
-          Swal.fire("Éxito", msg, "success");
-          setPasswords({ actual: "", nueva: "", repetir: "" });
-        } catch (err) {
-          Swal.fire("Error", err.response?.data || "No se pudo cambiar la contraseña.", "error");
+      if (!result.isConfirmed) return;
+
+      try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          Swal.fire("Sesión expirada", "Volvé a iniciar sesión.", "info");
+          navigate("/login");
+          return;
         }
+
+        const msg = await cambiarPassword(passwords, token);
+        Swal.fire("Éxito", msg, "success");
+        setPasswords({ actual: "", nueva: "", repetir: "" });
+      } catch (err) {
+        if (handleAuthError(err)) return;
+        Swal.fire("Error", err.response?.data || "No se pudo cambiar la contraseña.", "error");
       }
     });
   };
+
 
   // Renderizado condicional
   if (cargando) return <div className="p-4">Cargando perfil...</div>;
