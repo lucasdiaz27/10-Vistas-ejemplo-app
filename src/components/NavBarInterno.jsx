@@ -1,7 +1,22 @@
 import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { useState, useEffect } from "react";
 
 export const NavBarInterno = () => {
   const navigate = useNavigate();
+  const [rol, setRol] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setRol(decoded.rol || decoded.role);
+      } catch (e) {
+        setRol(null);
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -42,8 +57,8 @@ export const NavBarInterno = () => {
             <ul className="navbar-nav mx-auto">
               <li className="nav-item me-5">
                 <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=mesa-entrada">
-  Mesa de Entrada
-</Link>
+                  Mesa de Entrada
+                </Link>
 
               </li>
               <li className="nav-item me-5">
@@ -66,6 +81,13 @@ export const NavBarInterno = () => {
                   Ajustes
                 </Link>
               </li>
+              {(rol === "ADMIN" || rol === "DIRECCION") && (
+                <li className="nav-item me-5">
+                  <Link className="nav-link text-white fw-semibold" to="/menu-interno?vista=auditoria">
+                    Auditoría
+                  </Link>
+                </li>
+              )}
             </ul>
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">

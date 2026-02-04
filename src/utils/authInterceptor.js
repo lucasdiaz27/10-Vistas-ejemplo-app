@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 // crear instancia de axios para las llamadas autenticadas
 const axiosInstance = axios.create({
@@ -28,13 +29,13 @@ const isTokenExpired = (token) => {
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
     const parsed = JSON.parse(jsonPayload);
     const expirationTime = parsed.exp * 1000; // tiempo de expiración en milisegundos
     const currentTime = Date.now();
-    
+
     return currentTime >= expirationTime;
   } catch (error) {
     console.error('Error al decodificar token:', error);
@@ -56,7 +57,7 @@ axiosInstance.interceptors.request.use(
       // console.log('Estado del token:', { expired,
       //   url: config.url,
       //   isRefreshUrl: config.url.includes('/auth/refresh') });
-      
+
       if (expired && !config.url.includes('/auth/refresh')) {
         // console.log('⚠️ Token expirado, se lanzará error 401');
         // En lugar de throw axios.Cancel, retornamos Promise.reject
@@ -65,9 +66,9 @@ axiosInstance.interceptors.request.use(
           config: config
         });
       }
-      
+
       config.headers.Authorization = `Bearer ${token}`;
-    } 
+    }
     return config;
   },
   (error) => {
@@ -92,12 +93,33 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
 
-    // si el error es 403, redirigimos al login directamente
+    // si el error es 429 (Rate Limit), mostramos una alerta amigable
+    if (error.response?.status === 429) {
+      Swal.fire({
+        icon: 'warning',
+        title: '¡Epa! Vas muy rápido',
+        text: 'Por seguridad, espera unos segundos antes de intentar de nuevo.',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#3085d6',
+        background: '#f8fafc',
+        customClass: {
+          title: 'swal2-title-modern',
+          popup: 'swal2-popup-modern',
+        },
+        showClass: {
+          popup: 'animate__animated animate__fadeInDown'
+        },
+        hideClass: {
+          popup: 'animate__animated animate__fadeOutUp'
+        }
+      });
+      return Promise.reject(error);
+    }
+
+    // si el error es 403, NO debemos desloguear automáticamente.
+    // Dejamos que el componente maneje el error (ej: mostrando un mensaje).
     if (error.response?.status === 403) {
-      // console.log('🚫 Acceso prohibido (403), redirigiendo al login');
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      window.location.href = '/login';
+      // console.log('🚫 Acceso prohibido (403), pasando error al componente');
       return Promise.reject(error);
     }
 
@@ -128,7 +150,7 @@ axiosInstance.interceptors.response.use(
     isRefreshing = true;
 
     const refreshToken = localStorage.getItem('refreshToken');
-    
+
     if (!refreshToken) {
       // console.log('❌ No hay refresh token disponible');
       isRefreshing = false;
@@ -145,27 +167,27 @@ axiosInstance.interceptors.response.use(
       // console.log('✅ Refresh token exitoso');
 
       const { access_token: newToken, refresh_token: newRefreshToken } = response.data;
-      
+
       localStorage.setItem('token', newToken);
       localStorage.setItem('refreshToken', newRefreshToken);
-      
+
       originalRequest.headers.Authorization = `Bearer ${newToken}`;
-      
+
       processQueue(null, newToken);
       console.log('✅ Cola de peticiones procesada con éxito');
-      
+
       return axiosInstance(originalRequest);
     } catch (refreshError) {
       console.log('❌ Error fatal durante el refresh:', refreshError);
       processQueue(refreshError, null);
-      
-    if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+
+      if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
         console.log('🚪 Refresh token inválido o expirado, redirigiendo al login');
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';
       }
-      
+
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

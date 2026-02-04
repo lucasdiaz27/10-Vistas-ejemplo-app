@@ -17,6 +17,16 @@ export const enviarDenuncia = async (data, files) => {
   });
 };
 
+// --- NUEVO ENDPOINT SEGUN GUIA_FRONTEND.MD (JSON PURO) ---
+export const crearDenuncia = async (data, token) => {
+  // POST /denuncia
+  const res = await authAxios.post(`${BASE_URL}`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
+
+
 export const traerDenuncias = async (token) => {
   const res = await authAxios.get(`${BASE_URL}/traerDenuncia`, {
     headers: {
@@ -68,7 +78,7 @@ export const traerDocDenuncia = async (id, token) => {
 }
 
 export const mandarCorreo = async (id, observacion, token) => {
-  return authAxios.post(`${BASE_URL}/mandarCorreo/${id}`, 
+  return authAxios.post(`${BASE_URL}/mandarCorreo/${id}`,
     observacion, {
     headers: {
       Authorization: `Bearer ${token}`,

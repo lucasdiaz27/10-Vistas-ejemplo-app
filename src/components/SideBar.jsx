@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import "./SideBar.css";
+import "./SideBar.css"; // Asegurate que este archivo exista o comenta esta línea si da error
 import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
@@ -70,15 +70,14 @@ export const SideBar = ({ abierto, setAbierto }) => {
       )}
 
       <div
-        className={`sidebar bg-dark text-white p-3 position-fixed top-0 start-0 h-100 ${
-          abierto ? "sidebar-open" : "sidebar-closed"
-        }`}
+        className={`sidebar bg-dark text-white p-3 position-fixed top-0 start-0 h-100 ${abierto ? "sidebar-open" : "sidebar-closed"
+          }`}
         style={{ width: "280px", transition: "transform 0.3s ease", zIndex: 1051 }}
       >
         <button
           className="btn btn-outline-light position-fixed top-0 start-0 m-2 z-3"
           onClick={toggleSidebar}
-          style={{ zIndex: 1051 }} // asegúrate que esté encima del sidebar
+          style={{ zIndex: 1051 }}
         >
           <i className="bi bi-list"></i>
         </button>
@@ -104,74 +103,74 @@ export const SideBar = ({ abierto, setAbierto }) => {
           <li className="nav-item">
             <Link
               to="/menu-interno?vista=mesa-entrada"
-              className={`nav-link text-white ${
-                vistaActual === "mesa-entrada" ? "active" : ""
-              }`}
+              className={`nav-link text-white ${vistaActual === "mesa-entrada" ? "active" : ""
+                }`}
             >
               <i className="bi bi-house-door me-2"></i>
               Mesa de Entrada
             </Link>
           </li>
+
           {/* Solo mostrar el resto si NO es MESA_ENTRADA */}
           {rol !== "MESA_ENTRADA" && (
             <>
-              {/* <li>
-                                <Link to="/menu-interno?vista=pases" className={`nav-link text-white  ${vistaActual === "pases" ? "active" : ""}`}>
-                                    <i className="bi bi-speedometer2 me-2"></i>
-                                    Pases
-                                </Link>
-                            </li> */}
-              {(rol === "DIRECCION" || rol === "ABOGADOS" || rol === "ASESORIA_LEGAL") && (
+              {(rol === "DIRECCION" || rol === "ABOGADOS" || rol === "ASESORIA_LEGAL" || rol === "ADMIN") && (
                 <li>
                   <Link
                     to="/menu-interno?vista=expedientes"
-                    className={`nav-link text-white ${
-                      vistaActual === "expedientes" ? "active" : ""
-                    }`}
+                    className={`nav-link text-white ${vistaActual === "expedientes" ? "active" : ""
+                      }`}
                   >
                     <i className="bi bi-table me-2"></i>
                     Expedientes
                   </Link>
                 </li>
               )}
-              {rol ==
-                "DIRECCION" && (
-                  <li>
-                    <Link
-                      to="/menu-interno?vista=usuarios"
-                      className={`nav-link text-white ${
-                        vistaActual === "usuarios" ? "active" : ""
+
+              {/* ✅ MODULO USUARIOS: Visible para ADMIN y DIRECCION */}
+              {(rol === "DIRECCION" || rol === "ADMIN") && (
+                <li>
+                  <Link
+                    to="/menu-interno?vista=usuarios"
+                    className={`nav-link text-white ${vistaActual === "usuarios" ? "active" : ""
                       }`}
-                    >
-                      <i className="bi bi-grid me-2"></i>
-                      Usuarios
-                    </Link>
-                  </li>
-                )}
-              {/* NUEVO: Acceso temporal para probar el generador de PDF */}
-              {/* <li>
-                                <Link to="/menu-interno?vista=prueba-pdf" className={`nav-link text-white ${vistaActual === "prueba-pdf" ? "active" : ""}`}>
-                                    <i className="bi bi-file-earmark-pdf me-2"></i>
-                                    Prueba PDF
-                                </Link>
-                            </li> */}
+                  >
+                    <i className="bi bi-grid me-2"></i>
+                    Usuarios
+                  </Link>
+                </li>
+              )}
+
+              {/* ✅ MODULO AUDITORÍA: Visible para ADMIN y DIRECCION */}
+              {(rol === "ADMIN" || rol === "DIRECCION") && (
+                <li>
+                  <Link
+                    to="/auditoria"
+                    className={`nav-link text-white ${location.pathname === "/auditoria" ? "active" : ""
+                      }`}
+                  >
+                    <i className="bi bi-shield-lock me-2"></i>
+                    Auditoría
+                  </Link>
+                </li>
+              )}
             </>
           )}
+
           <Link
             to="/ajustes"
-            className={`nav-link text-white ${
-              location.pathname === "/ajustes" ? "active" : ""
-            }`}
+            className={`nav-link text-white ${location.pathname === "/ajustes" ? "active" : ""
+              }`}
           >
             <i className="bi bi-people me-2"></i>
             Ajustes
           </Link>
+
           <li>
             <Link
               to="/login"
-              className={`nav-link text-white ${
-                vistaActual === "cerrarsesion  " ? "active" : ""
-              }`}
+              className={`nav-link text-white ${vistaActual === "cerrarsesion" ? "active" : ""
+                }`}
               onClick={handleLogout}
               style={{ cursor: "pointer" }}
             >
@@ -191,12 +190,6 @@ export const SideBar = ({ abierto, setAbierto }) => {
             <i className="bi bi-person-circle me-2"></i>
             <strong>{userName || "Usuario"}</strong>
           </a>
-          {/* <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
-                        <li><a className="dropdown-item" href="#">Settings</a></li>
-                        <li><a className="dropdown-item" href="#">Profile</a></li>
-                        <li><hr className="dropdown-divider" /></li>
-                        <li><a className="dropdown-item" href="#">Sign out</a></li>
-                    </ul> */}
         </div>
       </div>
     </>

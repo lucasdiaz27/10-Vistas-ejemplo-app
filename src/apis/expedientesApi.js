@@ -4,17 +4,66 @@ import { authAxios } from '../utils/auth';
 
 const BASE_URL = "/expediente";
 
-export const traerExpedientes = async (token) => {
-  const res = await authAxios.get(`${BASE_URL}/traerExpedientes`);
-  return res.data;
-};
-export const traerExpedientePorId = async (id, token) => {
-  const res = await authAxios.get(`${BASE_URL}/traerExpedientePorId/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+
+// --- ENDPOINTS SEGÚN GUIA_FRONTEND.MD ---
+
+export const crearExpediente = async (data, token) => {
+  // POST /expediente
+  const res = await authAxios.post(`${BASE_URL}`, data, {
+    headers: { Authorization: `Bearer ${token}` }
   });
   return res.data;
+};
+
+export const obtenerExpedientePorId = async (id, token) => {
+  // GET /expediente/{id}
+  const res = await authAxios.get(`${BASE_URL}/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
+
+export const borrarExpediente = async (id, token) => {
+  // DELETE /expediente/{id}
+  const res = await authAxios.delete(`${BASE_URL}/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
+
+export const modificarExpediente = async (id, data, token) => {
+  // PUT /expediente/{id}
+  const res = await authAxios.put(`${BASE_URL}/${id}`, data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return res.data;
+};
+
+
+// --- ENDPOINTS LEGACY (Mantenidos por compatibilidad) ---
+
+export const traerExpedientes = async (token) => {
+  // TODO: Verificar si el backend soporta GET /expediente para la lista estándar.
+  // Por ahora mantenemos el endpoint viejo.
+  // Intento 1: REST estándar GET /expediente
+  try {
+    const res = await authAxios.get(`${BASE_URL}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return res.data;
+  } catch (error) {
+    console.warn("GET /expediente falló, intentando legacy /traerExpedientes", error);
+    // Fallback legacy
+    const res2 = await authAxios.get(`${BASE_URL}/traerExpedientes`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return res2.data;
+  }
+};
+
+export const traerExpedientePorId = async (id, token) => {
+  // Redireccionamos al nuevo si es compatible, o dejamos el viejo
+  return obtenerExpedientePorId(id, token);
 };
 
 export const validarYActualizarExpediente = async (id, nuevoEstado, callbackActualizarOCrear, token) => {
@@ -61,12 +110,7 @@ export const crearExpedienteDesdeDenuncia = async (denunciaId, token) => {
 };
 
 export const actualizarExpediente = async (id, expedienteActualizado, token) => {
-  const res = await authAxios.put(`${BASE_URL}/${id}`, expedienteActualizado, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  return res.data;
+  return modificarExpediente(id, expedienteActualizado, token);
 };
 
 export const existeExpedienteParaDenuncia = async (denunciaId, token) => {
@@ -78,16 +122,7 @@ export const existeExpedienteParaDenuncia = async (denunciaId, token) => {
 };
 
 export const editarExpediente = async (id, expedienteUpdateDTO, token) => {
-  const res = await authAxios.put(
-    `${BASE_URL}/editarExpediente/${id}`,
-    expedienteUpdateDTO,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  return res.data;
+  return modificarExpediente(id, expedienteUpdateDTO, token);
 };
 
 export const traerPorUsuario = async (token) => {
@@ -99,21 +134,8 @@ export const traerPorUsuario = async (token) => {
   return res.data;
 };
 
-
-
-
-// despues agregar funciones como eliminarExpediente(id, token), etc.
-
-//await crearExpedienteDesdeDenuncia(denunciaId, token);
-// Recargar expedientes después de crear uno nuevo
-// const nuevosExpedientes = await traerExpedientes(token);
-// setExpedientes(nuevosExpedientes);
-
-
-// ale
-
 export const traerEstadoExpediente = async (nroExp) => { //expediente/traerEstados/
   const res = await authAxios.get(`${BASE_URL}/traerEstados/${nroExp}`);
-  console.log("Respuesta",res)
+  console.log("Respuesta", res)
   return res.data;
 }

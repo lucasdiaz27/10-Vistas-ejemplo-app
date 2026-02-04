@@ -1,131 +1,128 @@
 import React, { useEffect, useState } from "react";
-import { date } from "zod";
 import { Link } from "react-router-dom";
-import { traerDenuncias } from "../apis/apiDenuncia";
-import { FaEye, FaEdit } from "react-icons/fa";
+import { traerExpedientes, borrarExpediente } from "../apis/expedientesApi";
+import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 const Expedientetabla = () => {
   const [expedientes, setExpedientes] = useState([]);
   const [busqueda, setBusqueda] = useState("");
 
+  const cargarExpedientes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const data = await traerExpedientes(token);
+      setExpedientes(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error al cargar expedientes:", error);
+    }
+  };
+
   useEffect(() => {
-    const cargarExpedientes = async () => {
-      try {
-        const data = await traerDenuncias();
-        setExpedientes(data);
-      } catch (error) {
-        console.error("Error al cargar expedientes:", error);
-      }
-    };
     cargarExpedientes();
   }, []);
 
-  const getSolicitante = (personas) => {
-    if (!Array.isArray(personas) || personas.length === 0) return "";
-    return `${personas[0].nombre || ""} ${personas[0].apellido || ""}`;
-  };
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción no se puede deshacer",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
 
-  const getDniSolicitante = (personas) => {
-    if (!Array.isArray(personas) || personas.length === 0) return "";
-    return personas[0].documento || "";
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem('token');
+        await borrarExpediente(id, token);
+        Swal.fire('Eliminado', 'El expediente ha sido eliminado.', 'success');
+        cargarExpedientes();
+      } catch (error) {
+        Swal.fire('Error', 'No se pudo eliminar el expediente', 'error');
+      }
+    }
   };
 
   // Filtrado
   const expedientesFiltrados = expedientes.filter((exp) => {
-    const solicitante = getSolicitante(exp.personas).toLowerCase();
-    const dni = getDniSolicitante(exp.personas).toLowerCase();
-    const estado = (exp.estado ?? "").toLowerCase();
-    const nroOrden = (exp.nroOrden ?? "").toLowerCase();
+    const descripcion = (exp.descripcion || "").toLowerCase();
+    const tipo = (exp.tipo || "").toLowerCase();
     const texto = busqueda.toLowerCase();
     return (
-      solicitante.includes(texto) ||
-      dni.includes(texto) ||
-      estado.includes(texto) ||
-      nroOrden.includes(texto)
+      descripcion.includes(texto) ||
+      tipo.includes(texto) ||
+      String(exp.id).includes(texto)
     );
   });
 
   return (
     <div className="mb-4">
-      <input
-        type="text"
-        placeholder="Buscar por nombre, estado, número o DNI"
-        className="form-control mb-3"
-        style={{ width: "300px" }}
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-      />
-      <div className="overflow-x-auto shadow rounded-lg"></div>
-      <table className="min-w-full bg-white border border-gray-200 text-sm">
-        <thead className="bg-gray-100 text-left">
-          <tr>
-            <th className="px-4 py-2 border-b">ID</th>
-            <th className="px-4 py-2 border-b">Solicitante</th>
-            <th className="px-4 py-2 border-b">Objeto</th>
-            <th className="px-4 py-2 border-b">Motivo</th>
-            <th className="px-4 py-2 border-b">Descripcion</th>
-            <th className="px-4 py-2 border-b">Fecha de Ingreso</th>
-            <th className="px-4 py-2 border-b">Estado</th>
-            <th className="px-4 py-2 border-b">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {expedientesFiltrados && expedientesFiltrados.length > 0 ? (
-            expedientesFiltrados.map((exp) => (
-              <tr key={exp.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border-b">{exp.id}</td>
-                <td className="px-4 py-2 border-b">{getSolicitante(exp.personas)}</td>
-                <td className="px-4 py-2 border-b">{exp.objeto?.join(", ")}</td>
-                <td className="px-4 py-2 border-b">{exp.motivo?.join(", ")}</td>
-                <td className="px-4 py-2 border-b">{getDniSolicitante(exp.personas)}</td>
-                <td className="px-4 py-2 border-b">{exp.fechaIngreso}</td>
-                <td className="px-4 py-2 border-b">{exp.estado ?? "null"}</td>
-                <td className="px-4 py-2 d-flex align-items-center gap-2">
-                  <Link
-                    to={`/denuncia/${exp.id}`}
-                    className="btn btn-link p-0 text-primary"
-                    title="Ver detalle"
-                  >
-                    <FaEye />
-                  </Link>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <input
+          type="text"
+          placeholder="Buscar..."
+          className="form-control"
+          style={{ width: "300px" }}
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+        />
+        {/* Botón para crear nuevo expediente (si aplica UI directa) */}
+      </div>
 
-                  <button
-                    className="btn btn-link p-0 text-secondary"
-                    title="Editar"
-                    onClick={() => Swal.fire({
-                      icon: 'info',
-                      title: 'Funcionalidad pendiente',
-                      text: 'Todavía no anda esto xD',
-                      confirmButtonText: 'Ok',
-                      confirmButtonColor: '#00bcd4',
-                      background: '#f8fafc',
-                      customClass: {
-                        title: 'swal2-title-modern',
-                        popup: 'swal2-popup-modern',
-                      },
-                      showClass: {
-                        popup: 'animate__animated animate__fadeInDown'
-                      },
-                      hideClass: {
-                        popup: 'animate__animated animate__fadeOutUp'
-                      }
-                    })}
-                  >
-                    <FaEdit />
-                  </button>
+      <div className="overflow-x-auto shadow rounded-lg">
+        <table className="min-w-full bg-white border border-gray-200 text-sm">
+          <thead className="bg-gray-100 text-left">
+            <tr>
+              <th className="px-4 py-2 border-b">ID</th>
+              <th className="px-4 py-2 border-b">Descripción</th>
+              <th className="px-4 py-2 border-b">Tipo</th>
+              <th className="px-4 py-2 border-b">Fecha Creación</th>
+              <th className="px-4 py-2 border-b">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {expedientesFiltrados && expedientesFiltrados.length > 0 ? (
+              expedientesFiltrados.map((exp) => (
+                <tr key={exp.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-2 border-b">{exp.id}</td>
+                  <td className="px-4 py-2 border-b">{exp.descripcion}</td>
+                  <td className="px-4 py-2 border-b">
+                    <span className="badge bg-secondary">{exp.tipo}</span>
+                  </td>
+                  <td className="px-4 py-2 border-b">
+                    {exp.createdAt ? new Date(exp.createdAt).toLocaleDateString() : '-'}
+                  </td>
+                  <td className="px-4 py-2 d-flex align-items-center gap-2">
+                    <Link
+                      to={`/expediente/${exp.id}`}
+                      className="btn btn-link p-0 text-primary"
+                      title="Ver detalle"
+                    >
+                      <FaEye />
+                    </Link>
+                    <button
+                      className="btn btn-link p-0 text-danger"
+                      title="Eliminar"
+                      onClick={() => handleDelete(exp.id)}
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center py-4">
+                  No hay expedientes disponibles
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="7" className="text-center py-4">
-                No hay expedientes disponibles
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

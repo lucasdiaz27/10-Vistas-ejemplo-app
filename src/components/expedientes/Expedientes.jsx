@@ -14,15 +14,20 @@ export default function Expedientes() {
 
   useEffect(() => {
     const fetchExpedientes = async () => {
-        const token = localStorage.getItem("token");
-        const decoded = jwtDecode(token);
-        if (decoded.rol == "ADMIN") {
-          const data = await traerExpedientes(token);
-          setExpedientes(data);
-        } else {
-          const data = await traerPorUsuario(token);
-          setExpedientes(data);
-        }
+      const token = localStorage.getItem("token");
+      const decoded = jwtDecode(token);
+      // Roles que pueden ver TODOS los expedientes
+      const rolesInternos = ["ADMIN", "ABOGADOS", "DIRECCION", "MESA_DE_ENTRADA", "ASESORIA_LEGAL"];
+
+      if (rolesInternos.includes(decoded.rol)) {
+        console.log("Rol interno detectado:", decoded.rol, "- Trayendo todos los expedientes");
+        const data = await traerExpedientes(token);
+        setExpedientes(data);
+      } else {
+        console.log("Rol externo detectado:", decoded.rol, "- Trayendo expedientes por usuario");
+        const data = await traerPorUsuario(token);
+        setExpedientes(data);
+      }
       setExpedientes(data);
     };
     fetchExpedientes();
@@ -86,9 +91,9 @@ export default function Expedientes() {
         </div>
       </div>
 
-      <TablaExpedientes 
-        filtro={busqueda} 
-        data={expedientes} 
+      <TablaExpedientes
+        filtro={busqueda}
+        data={expedientes}
         setExpedientes={setExpedientes}
         elementosPorPagina={elementosPorPagina}
       />

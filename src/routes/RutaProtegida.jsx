@@ -2,7 +2,6 @@ import React from "react";
 import { Navigate, Outlet, useLocation, useSearchParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
-
 export default function ProtectedRoute() {
     const location = useLocation();
     const [searchParams] = useSearchParams();
@@ -21,17 +20,21 @@ export default function ProtectedRoute() {
 
         // console.log("ROL DETECTADO:", userRole);
 
-        //se define  las rutas permitidas para cada rol
+        // se define las rutas permitidas para cada rol
         const permisosPorRol = {
-            DIRECCION: ["/menu-interno", "/mesa-entrada", "/expedientes", "/usuarios", "/ajustes","/denuncia"],
-            MESA_DE_ENTRADA: ["/menu-interno", "/mesa-entrada", "/ajustes","/denuncia"],
-            ABOGADOS: ["/menu-interno", "/mesa-entrada", "/expedientes", "/ajustes","/denuncia"],
-            ASESORIA_LEGAL: ["/menu-interno", "/mesa-entrada", "/expedientes", "/ajustes","/denuncia"],
+            // ✅ AGREGADO "/auditoria" y soporte para ADMIN
+            DIRECCION: ["/menu-interno", "/mesa-entrada", "/expedientes", "/usuarios", "/ajustes", "/denuncia", "/auditoria"],
+            ADMIN: ["/menu-interno", "/mesa-entrada", "/expedientes", "/usuarios", "/ajustes", "/denuncia", "/auditoria"],
+
+            MESA_DE_ENTRADA: ["/menu-interno", "/mesa-entrada", "/ajustes", "/denuncia"],
+            ABOGADOS: ["/menu-interno", "/mesa-entrada", "/expedientes", "/ajustes", "/denuncia"],
+            ASESORIA_LEGAL: ["/menu-interno", "/mesa-entrada", "/expedientes", "/ajustes", "/denuncia"],
         };
 
-        // sub vistas dentro del menu interno)
+        // sub vistas dentro del menu interno
         const vistasPorRol = {
             DIRECCION: ["mesa-entrada", "expedientes", "usuarios", "ajustes"],
+            ADMIN: ["mesa-entrada", "expedientes", "usuarios", "ajustes"], // ✅ ADMIN también ve todo
             MESA_DE_ENTRADA: ["mesa-entrada", "ajustes"],
             ABOGADOS: ["mesa-entrada", "expedientes", "ajustes"],
             ASESORIA_LEGAL: ["mesa-entrada", "expedientes", "ajustes"],
@@ -43,7 +46,7 @@ export default function ProtectedRoute() {
             return <Navigate to="/menu-interno?vista=mesa-entrada" replace />;
         }
 
-        //se verificar si la ruta actual esta permitida
+        // se verificar si la ruta actual esta permitida
         const rutaActual = location.pathname;
         const rutasPermitidas = permisosPorRol[userRole];
         const tienePermiso = rutasPermitidas.some((ruta) =>
@@ -76,7 +79,6 @@ export default function ProtectedRoute() {
                 }
             }
         }
-
 
         // Si todo esta bien entonces se muestra el contenido protegido
         return <Outlet />;

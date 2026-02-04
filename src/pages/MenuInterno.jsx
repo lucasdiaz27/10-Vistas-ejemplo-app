@@ -14,6 +14,7 @@ import {
 import Expedientes from "../components/expedientes/Expedientes";
 import Pases from "../components/pases/Pases";
 import GeneradorPDF from "../components/pdf/GeneradorPDF"; // <-- Importa el nuevo componente
+import AuditoriaPanel from "../components/AuditoriaPanel";
 import { jwtDecode } from "jwt-decode";
 
 const MenuInterno = () => {
@@ -68,7 +69,9 @@ const MenuInterno = () => {
       const token = localStorage.getItem("token"); // <-- Obtén el token aquí
       const decode = jwtDecode(token);
       const getDenunciaPorRol = () => {
-        if (decode.rol === "DIRECCION" || decode.rol === "MESA_DE_ENTRADA") {
+        // Roles internos que ven TODAS las denuncias
+        const rolesInternos = ["DIRECCION", "MESA_DE_ENTRADA", "ABOGADOS", "ADMIN", "ASESORIA_LEGAL"];
+        if (rolesInternos.includes(decode.rol)) {
           return traerDenuncias(token);
         } else {
           return traerDenunciaPorUsuario(token);
@@ -83,8 +86,7 @@ const MenuInterno = () => {
                   id: d.id,
                   solicitante:
                     d.personas && d.personas.length > 0
-                      ? `${d.personas[0].nombre || ""} ${
-                          d.personas[0].apellido || ""
+                      ? `${d.personas[0].nombre || ""} ${d.personas[0].apellido || ""
                         }`.trim()
                       : "",
                   objeto: Array.isArray(d.objeto)
@@ -336,6 +338,7 @@ const MenuInterno = () => {
       {vista === "expedientes" && <Expedientes />}
       {vista === "formulario" && <p>Formulario interno</p>}
       {vista === "usuarios" && <VistaUsuarios2 />}
+      {vista === "auditoria" && <AuditoriaPanel />}
       {vista === "ajustes" && <p>Vista de ajustes (en construcción)</p>}
       {/* NUEVO: Opción para probar el generador de PDF */}
       {vista === "prueba-pdf" && (
@@ -348,5 +351,6 @@ const MenuInterno = () => {
     </div>
   );
 };
+
 
 export default MenuInterno;

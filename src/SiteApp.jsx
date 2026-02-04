@@ -30,6 +30,7 @@ import { PaginaModal } from "./components/expedientes/modales/PaginaModal";
 import { ModalPdf } from "./components/expedientes/modales/ModalPdf";
 import PaginaTerminos from "./pages/PaginaTerminos";
 import Registro from "./pages/Registro";
+import AuditoriaPanel from "./components/AuditoriaPanel";
 
 function SiteApp() {
   return (
@@ -61,6 +62,7 @@ function SiteApp() {
             <Route path="/lista-denuncias" element={<ListaDenuncias />} />
             <Route path="/denuncia/:id" element={<DetalleDenunciaPage />} />
             <Route path="/expedientes/:id" element={<DetalleExpediente />} />
+            <Route path="/auditoria" element={<AuditoriaPanel />} />
             <Route path="/ajustes" element={<Ajustes />} />
           </Route>
         </Route>
